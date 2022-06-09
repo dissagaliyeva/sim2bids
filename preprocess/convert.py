@@ -2,14 +2,14 @@ import os
 import re
 import glob
 import json
+import logging
 from scipy.io import loadmat
 
 
-
-
 class Lookup:
-    def __init__(self, path='data', limit=3):
-        self.path = self.find_path(path, limit=limit)
+    def __init__(self, path='data', limit=3, output='output'):
+        self.path   = self.find_path(path, limit=limit)
+        self.output = output
 
         # define extensions
         self.extensions = ['.mat', '.dcm', '.txt', '.img', '.eeg']
@@ -73,3 +73,10 @@ look = Lookup()
 look.lookup()
 print(look.path)
 print(look.eegs, look.imgs, look.txts, look.mats, look.dcms)
+
+
+def to_tsv(files, output='output'):
+    # create folder if not present
+    if not os.path.exists(output):
+        os.mkdir(output)
+
