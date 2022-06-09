@@ -5,19 +5,37 @@ import json
 from scipy.io import loadmat
 
 
-def convert_mat(path: str = '../data') -> str:
-    files = os.listdir(path)
 
 
-def lookup(path: str):
-    files = [x for x in os.listdir(path) if not x.startswith('.')]
+class Lookup:
+    def __init__(self, path='../data'):
+        self.path = path
 
-    # store directories
-    dirs = []
+        # empty lists to store found file extensions
+        self.dcms = []              # Dicom files
+        self.txts = []              # Text files
+        self.mats = []              # MATLAB files
+        self.eegs = []              # EEG files
+        self.imgs = []              # Docker files
 
-    for file in files:
-        if os.path.isdir(os.path.join(path, file)):
-            print(f'found folder: {file}')
+        # store all found files
+        self.files = []
+
+        # store directories
+        self.dirs = []
+
+    def lookup(self):
+        files = [x for x in os.listdir(self.path) if not x.startswith('.')]
+
+        for file in files:
+            # path =
+            if os.path.isdir(os.path.join(self.path, file)):
+                self.dirs.append(file)
+            # if
+
+        print(files)
+        print(self.dirs)
 
 
-lookup('C:/Users/wwwxd/Desktop/incf')
+look = Lookup()
+look.lookup()
