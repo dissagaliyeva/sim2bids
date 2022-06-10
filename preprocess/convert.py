@@ -80,15 +80,22 @@ print(look.path)
 print(look.eegs, look.imgs, look.txts, look.mats, look.dcms)
 
 
-def to_tsv(files, output='../output'):
+def to_tsv(val, output='../output'):
     # create folder if not present
     if not os.path.exists(output):
+        print(f'Creating folder `{output}`')
         os.mkdir(output)
 
-    file = loadmat(files)
-    fname = os.path.join(output, os.path.splitext(os.path.basename(files))[0])
-    pd.DataFrame(file['data']).to_csv(os.path.join(output, fname),
-                                      index=False, sep='\t', header=False)
+    def mat_to_csv(mat_path):
+        assert os.path.exists(mat_path), f'`{mat_path}` does not exist.'
+        mat = loadmat(mat_path)
+        f_name = os.path.join(output, os.path.splitext(os.path.basename(mat_path))[0])
+        pd.DataFrame(mat['data']).to_csv(os.path.join(output, f_name),
+                                         index=False, sep='\t', header=False)
+
+    if isinstance(val, str):
+        mat_to_csv(val)
+    elif isinstance(val, list):
 
 
-to_tsv('../data/timeseries_all.mat')
+to_tsv(look.mats)
