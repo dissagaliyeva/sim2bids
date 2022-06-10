@@ -111,11 +111,29 @@ def to_tsv(val, output='../output'):
 
 def check_filetype(files: [str, list]) -> str:
 
+    # check whether it's a directory
+    if os.path.isdir(files):
+        print('it is a folder')
+        # TODO: add functionality for directory traversal
+
     # check filetype
     if isinstance(files, str):
-        return os.path.splitext(os.path.basename(files))[1]
+        return get_filetype(files)
 
+    # traverse the whole array and verify they all have the same file extension
+    diff = set([get_filetype(file) for file in files])
+
+    if len(diff) == 1 and diff in ['.mat', '.txt']:
+        return str(diff)
+
+    raise TypeError('Files are not the same type or of different type. Accepted types: .mat, .txt')
+
+
+def get_filetype(file):
+    return os.path.splitext(os.path.basename(file))[1]
 
 
 # to_tsv(look.mats)
-print(check_filetype('../data/timeseries_all.mat'))
+print(check_filetype('../data/dcm'))
+
+
