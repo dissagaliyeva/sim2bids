@@ -74,13 +74,20 @@ class Lookup:
             print('Found folders:', self.dirs)
 
 
-look = Lookup()
-look.lookup()
-print(look.path)
-print(look.eegs, look.imgs, look.txts, look.mats, look.dcms)
+# look = Lookup()
+# look.lookup()
+# print(look.path)
+# print(look.eegs, look.imgs, look.txts, look.mats, look.dcms)
 
 
 def to_tsv(val, output='../output'):
+    """
+    Two file extensions will be passed: .mat, .txt
+    :param val:
+    :param output:
+    :return:
+    """
+
     # create folder if not present
     if not os.path.exists(output):
         print(f'Creating folder `{output}`')
@@ -93,9 +100,22 @@ def to_tsv(val, output='../output'):
         pd.DataFrame(mat['data']).to_csv(os.path.join(output, f_name),
                                          index=False, sep='\t', header=False)
 
-    if isinstance(val, str):
-        mat_to_csv(val)
-    elif isinstance(val, list):
+    # if isinstance(val, str):
+    #     mat_to_csv(val)
+    # elif isinstance(val, list):
+    #
+
+    # TODO: add file check (mat, txt)
+    # TODO: depending on the file, convert files to tsv (one function)
 
 
-to_tsv(look.mats)
+def check_filetype(files: [str, list]) -> str:
+
+    # check filetype
+    if isinstance(files, str):
+        return os.path.splitext(os.path.basename(files))[1]
+
+
+
+# to_tsv(look.mats)
+print(check_filetype('../data/timeseries_all.mat'))
