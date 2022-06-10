@@ -5,6 +5,9 @@ import json
 import logging
 from scipy.io import loadmat
 
+import numpy as np
+import pandas as pd
+
 
 class Lookup:
     def __init__(self, path='data', limit=3, output='output'):
@@ -32,7 +35,7 @@ class Lookup:
 
         # base case = raise error if not limit reached
         if limit == idx:
-            raise ValueError(f'No folder {path} present in all {limit} levels.')
+            raise ValueError(f'No folder `{path}` present in all {limit} levels.')
 
         # return path if found
         if os.path.exists(path):
@@ -40,7 +43,7 @@ class Lookup:
 
         # update index and file location
         idx += 1
-        path = os.path.join('', path)
+        path = os.path.join('..', path)
 
         # recursively call function
         return self.find_path(path, idx=idx)
@@ -67,6 +70,8 @@ class Lookup:
                 elif path.endswith('.img'):
                     self.imgs.append(path)
 
+        if self.dirs:
+            print('Found folders:', self.dirs)
 
 
 look = Lookup()
@@ -75,8 +80,15 @@ print(look.path)
 print(look.eegs, look.imgs, look.txts, look.mats, look.dcms)
 
 
-def to_tsv(files, output='output'):
+def to_tsv(files, output='../output'):
     # create folder if not present
     if not os.path.exists(output):
         os.mkdir(output)
 
+    file = loadmat(files)
+    fname = os.path.join(output, os.path.splitext(os.path.basename(files))[0])
+    pd.DataFrame(file['data']).to_csv(os.path.join(output, fname),
+                                      index=False, sep='\t', header=False)
+
+
+to_tsv('../data/timeseries_all.mat')
