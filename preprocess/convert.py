@@ -12,10 +12,10 @@ import pandas as pd
 TSV = ['.mat', '.txt']
 
 
-def to_tsv(val, output='../output'):
+def to_tsv(paths: [str, list], output='../output'):
     """
     Two file extensions will be passed: .mat, .txt
-    :param val:
+    :param path:
     :param output:
     :return:
     """
@@ -25,13 +25,22 @@ def to_tsv(val, output='../output'):
         print(f'Creating folder `{output}`')
         os.mkdir(output)
 
-    file_ext = check_filetype(val)
+    # convert to list
+    paths = [paths] if isinstance(paths, str) else paths
+
+    # get file types
+    file_ext = check_filetype(paths)
 
     if file_ext not in TSV:
-        raise ValueError(f'Incorrect file extension: {file_ext}. Expecting to get .mat, .txt only.')
+        raise ValueError(f'Incorrect file extension: {file_ext}. Expecting to get .mat or .txt files only.')
 
     # verify the path exists
-    assert os.path.exists(val), f'`{val}` does not exist.'
+    assert os.path.exists(paths), f'`{paths}` does not exist.'
+
+    if file_ext == TSV[0]:
+        [mat_to_tsv(path, output) for path in paths]
+    elif file_ext == TSV[1]:
+        [txt_to_tsv(path, output) for path in paths]
 
 
 def mat_to_tsv(mat_path, output):
@@ -42,17 +51,17 @@ def mat_to_tsv(mat_path, output):
     print(f'Converted MATLAB -> TSV @{f_name}')
 
 
+# TODO: come back to it when get enough data
 def txt_to_tsv(txt_path, output):
     # Option 1: normal txt file without header
-    pd.read_csv(txt_path)
+    pass
 
 
 def check_filetype(files: [str, list]) -> str:
-
     # check whether it's a directory
-    if os.path.isdir(files):
-        print('it is a folder')
-        # TODO: add functionality for directory traversal
+    # if os.path.isdir(files):
+    #     print(f'Got a folder {files} instead of file(s). Traversing the content...')
+    #     # TODO: add functionality for directory traversal
 
     # check filetype
     if isinstance(files, str):
