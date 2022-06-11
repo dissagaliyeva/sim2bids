@@ -35,7 +35,8 @@ def to_tsv(paths: [str, list], output='../output'):
         raise ValueError(f'Incorrect file extension: {file_ext}. Expecting to get .mat or .txt files only.')
 
     # verify the path exists
-    assert os.path.exists(paths), f'`{paths}` does not exist.'
+    # TODO: add path check for multiple files
+    # assert os.path.exists(paths), f'`{paths}` does not exist.'
 
     if file_ext == TSV[0]:
         [mat_to_tsv(path, output) for path in paths]
@@ -58,29 +59,22 @@ def txt_to_tsv(txt_path, output):
 
 
 def check_filetype(files: [str, list]) -> str:
-    # check whether it's a directory
-    # if os.path.isdir(files):
-    #     print(f'Got a folder {files} instead of file(s). Traversing the content...')
-    #     # TODO: add functionality for directory traversal
-
     # check filetype
     if isinstance(files, str):
         return get_filetype(files)
 
     # traverse the whole array and verify they all have the same file extension
-    diff = set([get_filetype(file) for file in files])
+    diff = [get_filetype(file) for file in files]
 
-    if len(diff) == 1 and diff in ['.mat', '.txt']:
-        return str(diff)
-
-    raise TypeError('Files are not the same type or of different type. Accepted types: .mat, .txt')
+    if len(diff) == 1 and np.unique(diff) in TSV:
+        return diff[0]
+    else:
+        raise TypeError('Files are not the same type or of different type. Accepted types: .mat, .txt')
 
 
 def get_filetype(file):
     return os.path.splitext(os.path.basename(file))[1]
 
 
-# to_tsv(look.mats)
-print(to_tsv('../data/dcm'))
-
+to_tsv('../data/timeseries_all.mat')
 
