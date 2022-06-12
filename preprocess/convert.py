@@ -40,9 +40,9 @@ def to_tsv(paths: [str, list], output='../output'):
 
 
 def mat_to_tsv(mat_path, output):
-    output  = output.replace('/', '\\')
-    mat     = loadmat(mat_path)
-    f_name  = os.path.join(output, os.path.splitext(os.path.basename(mat_path))[0])
+    output = output.replace('/', '\\')
+    mat = loadmat(mat_path)
+    f_name = os.path.join(output, os.path.splitext(os.path.basename(mat_path))[0])
 
     for col in ['data', 'CON01T1_ROIts', 'CON01T1_ROIts_DK68',
                 'FC_cc_DK68', 'FC_cc', 'ROI_ID_table']:
