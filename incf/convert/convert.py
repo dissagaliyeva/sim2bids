@@ -3,6 +3,7 @@ import re
 import glob
 import json
 import logging
+import shutil
 from scipy.io import loadmat
 
 import numpy as np
@@ -16,6 +17,7 @@ def to_tsv(paths: [str, list], output='../../output'):
     Two file extensions will be passed: .mat, .txt
     :param paths:
     :param output:
+    :param test:
     :return:
     """
 
@@ -42,7 +44,12 @@ def to_tsv(paths: [str, list], output='../../output'):
 def mat_to_tsv(mat_path, output):
     output = output.replace('/', '\\')
 
+    if os.stat(mat_path).st_size == 0:
+        print(f'File `{mat_path}` is empty. Skipping...')
+        return None
+
     mat = loadmat(mat_path)
+
     f_name = os.path.join(output, os.path.splitext(os.path.basename(mat_path))[0])
 
     for col in ['data', 'CON01T1_ROIts', 'CON01T1_ROIts_DK68',
@@ -79,4 +86,4 @@ def get_filetype(file):
     return os.path.splitext(os.path.basename(file))[1]
 
 
-# to_tsv(['../../data/timeseries_all.mat', '../../data/ses-preop/FC.mat'])
+to_tsv('../../data/ses-preop/HRF.mat')
