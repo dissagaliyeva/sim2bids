@@ -14,7 +14,7 @@ TSV = ['.mat', '.txt']
 def to_tsv(paths: [str, list], output='../../output'):
     """
     Two file extensions will be passed: .mat, .txt
-    :param path:
+    :param paths:
     :param output:
     :return:
     """
@@ -41,7 +41,7 @@ def to_tsv(paths: [str, list], output='../../output'):
 
 def mat_to_tsv(mat_path, output):
     output = output.replace('/', '\\')
-    print(output)
+
     mat = loadmat(mat_path)
     f_name = os.path.join(output, os.path.splitext(os.path.basename(mat_path))[0])
 
@@ -49,7 +49,8 @@ def mat_to_tsv(mat_path, output):
                 'FC_cc_DK68', 'FC_cc', 'ROI_ID_table']:
         if col in mat.keys():
             name = f'{f_name}_{col}.tsv'
-            pd.DataFrame(mat[col]).to_csv(os.path.join(output, name),
+
+            pd.DataFrame(mat[col]).to_csv(os.path.join(name),
                                           index=False, sep='\t', header=False)
             print(f'Converted MATLAB -> TSV @ `{name}`')
 
@@ -78,4 +79,4 @@ def get_filetype(file):
     return os.path.splitext(os.path.basename(file))[1]
 
 
-to_tsv(['../../data/timeseries_all.mat', '../../data/ses-preop/FC.mat'])
+# to_tsv(['../../data/timeseries_all.mat', '../../data/ses-preop/FC.mat'])
