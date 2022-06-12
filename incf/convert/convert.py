@@ -77,14 +77,12 @@ def check_filetype(files: [str, list]) -> str:
     # traverse the whole array and verify they all have the same file extension
     diff = np.unique([get_filetype(file) for file in files])
 
-    if len(diff) == 1 and diff in TSV:
+    if len(diff) == 1:
         return diff[0]
     else:
-        raise TypeError('Files are not the same type or of different type. Accepted types: .mat, .txt')
+        raise TypeError(f'Files are not of the same type. Accepted files: {TSV}')
 
 
 def get_filetype(file):
     return os.path.splitext(os.path.basename(file))[1]
 
-
-to_tsv('../../data/ses-preop/HRF.mat')

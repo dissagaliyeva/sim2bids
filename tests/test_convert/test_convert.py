@@ -11,7 +11,7 @@ from incf.util import rm_tree
 PATHS = ['../../data/timeseries_all.mat',
          '../../data/ses-preop/FC.mat']
 
-FAIL = ['../../data/ses-preop/HRF.mat']
+FAIL1 = ['../../data/ses-preop/HRF.mat']
 
 OUTPUT = '../../output'
 
@@ -49,16 +49,36 @@ class TestConvert(unittest.TestCase):
         rm_tree(OUTPUT)
 
         # verify empty files don't get processed
-        _ = convert.to_tsv(FAIL)
+        _ = convert.to_tsv(FAIL1)
         self.assertFalse(len(os.listdir(OUTPUT)) > 0)
 
         # remove all files
         rm_tree(OUTPUT)
         self.assertFalse(os.path.exists(OUTPUT))
 
-    def test_to_(self):
-        pass
+    def test_check_filetype(self):
+
+        # check .mat file
+        p1 = convert.check_filetype(PATHS[0])
+        self.assertTrue(p1, '.mat')
+
+        # check multiple .mat files
+        p2 = convert.check_filetype(PATHS)
+        self.assertTrue(p2, '.mat')
+
+        # verify .csv file
+        p3 = convert.check_filetype('../../data/ses-preop/HRF.csv')
+        self.assertTrue(p3, '.csv')
+
+        # verify .dcm file
+        p4 = convert.check_filetype('../../data/dcm/image-000350.dcm')
+        self.assertTrue(p4, '.dcm')
+
+        # verify exception
+        self.assertRaises(TypeError, convert.check_filetype,
+                          [PATHS[0], '../../data/ses-preop/HRF.csv'])
 
 
 if __name__ == '__main__':
     unittest.main()
+
