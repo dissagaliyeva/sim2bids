@@ -18,6 +18,9 @@ incf
      :target: https://pyup.io/repos/github/dissagaliyeva/incf/
      :alt: Updates
 
+.. image:: https://www.codefactor.io/repository/github/dissagaliyeva/incf/badge
+   :target: https://www.codefactor.io/repository/github/dissagaliyeva/incf
+   :alt: CodeFactor
 
 
 Holoviz app to load, transform, store, and download neuroscience data"
