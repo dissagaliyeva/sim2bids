@@ -11,6 +11,8 @@ from incf.util import rm_tree
 PATHS = ['../../data/timeseries_all.mat',
          '../../data/ses-preop/FC.mat']
 
+FAIL = ['../../data/ses-preop/HRF.mat']
+
 OUTPUT = '../../output'
 
 OUTPUT_FILE = ['../../output/timeseries_all_data.tsv',
@@ -43,7 +45,14 @@ class TestConvert(unittest.TestCase):
         for path in OUTPUT_FILE:
             self.assertTrue(os.path.exists(path))
 
-        # verify files deletion
+        # remove all files
+        rm_tree(OUTPUT)
+
+        # verify empty files don't get processed
+        _ = convert.to_tsv(FAIL)
+        self.assertFalse(len(os.listdir(OUTPUT)) > 0)
+
+        # remove all files
         rm_tree(OUTPUT)
         self.assertFalse(os.path.exists(OUTPUT))
 
