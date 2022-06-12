@@ -42,11 +42,12 @@ def to_tsv(paths: [str, list], output='../../output'):
 
 
 def mat_to_tsv(mat_path, output):
-    output = output.replace('/', '\\')
 
     if os.stat(mat_path).st_size == 0:
         print(f'File `{mat_path}` is empty. Skipping...')
-        return None
+        return
+
+    output = output.replace('/', '\\')
 
     mat = loadmat(mat_path)
 
