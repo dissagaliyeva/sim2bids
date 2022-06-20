@@ -13,12 +13,24 @@ TSV = ['.mat', '.txt']
 
 
 def to_tsv(paths: [str, list], output='../../output'):
-    """
-    Two file extensions will be passed: .mat, .txt
-    :param paths:
-    :param output:
-    :param test:
-    :return:
+    """Two file extensions will be passed: .mat, .txt
+
+    Parameters
+    ----------
+    paths :
+        param output:
+    test :
+        return:
+    paths: [str :
+        
+    list] :
+        
+    output :
+         (Default value = '../../output')
+
+    Returns
+    -------
+
     """
 
     # create folder if not present
@@ -42,6 +54,19 @@ def to_tsv(paths: [str, list], output='../../output'):
 
 
 def mat_to_tsv(mat_path, output):
+    """
+
+    Parameters
+    ----------
+    mat_path :
+        
+    output :
+        
+
+    Returns
+    -------
+
+    """
 
     if os.stat(mat_path).st_size == 0:
         print(f'File `{mat_path}` is empty. Skipping...')
@@ -65,11 +90,37 @@ def mat_to_tsv(mat_path, output):
 
 # TODO: come back to it when get enough data
 def txt_to_tsv(txt_path, output):
+    """
+
+    Parameters
+    ----------
+    txt_path :
+        
+    output :
+        
+
+    Returns
+    -------
+
+    """
     # Option 1: normal txt file without header
     pass
 
 
 def check_filetype(files: [str, list]) -> str:
+    """
+
+    Parameters
+    ----------
+    files: [str :
+        
+    list] :
+        
+
+    Returns
+    -------
+
+    """
     # check filetype
     if isinstance(files, str):
         return get_filetype(files)
@@ -84,6 +135,17 @@ def check_filetype(files: [str, list]) -> str:
 
 
 def get_filetype(file):
+    """
+
+    Parameters
+    ----------
+    file :
+        
+
+    Returns
+    -------
+
+    """
     return os.path.splitext(os.path.basename(file))[1]
 
 <<<<<<< HEAD
