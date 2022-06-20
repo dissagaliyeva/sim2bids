@@ -79,7 +79,7 @@ class Lookup:
 
         if self.dirs:
             print('Found folders:', self.dirs)
-            # TODO: add recursive folder lookup
+            # TODO: add recursive folder lookup (use os.walk)
 
 
 
