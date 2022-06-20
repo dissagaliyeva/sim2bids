@@ -13,6 +13,7 @@ FILE_EXT = ['.mat', '.txt', '.dcm', '.eeg', '.img', '.py']
 
 
 class Lookup:
+    """ """
     def __init__(self, path='data', limit=3, output='output'):
         self.path   = self.find_path(path, limit=limit)
         self.output = output
@@ -37,7 +38,19 @@ class Lookup:
         # self.
 
     def find_path(self, limit=3, idx=0):
-        """Recursively find path by traversing parent directory LIMIT times"""
+        """Recursively find path by traversing parent directory LIMIT times
+
+        Parameters
+        ----------
+        limit :
+             (Default value = 3)
+        idx :
+             (Default value = 0)
+
+        Returns
+        -------
+
+        """
 
         # base case = raise error if not limit reached
         if limit == idx:
@@ -56,6 +69,7 @@ class Lookup:
         return self.find_path(idx=idx)
 
     def lookup(self):
+        """ """
         files = [x for x in os.listdir(self.path) if not x.startswith('.')]
 
         for file in files:
