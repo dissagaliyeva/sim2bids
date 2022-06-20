@@ -50,10 +50,10 @@ class Lookup:
 
         # update index and file location
         idx += 1
-        path = os.path.join('..', self.path)
+        self.path = os.path.join('..', self.path)
 
         # recursively call function
-        return self.find_path(path, idx=idx)
+        return self.find_path(idx=idx)
 
     def lookup(self):
         files = [x for x in os.listdir(self.path) if not x.startswith('.')]

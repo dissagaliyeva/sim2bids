@@ -41,7 +41,7 @@ def to_tsv(paths: [str, list], output='../../output'):
 
 def mat_to_tsv(mat_path, output):
     output = output.replace('/', '\\')
-    print(output)
+
     mat = loadmat(mat_path)
     f_name = os.path.join(output, os.path.splitext(os.path.basename(mat_path))[0])
 
@@ -79,3 +79,4 @@ def get_filetype(file):
 
 
 to_tsv(['../../data/timeseries_all.mat', '../../data/ses-preop/FC.mat'])
+# print(os.path.exists('../../data/timeseries_all.mat'))
