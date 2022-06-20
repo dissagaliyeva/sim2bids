@@ -86,3 +86,9 @@ def check_filetype(files: [str, list]) -> str:
 def get_filetype(file):
     return os.path.splitext(os.path.basename(file))[1]
 
+<<<<<<< HEAD
+
+to_tsv(['../../data/timeseries_all.mat', '../../data/ses-preop/FC.mat'])
+# print(os.path.exists('../../data/timeseries_all.mat'))
+=======
+>>>>>>> 59d54fadb6085e3beced854cef6948636e9ba4ed
