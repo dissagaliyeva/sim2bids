@@ -35,7 +35,7 @@ def check_uuid(new_id):
 
     """
     if new_id in IDS:
-        print('Retrying to create a new UUID')
+        # print('Retrying to create a new UUID')
         check_uuid(create_uuid())
 
     IDS.append(new_id)
