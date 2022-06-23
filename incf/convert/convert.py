@@ -22,9 +22,9 @@ def to_tsv(paths: [str, list], output='../../output'):
     test :
         return:
     paths: [str :
-        
+
     list] :
-        
+
     output :
          (Default value = '../../output')
 
@@ -43,6 +43,7 @@ def to_tsv(paths: [str, list], output='../../output'):
 
     # get file types
     file_ext = check_filetype(paths)
+    print(file_ext)
 
     if file_ext not in TSV:
         raise ValueError(f'Incorrect file extension: {file_ext}. Expecting to get .mat or .txt files only.')
@@ -59,9 +60,9 @@ def mat_to_tsv(mat_path, output):
     Parameters
     ----------
     mat_path :
-        
+
     output :
-        
+
 
     Returns
     -------
@@ -95,16 +96,19 @@ def txt_to_tsv(txt_path, output):
     Parameters
     ----------
     txt_path :
-        
+
     output :
-        
+
 
     Returns
     -------
 
     """
-    # Option 1: normal txt file without header
-    pass
+
+    if not os.path.exists(output):
+        os.mkdir(output)
+    file = pd.read_csv(txt_path)
+    file.to_csv(os.path.join(output, 'distances.tsv'), index=False, sep='\t', header=False)
 
 
 def check_filetype(files: [str, list]) -> str:
@@ -113,9 +117,9 @@ def check_filetype(files: [str, list]) -> str:
     Parameters
     ----------
     files: [str :
-        
+
     list] :
-        
+
 
     Returns
     -------
@@ -140,7 +144,7 @@ def get_filetype(file):
     Parameters
     ----------
     file :
-        
+
 
     Returns
     -------
@@ -148,9 +152,7 @@ def get_filetype(file):
     """
     return os.path.splitext(os.path.basename(file))[1]
 
-<<<<<<< HEAD
 
-to_tsv(['../../data/timeseries_all.mat', '../../data/ses-preop/FC.mat'])
+# to_tsv(['../../data/timeseries_all.mat', '../../data/ses-preop/FC.mat'])
 # print(os.path.exists('../../data/timeseries_all.mat'))
-=======
->>>>>>> 59d54fadb6085e3beced854cef6948636e9ba4ed
+# to_tsv('../../data/txt_files/weights.txt')
