@@ -6,46 +6,37 @@ import panel as pn
 class MainArea(param.Parameterized):
     # generate files button
     gen_btn = pn.widgets.Button(name='Generate files', button_type='primary')
-    
-    def __init__(self, **params):
-        super().__init__(file_input=pn.widgets.FileInput(multiple=True, accept='.mat,.txt,.zip,.h5,.hdf5'),
-                         fold_input=pn.widgets.FileSelector(root_directory='~', sizing_mode='stretch_width'),
-                         **params)
-        self.file_sel = pn.Column(SELECT_FILES, self.file_input)
-        self.fold_sel = pn.Column(SELECT_FOLDERS, self.fold_input)
-        
-    @pn.depends('file_input.value', watch=True)
-    def _select_files(self):
-        print(self.file_input.value)
 
-    @pn.depends('fold_input.value', watch=True)
-    def _select_folders(self):
-        print(self.fold_input.value)
+    def __init__(self, **params):
+        super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'), **params)
+        self.file_selector = param.MultiFileSelector(path=os.getcwd())
+        self.cross_select = pn.widgets.CrossSelector(options=os.listdir())
+
+    @pn.depends('text_input.value', watch=True)
+    def _select_path(self):
+        if os.path.exists(self.text_input.value):
+            self.file_selector.path = self.text_input.valugite
+            self.cross_select.options = os.listdir(self.file_selector.path)
 
     def view(self):
         return pn.Tabs(
                 ('Select Files', pn.Column(pn.pane.Markdown(GET_STARTED),
-                                           pn.Tabs(('Select files', self.file_input),
-                                                   ('Select folders', self.fold_input)),
-                                 self.gen_btn)), 
+                                           self.text_input,
+                                           self.cross_select,
+                                           self.gen_btn)),
                 ('User Guide', UserGuide().view()))
-    
-    
-    
-    
-    
 
-    
+
 class UserGuide(param.Parameterized):
+    # TODO: Try out 'Select' option from HoloViz
+
     # content buttons
     intro = pn.widgets.Button(name='Introduction', button_type='light', value=True, width=100)
     sup_files = pn.widgets.Button(name='Supported Files', button_type='light', width=100)
     transform = pn.widgets.Button(name='Transforming Data', button_type='light', width=100)
     how_to = pn.widgets.Button(name='How to use the app', button_type='light', width=100)
     bep034 = pn.widgets.Button(name='BIDS Computational Data Standard', button_type='light', width=100)
-    
-    
-    
+
     def view(self):
         return pn.Tabs(
             ('Introduction', INTRO),
@@ -54,24 +45,21 @@ class UserGuide(param.Parameterized):
             ('How to Use the App', INTRO),
             ('BEP034', INTRO)
         )
-    
-    
-    
-    
+
 
 SELECT_FILES = """
 ### Select file(s)
 
 This widgets lets you select multiple files without specifying the folder. There's no limit on the file numbers. However,
-note that the accepted file types are `.mat`, `.txt`, `.zip`, `.h5`. If you select other files, they will be simply ignored 
-without errors. 
+note that the accepted file types are `.mat`, `.txt`, `.zip`, `.h5`. If you select other files, they will be simply ignored
+without errors.
 """
 
 SELECT_FOLDERS = """
 ### Select folder(s)
 
 This widgets lets you select multiple folders. Unfortunately, the input with current path doesn't get updated if specified.
-However, you can use the arrows to find the folders. 
+However, you can use the arrows to find the folders.
 """
 
 GET_STARTED = """
