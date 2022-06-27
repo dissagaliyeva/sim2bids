@@ -15,7 +15,7 @@ class MainArea(param.Parameterized):
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
         if os.path.exists(self.text_input.value):
-            self.file_selector.path = self.text_input.value
+            self.file_selector.path = self.text_input.valugite
             self.cross_select.options = os.listdir(self.file_selector.path)
 
     def view(self):
