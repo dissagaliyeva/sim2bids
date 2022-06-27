@@ -8,4 +8,5 @@ h5py
 jupyter
 panel
 holoviews
-
+param~=1.12.0
+graphviz~=2.38
