@@ -6,17 +6,23 @@ import panel as pn
 class MainArea(param.Parameterized):
     # generate files button
     gen_btn = pn.widgets.Button(name='Generate files', button_type='primary')
+    txt = param.String()
 
     def __init__(self, **params):
-        super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'), **params)
+        super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
+                         cross_select=pn.widgets.CrossSelector(options=os.listdir()),
+                         **params)
         self.file_selector = param.MultiFileSelector(path=os.getcwd())
-        self.cross_select = pn.widgets.CrossSelector(options=os.listdir())
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
         if os.path.exists(self.text_input.value):
-            self.file_selector.path = self.text_input.valugite
+            self.file_selector.path = self.text_input.value
             self.cross_select.options = os.listdir(self.file_selector.path)
+
+    @pn.depends('cross_select.value', watch=True)
+    def _generate_path(self):
+        print('Selected files:', self.cross_select.value)
 
     def view(self):
         return pn.Tabs(
