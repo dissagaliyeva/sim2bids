@@ -2,7 +2,7 @@ import io
 import os
 import pandas as pd
 from pathlib import Path
-import preprocess as prep
+import incf.preprocess.preprocess as prep
 
 
 IDS = {}
@@ -22,7 +22,7 @@ def check_file(fname=None, value=None):
     IDS[sid] = {
         'sid': sid,
         'uuid': hash(file),
-        'fname': fname
+        'fname': file
     }
 
     create_output_folder(sub=f'sub-{sid}')
