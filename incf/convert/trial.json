@@ -1,0 +1,26 @@
+{
+    "ID": "",
+    "UUID": "",
+    "Desc": "",
+    "DataFiles": [
+
+    ],
+    "Description": "",
+    "VolumeUnit": "mm^3",
+    "LengthUnit": "mm",
+    "Atlas": "Glasser",
+    "Notes": "",
+    "Nodes": {
+        "Count": 1,
+        "ID": [],
+        "FullName": [],
+        "IsCortical": [],
+        "CenterX": [],
+        "CenterY": [],
+        "CenterZ": []
+    },
+    "SourceData": {
+
+    }
+
+}

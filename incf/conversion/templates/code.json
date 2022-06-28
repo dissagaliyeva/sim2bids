@@ -1,0 +1,47 @@
+{
+    "ID": "",
+    "UUID": "",
+    "SubjectID": "",
+
+    "Description": {
+        "Name": "",
+        "Type": "",
+        "SubTypes": "",
+        "TypeLong": "",
+        "Version": ""
+    },
+
+    "Desc": "",
+    "DataFiles": [],
+    "Units": "",
+    "VolumeUnit": "mm^3",
+    "SurfaceUnit": "",
+    "LengthUnit": "mm",
+    "Atlas": "Glasser",
+    "Surface": "",
+    "Space": "",
+    "TimeSteps": "",
+    "Format": "",
+    "Notes": "",
+
+    "SourceData": {
+        "UUID": "",
+        "ID": "",
+        "DOI": "",
+        "URL": "",
+        "DataFiles": ""
+    },
+
+    "Publication": {
+        "DOI": "",
+        "URL": "",
+        "Type": "",
+        "Title": "",
+        "Authors": "",
+        "Volume": "",
+        "Number": "",
+        "Pages": "",
+        "Year": "",
+        "Publisher": ""
+    }
+}
