@@ -4,16 +4,22 @@ import pandas as pd
 from pathlib import Path
 import incf.preprocess.preprocess as prep
 
+import time
+import sys
+sys.path.append('..')
+
 
 IDS = {}
 
 
-def check_file(fname=None, value=None):
+def check_file(fname, content, path='../output', save=False):
     sid = prep.create_uuid()
+
     file = fname.split('.')[0] if '.' in fname else fname
+    gen_structure = None
 
     if file == 'weights':
-        val = create_layout({
+        gen_structure = create_layout({
             'name': file,
             'desc': 'default',
             'sid': sid
@@ -25,13 +31,27 @@ def check_file(fname=None, value=None):
         'fname': file
     }
 
-    create_output_folder(sub=f'sub-{sid}')
-    fname = f'sub-{sid}_desc-default_{file}.tsv'
-    string_io = io.StringIO(value.decode("utf8"))
-    pd.read_csv(string_io, sep='\t').to_csv(os.path.join('../output', f'sub_{sid}', 'net', fname), sep='\t',
-                                            header=None, index=None)
-    Path(os.path.join('../output', f'sub_{sid}', 'net', f'{fname}.json')).touch()
-    return val
+    if save:
+        create_output_folder(sub=f'sub-{sid}')
+        fname = f'sub-{sid}_desc-default_{file}.tsv'
+        save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
+        save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
+
+        saving = True
+        while saving:
+            saving = save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
+            print(os.path.join(path, f'sub_{sid}', 'net'))
+
+    return gen_structure
+
+
+def save_file(content, path, sid, fname):
+    if not os.path.exists(path):
+        return False
+    print(path)
+    content.to_csv(os.path.join(path, fname), sep='\t', header=None, index=None)
+    Path(os.path.join(path, f'sub_{sid}', 'net', f'{fname}.json')).touch()
+    return True
 
 
 def create_output_folder(path='../output', sub='sub_00'):
@@ -48,6 +68,8 @@ def create_output_folder(path='../output', sub='sub_00'):
 
         print(f'Creating folder `{net}`...')
         os.mkdir(net)
+
+        time.sleep(5)
 
     else:
         # TODO: add create new id creation
@@ -100,22 +122,22 @@ def create_layout(subs=None):
 
 def create_sub(sub):
     if sub is not None:
-        if sub['fname'] == 'weights.txt':
+        if sub['name'] == 'weights':
             return f"""
             |___ sub-{sub['name']} <br>
                      &emsp;&emsp;&emsp;|__ net <br>
-                         &emsp;&emsp;&emsp;&emsp;|__ sub-{sub['name']}_desc-{sub['desc']}_weights.tsv <br>
-                         &emsp;&emsp;&emsp;&emsp;|__ sub-{sub['name']}_desc-{sub['desc']}_weights.json <br>
+                         &emsp;&emsp;&emsp;&emsp;|__ sub-{sub['sid']}_desc-{sub['desc']}_{sub['name']}.tsv <br>
+                         &emsp;&emsp;&emsp;&emsp;|__ sub-{sub['sid']}_desc-{sub['desc']}_{sub['name']}.json <br>
                      &emsp;&emsp;&emsp;|__ spatial <br>
                      &emsp;&emsp;&emsp;|__ ts  <br>
             """
 
-        elif sub['fname'] == 'distances.txt':
+        elif sub['fname'] == 'distances':
             return f"""
                 &emsp;|___ sub-{sub['name']} <br>
                      &emsp;&emsp;|__ net <br>
-                         &emsp;&emsp;&emsp;|__ sub-{sub['name']}_desc-{sub['desc']}_distances.tsv <br>
-                         &emsp;&emsp;&emsp;|__ sub-{sub['name']}_desc-{sub['desc']}_distances.json <br>
+                         &emsp;&emsp;&emsp;|__ sub-{sub['sid']}_desc-{sub['desc']}_{sub['name']}.tsv <br>
+                         &emsp;&emsp;&emsp;|__ sub-{sub['sid']}_desc-{sub['desc']}_{sub['name']}.json <br>
                      &emsp;&emsp;|__ spatial <br>
                      &emsp;&emsp;|__ ts  <br>
             """
