@@ -29,25 +29,7 @@ class MainArea(param.Parameterized):
         if len(self.cross_select.value) > 0:
             self.static_text.value = gen.check_file(og_path=self.text_input.value,
                                                     values=self.cross_select.value,
-                                                    output='../output', save=False)
-
-
-
-        # # if len(self.cross_select.value) == 1:
-        # if len(self.cross_select.value) != 0:
-        #     self.static_text.value = ''
-        #     for selected in self.cross_select.value:
-        #         # val = self.cross_select.value[0]
-        #         self.static_text.value = ''
-        #
-        #         abs_path = os.path.join(self.text_input.value, selected)
-        #
-        #         # TODO: refactor code to put the below 2 lines to gen.check_file
-        #         # content = pd.read_csv(abs_path, sep='\t')
-        #         # fname = os.path.basename(abs_path)
-        #
-        #         # TODO: refactor check_file to accept list & show multiple files
-        #         self.static_text.value = gen.check_file(abs_path)
+                                                    output='../output', save=True)
 
     def view(self):
         return pn.Tabs(

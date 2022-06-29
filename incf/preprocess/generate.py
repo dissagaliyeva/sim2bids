@@ -17,10 +17,11 @@ def check_file(og_path, values, output='../output', save=False):
 
     for val in values:
         path = os.path.join(og_path, val)
+        name = os.path.basename(val).split('.')[0]
 
         # create subjects
         subs[val] = {'name': val, 'sid': prep.create_uuid(),
-                     'desc': 'default', 'path': path}
+                     'desc': 'default', 'path': path, 'fname': name}
         prep.IDS.append(subs[val]['sid'])
 
     if save:
@@ -78,7 +79,7 @@ def create_sub(subs):
                         &emsp;&emsp;&emsp;|__ spatial <br>
                         &emsp;&emsp;&emsp;|__ ts  <br>
                     """)
-        elif subs[k]['name'] == 'distances.txt':
+        elif subs[k]['name'] == 'tract_lengths.txt':
             outputs.append(f"""
                     |___ sub-{subs[k]['sid']} <br>
                          &emsp;&emsp;&emsp;|__ net <br>
@@ -132,28 +133,32 @@ def create_sub(subs):
 #     return True
 
 
-def create_output_folder(path, subs: [str, dict]):
+def create_output_folder(path, subs: dict):
     # verify folders exist
     check_folders(path)
 
-    print(subs)
+    for k, v in subs.items():
+        if k in ['weights.txt', 'distances.txt']:
+            create_weights_distances(path, subs[k])
 
-    # # patient specific folders
-    # sub = os.path.join(path, sub)
-    # net = os.path.join(sub, 'net')
-    #
-    # if not os.path.exists(sub):
-    #     print(f'Creating folder `{sub}`...')
-    #     os.mkdir(sub)
-    #
-    #     print(f'Creating folder `{net}`...')
-    #     os.mkdir(net)
-    #
-    #     time.sleep(5)
-    #
-    # else:
-    #     # TODO: add create new id creation
-    #     pass
+
+def create_weights_distances(path, subs):
+    sub = os.path.join(path, f"sub-{subs['sid']}")
+    net = os.path.join(sub, 'net')
+
+    if not os.path.exists(sub):
+        print(f'Creating folder `{sub}`')
+        os.mkdir(sub)
+
+    if not os.path.exists(net):
+        print(f'Creating folder `{net}`')
+        os.mkdir(net)
+
+    fname = f'sub-{subs["sid"]}_desc-default_{subs["fname"]}.tsv'
+
+    pd.read_csv(subs['path'], sep='\t').to_csv(os.path.join(net, fname), sep='\t',
+                                               header=None, index=None)
+
 
 
 def check_folders(path):
