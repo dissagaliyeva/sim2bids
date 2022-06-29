@@ -26,17 +26,18 @@ class MainArea(param.Parameterized):
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
-        if len(self.cross_select.value) == 1:
-            val = self.cross_select.value[0]
+        # if len(self.cross_select.value) == 1:
+        if len(self.cross_select.value) != 0:
+            for selected in self.cross_select.value:
+                # val = self.cross_select.value[0]
+                self.static_text.value = ''
 
-            abs_path = os.path.join(self.text_input.value, val)
-            content = pd.read_csv(abs_path, sep='\t')
+                abs_path = os.path.join(self.text_input.value, selected)
+                content = pd.read_csv(abs_path, sep='\t')
 
-            fname = os.path.basename(abs_path)
-            print(f'fname: {fname}')
-            print(f'value: {content}')
+                fname = os.path.basename(abs_path)
 
-            self.static_text.value = gen.check_file(fname, content)
+                self.static_text.value = gen.check_file(fname, content)
 
     def view(self):
         return pn.Tabs(
