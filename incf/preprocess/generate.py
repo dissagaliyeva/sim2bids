@@ -145,7 +145,7 @@ def create_layout(subs=None, output='../output'):
     """
 
     output = output.replace('.', '').replace('/', '')
-    layout = '\n\t'.join(create_sub(subs))
+    layout = '&emsp;'.join(create_sub(subs))
 
     return f"""
     {output}/ <br>
@@ -169,7 +169,7 @@ def create_sub(subs):
         name = subs[k]['name'].split('.')[0]
         if subs[k]['name'] == 'weights.txt':
             outputs.append(f"""
-                    |___ sub-{subs[k]['name']} <br>
+                    |___ sub-{subs[k]['sid']} <br>
                         &emsp;&emsp;&emsp;|__ net <br>
                             &emsp;&emsp;&emsp;&emsp;|__ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.tsv <br>
                             &emsp;&emsp;&emsp;&emsp;|__ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.json <br>
@@ -178,7 +178,7 @@ def create_sub(subs):
                     """)
         elif subs[k]['name'] == 'distances.txt':
             outputs.append(f"""
-                    |___ sub-{subs[k]['name']} <br>
+                    |___ sub-{subs[k]['sid']} <br>
                          &emsp;&emsp;&emsp;|__ net <br>
                              &emsp;&emsp;&emsp;&emsp;|__ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.tsv <br>
                              &emsp;&emsp;&emsp;&emsp;|__ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.json <br>
