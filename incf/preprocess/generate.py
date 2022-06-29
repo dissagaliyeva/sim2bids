@@ -4,6 +4,7 @@ import pandas as pd
 from pathlib import Path
 import incf.preprocess.preprocess as prep
 
+import json
 import time
 import sys
 
@@ -91,48 +92,6 @@ def create_sub(subs):
     return outputs
 
 
-# def check_file(fname, content, path='../output', save=False):
-#     sid = prep.create_uuid()
-#
-#     file = fname.split('.')[0] if '.' in fname else fname
-#     gen_structure = None
-#
-#     if file == 'weights':
-#         gen_structure = create_layout({
-#             'name': file,
-#             'desc': 'default',
-#             'sid': sid
-#         })
-#
-#     IDS[sid] = {
-#         'sid': sid,
-#         'uuid': hash(file),
-#         'fname': file
-#     }
-#
-#     if save:
-#         create_output_folder(sub=f'sub-{sid}')
-#         fname = f'sub-{sid}_desc-default_{file}.tsv'
-#         # save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
-#         # save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
-#
-#         saving = True
-#         while saving:
-#             saving = save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
-#             # print(os.path.join(path, f'sub_{sid}', 'net'))
-#
-#     return gen_structure
-#
-#
-# def save_file(content, path, sid, fname, type='.txt'):
-#     if not os.path.exists(path):
-#         return False
-#     print(path)
-#     content.to_csv(os.path.join(path, fname), sep='\t', header=None, index=None)
-#     Path(os.path.join(path, f'sub_{sid}', 'net', f'{fname}.json')).touch()
-#     return True
-
-
 def create_output_folder(path, subs: dict):
     # verify folders exist
     check_folders(path)
@@ -154,11 +113,23 @@ def create_weights_distances(path, subs):
         print(f'Creating folder `{net}`')
         os.mkdir(net)
 
-    fname = f'sub-{subs["sid"]}_desc-default_{subs["fname"]}.tsv'
+    fname = f'sub-{subs["sid"]}_desc-default_{subs["fname"]}'
 
-    pd.read_csv(subs['path'], sep='\t').to_csv(os.path.join(net, fname), sep='\t',
-                                               header=None, index=None)
+    f = pd.read_csv(subs['path'], sep=r'\s{1,}')
+    f.to_csv(os.path.join(net, fname + '.tsv'), sep='\t', header=None, index=None)
 
+    shape = f.shape
+
+    json_file = {
+        'NumberOfRows': shape[0],
+        'NumberOfColumns': shape[1],
+        'CoordsRows': '',
+        'CoordsColumns': '',
+        'Description': ''
+    }
+
+    with open(os.path.join(net, fname + '.json'), 'w') as outfile:
+        json.dump(json_file, outfile)
 
 
 def check_folders(path):
