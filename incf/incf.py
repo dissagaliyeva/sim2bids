@@ -15,29 +15,39 @@ class MainArea(param.Parameterized):
         super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
                          cross_select=pn.widgets.CrossSelector(options=os.listdir()),
                          **params)
-        # self.file_selector = param.MultiFileSelector(path=os.getcwd())
         self.static_text = pn.widgets.StaticText()
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
         if os.path.exists(self.text_input.value):
-            # self.file_selector.path = self.text_input.value
             self.cross_select.options = os.listdir(self.text_input.value)
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
-        # if len(self.cross_select.value) == 1:
-        if len(self.cross_select.value) != 0:
-            for selected in self.cross_select.value:
-                # val = self.cross_select.value[0]
-                self.static_text.value = ''
+        self.static_text.value = ''
 
-                abs_path = os.path.join(self.text_input.value, selected)
-                content = pd.read_csv(abs_path, sep='\t')
+        if len(self.cross_select.value) > 0:
+            self.static_text.value = gen.check_file(og_path=self.text_input.value,
+                                                    values=self.cross_select.value,
+                                                    output='../output', save=False)
 
-                fname = os.path.basename(abs_path)
 
-                self.static_text.value = gen.check_file(fname, content)
+
+        # # if len(self.cross_select.value) == 1:
+        # if len(self.cross_select.value) != 0:
+        #     self.static_text.value = ''
+        #     for selected in self.cross_select.value:
+        #         # val = self.cross_select.value[0]
+        #         self.static_text.value = ''
+        #
+        #         abs_path = os.path.join(self.text_input.value, selected)
+        #
+        #         # TODO: refactor code to put the below 2 lines to gen.check_file
+        #         # content = pd.read_csv(abs_path, sep='\t')
+        #         # fname = os.path.basename(abs_path)
+        #
+        #         # TODO: refactor check_file to accept list & show multiple files
+        #         self.static_text.value = gen.check_file(abs_path)
 
     def view(self):
         return pn.Tabs(

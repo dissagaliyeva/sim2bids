@@ -12,68 +12,104 @@ sys.path.append('..')
 IDS = {}
 
 
-def check_file(fname, content, path='../output', save=False):
-    sid = prep.create_uuid()
+def check_file(og_path, values, output='../output', save=False):
+    subs = {}
 
-    file = fname.split('.')[0] if '.' in fname else fname
-    gen_structure = None
+    for val in values:
+        path = os.path.join(og_path, val)
 
-    if file == 'weights':
-        gen_structure = create_layout({
-            'name': file,
-            'desc': 'default',
-            'sid': sid
-        })
+        # create subjects
+        subs[val] = {'name': val, 'sid': prep.create_uuid(),
+                     'uuid': hash(path), 'desc': 'default', 'path': path}
+        prep.IDS.append(subs[val]['sid'])
 
-    IDS[sid] = {
-        'sid': sid,
-        'uuid': hash(file),
-        'fname': file
-    }
+        if save:
+            save_files(subs[val], output)
 
-    if save:
-        create_output_folder(sub=f'sub-{sid}')
-        fname = f'sub-{sid}_desc-default_{file}.tsv'
-        save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
-        save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
+    create_output_folder(output, subs)
 
-        saving = True
-        while saving:
-            saving = save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
-            print(os.path.join(path, f'sub_{sid}', 'net'))
+    return ''
+    # sid = prep.create_uuid()
+    # fname = os.path.basename(abs_path)
 
-    return gen_structure
+    # if fname.endswith('.txt'):
+        # TODO: cover weights.txt & distances.txt
 
 
-def save_file(content, path, sid, fname):
-    if not os.path.exists(path):
-        return False
-    print(path)
-    content.to_csv(os.path.join(path, fname), sep='\t', header=None, index=None)
-    Path(os.path.join(path, f'sub_{sid}', 'net', f'{fname}.json')).touch()
-    return True
+        # TODO: cover centres.txt
 
 
-def create_output_folder(path='../output', sub='sub_00'):
+
+# TODO: create function to determine separators
+
+
+def save_files(subs, output):
+    pass
+
+# def check_file(fname, content, path='../output', save=False):
+#     sid = prep.create_uuid()
+#
+#     file = fname.split('.')[0] if '.' in fname else fname
+#     gen_structure = None
+#
+#     if file == 'weights':
+#         gen_structure = create_layout({
+#             'name': file,
+#             'desc': 'default',
+#             'sid': sid
+#         })
+#
+#     IDS[sid] = {
+#         'sid': sid,
+#         'uuid': hash(file),
+#         'fname': file
+#     }
+#
+#     if save:
+#         create_output_folder(sub=f'sub-{sid}')
+#         fname = f'sub-{sid}_desc-default_{file}.tsv'
+#         # save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
+#         # save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
+#
+#         saving = True
+#         while saving:
+#             saving = save_file(content, os.path.join(path, f'sub_{sid}', 'net'), sid, fname)
+#             # print(os.path.join(path, f'sub_{sid}', 'net'))
+#
+#     return gen_structure
+#
+#
+# def save_file(content, path, sid, fname, type='.txt'):
+#     if not os.path.exists(path):
+#         return False
+#     print(path)
+#     content.to_csv(os.path.join(path, fname), sep='\t', header=None, index=None)
+#     Path(os.path.join(path, f'sub_{sid}', 'net', f'{fname}.json')).touch()
+#     return True
+
+
+def create_output_folder(path, subs: [str, dict]):
     # verify folders exist
     check_folders(path)
 
-    # patient specific folders
-    sub = os.path.join(path, sub)
-    net = os.path.join(sub, 'net')
+    print(subs)
 
-    if not os.path.exists(sub):
-        print(f'Creating folder `{sub}`...')
-        os.mkdir(sub)
-
-        print(f'Creating folder `{net}`...')
-        os.mkdir(net)
-
-        time.sleep(5)
-
-    else:
-        # TODO: add create new id creation
-        pass
+    # # patient specific folders
+    # sub = os.path.join(path, sub)
+    # net = os.path.join(sub, 'net')
+    #
+    # if not os.path.exists(sub):
+    #     print(f'Creating folder `{sub}`...')
+    #     os.mkdir(sub)
+    #
+    #     print(f'Creating folder `{net}`...')
+    #     os.mkdir(net)
+    #
+    #     time.sleep(5)
+    #
+    # else:
+    #     # TODO: add create new id creation
+    #     pass
 
 
 def check_folders(path):
