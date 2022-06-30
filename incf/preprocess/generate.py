@@ -6,32 +6,52 @@ import incf.preprocess.preprocess as prep
 
 import json
 import sys
+import csv
 
 sys.path.append('..')
 
-IDS = {}
-
 
 def check_file(og_path, values, output='../output', save=False):
+    # create dictionary to store values
     subs = {}
 
     for val in values:
+        # get the absolute path
         path = os.path.join(og_path, val)
+
+        # get filename without file extension
         name = os.path.basename(val).split('.')[0]
 
         # create subjects
-        subs[val] = {'name': val, 'sid': prep.create_uuid(),
+        subs[val] = {'name': val, 'sid': prep.create_uuid(), 'sep': find_separator(path),
                      'desc': 'default', 'path': path, 'fname': name}
+
+        # add new id to make sure there's no overlap in folder creation
         prep.IDS.append(subs[val]['sid'])
 
+    # create folders if required
     if save:
         create_output_folder(output, subs)
 
+    # generate folder structure layout
     layout = create_layout(subs, output)
 
     return layout
 
-# TODO: create function to determine separators
+
+def find_separator(path):
+    """
+    Find the separator/delimiter used in the file to ensure no exception
+    is raised while reading files.
+
+    :param path:
+    :return:
+    """
+
+    sniffer = csv.Sniffer()
+    with open(path) as fp:
+        delimiter = sniffer.sniff(fp.read(500)).delimiter
+    return delimiter
 
 
 def save_files(subs, output):
@@ -127,7 +147,7 @@ def create_weights_distances(path, subs):
 
     fname = f'sub-{subs["sid"]}_desc-default_{subs["fname"]}'
 
-    f = pd.read_csv(subs['path'], sep=r'\s{1,}', index_col=None, header=None)
+    f = pd.read_csv(subs['path'], sep=subs['sep'], index_col=None, header=None)
     f.to_csv(os.path.join(net, fname + '.tsv'), sep='\t', header=None, index=None)
 
     shape = f.shape
@@ -145,7 +165,9 @@ def create_weights_distances(path, subs):
 
 
 def create_centers(path, subs):
-    f = pd.read_csv(subs['path'], sep=r'\s{1,}', index_col=None, header=None)
+    f = pd.read_csv(subs['path'], sep=subs['sep'], index_col=None, header=None)
+    print(f)
+    print(subs)
     labels, nodes = f[0], f[[1, 2, 3]]
 
     # save in `.tsv` format
@@ -164,10 +186,10 @@ def create_centers(path, subs):
 def check_folders(path):
     eq = os.path.join(path, 'eq')
     code = os.path.join(path, 'code')
-    coor = os.path.join(path, 'coord')
+    coord = os.path.join(path, 'coord')
     param = os.path.join(path, 'param')
 
-    for p in [path, eq, code, coor, param]:
+    for p in [path, eq, code, coord, param]:
         if not os.path.exists(p):
             print(f'Creating folder `{os.path.basename(p)}`...')
             os.mkdir(p)
