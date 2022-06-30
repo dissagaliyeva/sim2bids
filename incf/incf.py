@@ -33,19 +33,20 @@ class MainArea(param.Parameterized):
                                                     output='../output', save=False)
 
     def _generate_files(self, event=None):
-        if len(self.cross_select.value) > 0:
-            print(self.cross_select.value)
+        _ = gen.check_file(og_path=self.text_input.value,
+                           values=self.cross_select.value,
+                           output='../output', save=True)
 
     def view(self):
         button = pn.Param(self.param, widgets={'gen_btn': {"button_type": "primary"}}, show_name=False)
         return pn.Tabs(
-                ('Select Files', pn.Column(pn.pane.Markdown(GET_STARTED),
-                                           self.text_input,
-                                           self.cross_select,
-                                           self.static_text,
-                                           pn.Param(self, parameters=['gen_btn'],
-                                                    show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}))),
-                ('User Guide', UserGuide().view()))
+            ('Select Files', pn.Column(pn.pane.Markdown(GET_STARTED),
+                                       self.text_input,
+                                       self.cross_select,
+                                       self.static_text,
+                                       pn.Param(self, parameters=['gen_btn'],
+                                                show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}))),
+            ('User Guide', UserGuide().view()))
 
 
 class UserGuide(param.Parameterized):

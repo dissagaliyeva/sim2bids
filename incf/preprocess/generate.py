@@ -5,7 +5,6 @@ from pathlib import Path
 import incf.preprocess.preprocess as prep
 
 import json
-import time
 import sys
 
 sys.path.append('..')
@@ -49,12 +48,12 @@ def create_layout(subs=None, output='../output'):
     """
 
     output = output.replace('.', '').replace('/', '')
-    layout = '&emsp;'.join(create_sub(subs))
+    layout = create_sub(subs)
+    layout = '&emsp;'.join(layout) if len(layout) > 1 else ''.join(layout)
 
     return f"""
     {output}/ <br>
         &emsp;|___ code <br>
-        &emsp;|___ coord <br>
         &emsp;|___ eq <br>
         &emsp;|___ param <br>
         &emsp;{layout}
@@ -67,28 +66,39 @@ def create_layout(subs=None, output='../output'):
 
 def create_sub(subs):
     outputs = []
+    centers_found = False
+
     for k, v in subs.items():
         print(k, v, end='\n\n')
 
         name = subs[k]['name'].split('.')[0]
         if subs[k]['name'] == 'weights.txt':
-            outputs.append(f"""
-                    |___ sub-{subs[k]['sid']} <br>
-                        &emsp;&emsp;&emsp;|__ net <br>
-                            &emsp;&emsp;&emsp;&emsp;|__ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.tsv <br>
-                            &emsp;&emsp;&emsp;&emsp;|__ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.json <br>
-                        &emsp;&emsp;&emsp;|__ spatial <br>
-                        &emsp;&emsp;&emsp;|__ ts  <br>
+            outputs.append(f"""|___ sub-{subs[k]['sid']} <br>
+                        &emsp;&emsp;&emsp;|___ net <br>
+                            &emsp;&emsp;&emsp;&emsp;|___ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.tsv <br>
+                            &emsp;&emsp;&emsp;&emsp;|___ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.json <br>
+                        &emsp;&emsp;&emsp;|___ spatial <br>
+                        &emsp;&emsp;&emsp;|___ ts  <br>
                     """)
-        elif subs[k]['name'] == 'tract_lengths.txt':
-            outputs.append(f"""
-                    |___ sub-{subs[k]['sid']} <br>
-                         &emsp;&emsp;&emsp;|__ net <br>
-                             &emsp;&emsp;&emsp;&emsp;|__ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.tsv <br>
-                             &emsp;&emsp;&emsp;&emsp;|__ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.json <br>
-                         &emsp;&emsp;&emsp;|__ spatial <br>
-                         &emsp;&emsp;&emsp;|__ ts  <br>
+        elif subs[k]['name'] == 'distances.txt':
+            outputs.append(f"""|___ sub-{subs[k]['sid']} <br>
+                         &emsp;&emsp;&emsp;|___ net <br>
+                             &emsp;&emsp;&emsp;&emsp;|___ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.tsv <br>
+                             &emsp;&emsp;&emsp;&emsp;|___ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.json <br>
+                         &emsp;&emsp;&emsp;|___ spatial <br>
+                         &emsp;&emsp;&emsp;|___ ts  <br>
                     """)
+        elif subs[k]['name'] in ['centres.txt', 'centers.txt']:
+            outputs.append(f"""|___ coord <br>
+                        &emsp;&emsp;&emsp;|___ desc-{subs[k]['desc']}_nodes.json <br>
+                        &emsp;&emsp;&emsp;|___ desc-{subs[k]['desc']}_labels.json <br>
+                        &emsp;&emsp;&emsp;|___ desc-{subs[k]['desc']}_nodes.tsv <br>
+                        &emsp;&emsp;&emsp;|___ desc-{subs[k]['desc']}_labels.tsv <br>
+            """)
+            centers_found = True
+
+    if not centers_found:
+        outputs.append('|___ coord <br>')
     return outputs
 
 
