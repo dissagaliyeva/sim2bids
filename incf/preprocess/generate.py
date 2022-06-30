@@ -109,6 +109,8 @@ def create_output_folder(path, subs: dict):
     for k, v in subs.items():
         if k in ['weights.txt', 'distances.txt']:
             create_weights_distances(path, subs[k])
+        if k in ['centres.txt', 'centers.txt', 'centre.txt', 'center.txt']:
+            create_centers(path, subs[k])
 
 
 def create_weights_distances(path, subs):
@@ -125,7 +127,7 @@ def create_weights_distances(path, subs):
 
     fname = f'sub-{subs["sid"]}_desc-default_{subs["fname"]}'
 
-    f = pd.read_csv(subs['path'], sep=r'\s{1,}')
+    f = pd.read_csv(subs['path'], sep=r'\s{1,}', index_col=None, header=None)
     f.to_csv(os.path.join(net, fname + '.tsv'), sep='\t', header=None, index=None)
 
     shape = f.shape
@@ -140,6 +142,23 @@ def create_weights_distances(path, subs):
 
     with open(os.path.join(net, fname + '.json'), 'w') as outfile:
         json.dump(json_file, outfile)
+
+
+def create_centers(path, subs):
+    f = pd.read_csv(subs['path'], sep=r'\s{1,}', index_col=None, header=None)
+    labels, nodes = f[0], f[[1, 2, 3]]
+
+    # save in `.tsv` format
+    labels.to_csv(os.path.join(path, 'coord', f'desc-{subs["desc"]}_labels.tsv'), header=None, index=None)
+    nodes.to_csv(os.path.join(path, 'coord', f'desc-{subs["desc"]}_nodes.tsv'), sep='\t', header=None, index=None)
+
+    # save in `.json` format
+    with open(os.path.join(path, 'coord', f'desc-{subs["desc"]}_labels.json'), 'w') as outfile:
+        json.dump({'NumberOfRows': labels.shape[0], 'NumberOfColumns': 1, 'Units': '', 'Description': ''}, outfile)
+
+    with open(os.path.join(path, 'coord', f'desc-{subs["desc"]}_nodes.json'), 'w') as outfile:
+        json.dump({'NumberOfRows': nodes.shape[0], 'NumberOfColumns': nodes.shape[1],
+                   'Units': '', 'Description': ''}, outfile)
 
 
 def check_folders(path):
