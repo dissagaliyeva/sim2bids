@@ -5,7 +5,6 @@ from pathlib import Path
 import incf.preprocess.preprocess as prep
 
 import json
-import time
 import sys
 
 sys.path.append('..')
@@ -80,7 +79,7 @@ def create_sub(subs):
                         &emsp;&emsp;&emsp;|__ spatial <br>
                         &emsp;&emsp;&emsp;|__ ts  <br>
                     """)
-        elif subs[k]['name'] == 'tract_lengths.txt':
+        elif subs[k]['name'] == 'distances.txt':
             outputs.append(f"""
                     |___ sub-{subs[k]['sid']} <br>
                          &emsp;&emsp;&emsp;|__ net <br>
