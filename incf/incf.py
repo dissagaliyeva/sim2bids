@@ -49,6 +49,10 @@ class MainArea(param.Parameterized):
             ('User Guide', UserGuide().view()))
 
 
+class ViewResults(param.Parameterized):
+    pass
+
+
 class UserGuide(param.Parameterized):
     # TODO: Try out 'Select' option from HoloViz
 

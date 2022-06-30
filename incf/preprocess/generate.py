@@ -10,30 +10,44 @@ import csv
 
 sys.path.append('..')
 
-IDS = {}
-
 
 def check_file(og_path, values, output='../output', save=False):
+    # create dictionary to store values
     subs = {}
 
     for val in values:
+        # get the absolute path
         path = os.path.join(og_path, val)
+
+        # get filename without file extension
         name = os.path.basename(val).split('.')[0]
 
         # create subjects
         subs[val] = {'name': val, 'sid': prep.create_uuid(), 'sep': find_separator(path),
                      'desc': 'default', 'path': path, 'fname': name}
+
+        # add new id to make sure there's no overlap in folder creation
         prep.IDS.append(subs[val]['sid'])
 
+    # create folders if required
     if save:
         create_output_folder(output, subs)
 
+    # generate folder structure layout
     layout = create_layout(subs, output)
 
     return layout
 
 
 def find_separator(path):
+    """
+    Find the separator/delimiter used in the file to ensure no exception
+    is raised while reading files.
+
+    :param path:
+    :return:
+    """
+
     sniffer = csv.Sniffer()
     with open(path) as fp:
         delimiter = sniffer.sniff(fp.read(500)).delimiter
