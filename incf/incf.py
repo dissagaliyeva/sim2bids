@@ -4,6 +4,17 @@ import pandas as pd
 import param
 import panel as pn
 import incf.preprocess.generate as gen
+import json
+
+
+def get_files(path='../output', ftype='.json'):
+    f = []
+
+    for root, dirs, files in os.walk(path, topdown=False):
+        for name in files:
+            if ftype in name:
+                f.append(os.path.join(root, name))
+    return f
 
 
 class MainArea(param.Parameterized):
@@ -38,19 +49,66 @@ class MainArea(param.Parameterized):
                            output='../output', save=True)
 
     def view(self):
-        button = pn.Param(self.param, widgets={'gen_btn': {"button_type": "primary"}}, show_name=False)
-        return pn.Tabs(
+        main = pn.Tabs(
             ('Select Files', pn.Column(pn.pane.Markdown(GET_STARTED),
                                        self.text_input,
                                        self.cross_select,
                                        self.static_text,
                                        pn.Param(self, parameters=['gen_btn'],
                                                 show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}))),
+            ('View Results', ViewResults().view()),
             ('User Guide', UserGuide().view()))
+
+        return pn.template.FastListTemplate(
+            title='Visualize | Transform | Download',
+            site='INCF',
+            main=main
+        )
 
 
 class ViewResults(param.Parameterized):
-    pass
+    options = ['JSON files', 'TSV files']
+    json_files = get_files()
+    tsv_files = get_files(ftype='.tsv')
+
+    def __init__(self, **params):
+        super().__init__(file_selection=pn.widgets.RadioButtonGroup(options=self.options,
+                                                                    button_type='primary', value=[]),
+                         select_options=pn.widgets.Select())
+
+        self.layout = None
+        self.widget = pn.WidgetBox('### Select File', self.select_options)
+
+    @pn.depends('file_selection.value', watch=True)
+    def _change_filetype(self):
+        if self.file_selection.value == 'JSON files':
+            self.select_options.options = self.json_files
+        elif self.file_selection.value == 'TSV files':
+            self.select_options.options = self.tsv_files
+
+    @pn.depends('select_options.value', watch=True)
+    def _change_file(self):
+        if len(self.widget) > 2:
+            self.widget.pop(-1)
+
+        if self.file_selection.value == 'JSON files':
+            try:
+                file = json.load(open(self.select_options.value))
+            except Exception:
+                print(f'File `{self.select_options.value}` is empty!')
+            else:
+                self.widget.append(pn.widgets.JSONEditor(value=file))
+
+        elif self.file_selection.value == 'TSV files':
+            try:
+                file = pd.read_csv(self.select_options.value, sep='\t', header=None, index_col=None)
+            except Exception:
+                print(f'File `{self.select_options.value}` is empty!')
+            else:
+                self.widget.append(pn.widgets.Tabulator(file))
+
+    def view(self):
+        return pn.Column(self.file_selection, self.widget)
 
 
 class UserGuide(param.Parameterized):
