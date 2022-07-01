@@ -49,8 +49,9 @@ def find_separator(path):
     """
 
     sniffer = csv.Sniffer()
+
     with open(path) as fp:
-        delimiter = sniffer.sniff(fp.read(500)).delimiter
+        delimiter = sniffer.sniff(fp.read(5000)).delimiter
     return delimiter
 
 
@@ -89,8 +90,6 @@ def create_sub(subs):
     centers_found = False
 
     for k, v in subs.items():
-        print(k, v, end='\n\n')
-
         name = subs[k]['name'].split('.')[0]
         if subs[k]['name'] == 'weights.txt':
             outputs.append(f"""|___ sub-{subs[k]['sid']} <br>
