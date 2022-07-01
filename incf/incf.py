@@ -27,7 +27,7 @@ class MainArea(param.Parameterized):
         super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
                          cross_select=pn.widgets.CrossSelector(options=os.listdir()),
                          **params)
-        self.static_text = pn.widgets.StaticText()
+        self.static_text = pn.widgets.StaticText(margin=(50, 0, 0, 0))
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
@@ -110,6 +110,77 @@ class ViewResults(param.Parameterized):
     def view(self):
         return pn.Column(self.file_selection, self.widget)
 
+
+# def verify_keys(json1, json2):
+#     diff = set(json1).difference(set(json2))
+#     return diff == set(), diff
+# class ShowFiles(param.Parameterized):
+#     options = ['JSON files', 'TSV files']
+#     json_files = get_files()
+#     tsv_files = get_files(ftype='.tsv')
+#
+#     def __init__(self, **params):
+#         super().__init__(file_selection=pn.widgets.RadioButtonGroup(options=self.options,
+#                                                                     button_type='primary', value=[]),
+#                          select_options=pn.widgets.Select(),
+#                          json=pn.widgets.JSONEditor(),
+#                          tsv=pn.widgets.Tabulator())
+#
+#         self.layout = None
+#         self.json_keys = None
+#         self.widget = pn.WidgetBox('### Select File', self.select_options)
+#
+#     @pn.depends('file_selection.value', watch=True)
+#     def _change_filetype(self):
+#         if self.file_selection.value == 'JSON files':
+#             self.select_options.options = self.json_files
+#         elif self.file_selection.value == 'TSV files':
+#             self.select_options.options = self.tsv_files
+#
+#     @pn.depends('select_options.value', watch=True)
+#     def _change_file(self):
+#         if len(self.widget) > 2:
+#             self.widget.pop(-1)
+#
+#         if self.file_selection.value == 'JSON files':
+#             try:
+#                 file = json.load(open(self.select_options.value))
+#                 self.json_items = file.items()
+#
+#             except Exception:
+#                 print(f'File `{self.file_selection.value}` is empty!')
+#             else:
+#                 self.json.value = file
+#                 self.widget.append(self.json)
+#
+#         elif self.file_selection.value == 'TSV files':
+#             try:
+#                 file = pd.read_csv(self.select_options.value, sep='\t', header=None, index_col=None)
+#             except Exception:
+#                 print(f'File `{self.file_selection.value}` is empty!')
+#             else:
+#                 self.tsv.value = pn.widgets.Tabulator(file)
+#                 self.widget.append(self.tsv)
+#
+#     @pn.depends('json.value', watch=True)
+#     def _change_json_file(self):
+#         #         equal, diff = verify_keys(self.json_keys, self.json.value.keys())
+#         #         print(equal, diff)
+#         #         print(self.json.value.values())
+#         print(self.json.value.items())
+#         print(self.json_keys)
+#
+#     #         if equal:
+#     #             with open(os.path.join(self.select_options.value), 'a') as f:
+#     #                 json.dump(self.json.value, f)
+#     #         else:
+#     #             print(f'Not saving the results; `{diff}` columns are missing')
+#     def view(self):
+#         return pn.Column(self.file_selection, self.widget)
+#
+#
+# sf = ShowFiles(path='../output')
+# pn.serve(sf.view())
 
 class UserGuide(param.Parameterized):
     # TODO: Try out 'Select' option from HoloViz
