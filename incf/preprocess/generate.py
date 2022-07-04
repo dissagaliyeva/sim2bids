@@ -90,15 +90,6 @@ def create_layout(subs=None, output='../output'):
 
 def create_sub(subs):
     centers_found, sid = False, None
-
-    structure = """|___ sub-{} <br>
-    &emsp;&emsp;&emsp;|___ net <br>
-    &emsp;&emsp;&emsp;&emsp;|___ sub-{}_desc-{}_{}.json <br>
-    &emsp;&emsp;&emsp;&emsp;|___ sub-{}_desc-{}_{}.tsv <br>
-    &emsp;&emsp;&emsp;|___ spatial <br>
-    &emsp;&emsp;&emsp;|___ ts  <br>
-    """
-
     struct = []
 
     for k, v in subs.items():
