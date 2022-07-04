@@ -10,6 +10,7 @@ import csv
 from collections import OrderedDict
 
 sys.path.append('..')
+SID = None
 
 
 def check_file(og_path, values, output='../output', save=False):
@@ -22,9 +23,10 @@ def check_file(og_path, values, output='../output', save=False):
 
         # get filename without file extension
         name = os.path.basename(val).split('.')[0]
+        sid = SID
 
         # create subjects
-        subs[val] = {'name': val, 'sid': prep.create_uuid(), 'sep': find_separator(path),
+        subs[val] = {'name': val, 'sid': sid, 'sep': find_separator(path),
                      'desc': 'default', 'path': path, 'fname': name}
         if subs[val]['fname'] in ['tract_lengths', 'tract_length']:
             subs[val]['fname'] = 'distances'
@@ -152,11 +154,28 @@ def create_weights_distances(path, subs):
 
     shape = f.shape
 
+    """
+    "CoordsRows": [
+        "../coord/desc-50healthy_labels.json",
+        "../coord/desc-50healthy_nodes.json",
+    ],
+    "CoordsColumns": [
+    "../coord/desc-50healthy_labels.json",
+    "../coord/desc-50healthy_nodes.json",
+    ],
+
+    """
+
+    # get info on centers
+    has_centers = True if len(os.listdir(os.path.join(path, 'coord'))) == 4 else False
+    coords = [f'../coord/desc-{subs["desc"]}_labels.json',
+              f'../coord/desc-{subs["desc"]}_nodes.json'] if has_centers else ''
+
     json_file = {
         'NumberOfRows': shape[0],
         'NumberOfColumns': shape[1],
-        'CoordsRows': '',
-        'CoordsColumns': '',
+        'CoordsRows': coords,
+        'CoordsColumns': coords,
         'Description': ''
     }
 
@@ -166,8 +185,6 @@ def create_weights_distances(path, subs):
 
 def create_centers(path, subs):
     f = pd.read_csv(subs['path'], sep=subs['sep'], index_col=None, header=None)
-    print(f)
-    print(subs)
     labels, nodes = f[0], f[[1, 2, 3]]
 
     # save in `.tsv` format
@@ -175,12 +192,16 @@ def create_centers(path, subs):
     nodes.to_csv(os.path.join(path, 'coord', f'desc-{subs["desc"]}_nodes.tsv'), sep='\t', header=None, index=None)
 
     # save in `.json` format
-    with open(os.path.join(path, 'coord', f'desc-{subs["desc"]}_labels.json'), 'w') as outfile:
-        json.dump({'NumberOfRows': labels.shape[0], 'NumberOfColumns': 1, 'Units': '', 'Description': ''}, outfile)
+    desc = subs['desc']
+    for content in ['labels', 'nodes']:
+        cols = 1 if content == 'labels' else 3
 
-    with open(os.path.join(path, 'coord', f'desc-{subs["desc"]}_nodes.json'), 'w') as outfile:
-        json.dump({'NumberOfRows': nodes.shape[0], 'NumberOfColumns': nodes.shape[1],
-                   'Units': '', 'Description': ''}, outfile)
+        with open(os.path.join(path, 'coord', f'desc-{desc}_{content}.json'), 'w') as outfile:
+            json.dump({
+                'NumberOfRows': labels.shape[0],
+                'NumberOfColumns': cols,
+                'Units': 'ms',
+                'Description': 'Time steps of the simulated time series.'}, outfile)
 
 
 def check_folders(path):
