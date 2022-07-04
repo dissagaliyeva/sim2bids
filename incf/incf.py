@@ -4,6 +4,7 @@ import pandas as pd
 import param
 import panel as pn
 import incf.preprocess.generate as gen
+import incf.preprocess.preprocess as prep
 import json
 
 
@@ -39,11 +40,14 @@ class MainArea(param.Parameterized):
         self.static_text.value = ''
 
         if len(self.cross_select.value) > 0:
+            gen.SID = prep.create_uuid()
+            self.sid = gen.SID
             self.static_text.value = gen.check_file(og_path=self.text_input.value,
                                                     values=self.cross_select.value,
                                                     output='../output', save=False)
 
     def _generate_files(self, event=None):
+        gen.SID = self.sid
         _ = gen.check_file(og_path=self.text_input.value,
                            values=self.cross_select.value,
                            output='../output', save=True)
@@ -68,13 +72,12 @@ class MainArea(param.Parameterized):
 
 class ViewResults(param.Parameterized):
     options = ['JSON files', 'TSV files']
-    json_files = get_files()
-    tsv_files = get_files(ftype='.tsv')
 
     def __init__(self, **params):
         super().__init__(file_selection=pn.widgets.RadioButtonGroup(options=self.options,
                                                                     button_type='primary', value=[]),
-                         select_options=pn.widgets.Select())
+                         select_options=pn.widgets.Select(),
+                         )
 
         self.layout = None
         self.widget = pn.WidgetBox('### Select File', self.select_options)
@@ -82,9 +85,9 @@ class ViewResults(param.Parameterized):
     @pn.depends('file_selection.value', watch=True)
     def _change_filetype(self):
         if self.file_selection.value == 'JSON files':
-            self.select_options.options = self.json_files
+            self.select_options.options = get_files()
         elif self.file_selection.value == 'TSV files':
-            self.select_options.options = self.tsv_files
+            self.select_options.options = get_files(ftype='.tsv')
 
     @pn.depends('select_options.value', watch=True)
     def _change_file(self):
@@ -97,7 +100,7 @@ class ViewResults(param.Parameterized):
             except Exception:
                 print(f'File `{self.select_options.value}` is empty!')
             else:
-                self.widget.append(pn.widgets.JSONEditor(value=file))
+                self.widget.append(pn.widgets.JSONEditor(value=file, height=350))
 
         elif self.file_selection.value == 'TSV files':
             try:
