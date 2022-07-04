@@ -7,6 +7,7 @@ import incf.preprocess.preprocess as prep
 import json
 import sys
 import csv
+from collections import OrderedDict
 
 sys.path.append('..')
 
@@ -25,6 +26,8 @@ def check_file(og_path, values, output='../output', save=False):
         # create subjects
         subs[val] = {'name': val, 'sid': prep.create_uuid(), 'sep': find_separator(path),
                      'desc': 'default', 'path': path, 'fname': name}
+        if subs[val]['fname'] in ['tract_lengths', 'tract_length']:
+            subs[val]['fname'] = 'distances'
 
         # add new id to make sure there's no overlap in folder creation
         prep.IDS.append(subs[val]['sid'])
@@ -86,39 +89,46 @@ def create_layout(subs=None, output='../output'):
 
 
 def create_sub(subs):
-    outputs = []
-    centers_found = False
+    centers_found, sid = False, None
+
+    structure = """|___ sub-{} <br>
+    &emsp;&emsp;&emsp;|___ net <br>
+    &emsp;&emsp;&emsp;&emsp;|___ sub-{}_desc-{}_{}.json <br>
+    &emsp;&emsp;&emsp;&emsp;|___ sub-{}_desc-{}_{}.tsv <br>
+    &emsp;&emsp;&emsp;|___ spatial <br>
+    &emsp;&emsp;&emsp;|___ ts  <br>
+    """
+
+    struct = []
 
     for k, v in subs.items():
-        name = subs[k]['name'].split('.')[0]
-        if subs[k]['name'] == 'weights.txt':
-            outputs.append(f"""|___ sub-{subs[k]['sid']} <br>
-                        &emsp;&emsp;&emsp;|___ net <br>
-                            &emsp;&emsp;&emsp;&emsp;|___ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.tsv <br>
-                            &emsp;&emsp;&emsp;&emsp;|___ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.json <br>
-                        &emsp;&emsp;&emsp;|___ spatial <br>
-                        &emsp;&emsp;&emsp;|___ ts  <br>
-                    """)
-        elif subs[k]['name'] == 'distances.txt':
-            outputs.append(f"""|___ sub-{subs[k]['sid']} <br>
-                         &emsp;&emsp;&emsp;|___ net <br>
-                             &emsp;&emsp;&emsp;&emsp;|___ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.tsv <br>
-                             &emsp;&emsp;&emsp;&emsp;|___ sub-{subs[k]['sid']}_desc-{subs[k]['desc']}_{name}.json <br>
-                         &emsp;&emsp;&emsp;|___ spatial <br>
-                         &emsp;&emsp;&emsp;|___ ts  <br>
-                    """)
+        name, desc = subs[k]['fname'], subs[k]['desc']
+
+        if subs[k]['name'] in ['weights.txt', 'tract_lengths.txt', 'tract_length.txt', 'distances.txt']:
+            if sid is None:
+                sid = subs[k]['sid']
+                struct.append(f"""|___ sub-{sid} <br>
+                &emsp;&emsp;&emsp;|___ net <br>
+                """)
+
+            struct.append(f'&emsp;&emsp;&emsp;&emsp;|___ sub-{sid}_desc-{desc}_{name}.json <br>')
+            struct.append(f'&emsp;&emsp;&emsp;&emsp;|___ sub-{sid}_desc-{desc}_{name}.tsv <br>')
+
         elif subs[k]['name'] in ['centres.txt', 'centers.txt']:
-            outputs.append(f"""|___ coord <br>
-                        &emsp;&emsp;&emsp;|___ desc-{subs[k]['desc']}_nodes.json <br>
-                        &emsp;&emsp;&emsp;|___ desc-{subs[k]['desc']}_labels.json <br>
-                        &emsp;&emsp;&emsp;|___ desc-{subs[k]['desc']}_nodes.tsv <br>
-                        &emsp;&emsp;&emsp;|___ desc-{subs[k]['desc']}_labels.tsv <br>
-            """)
             centers_found = True
+            struct.append(f"""|___ coord <br>
+            &emsp;&emsp;&emsp;|___ desc-{desc}_nodes.json <br>
+            &emsp;&emsp;&emsp;|___ desc-{desc}_nodes.tsv <br>
+            &emsp;&emsp;&emsp;|___ desc-{desc}_labels.json <br>
+            &emsp;&emsp;&emsp;|___ desc-{desc}_labels.tsv <br>
+            """)
+
+    struct[0] = struct[0].format(sid)
 
     if not centers_found:
-        outputs.append('|___ coord <br>')
-    return outputs
+        struct.append('|___ coord <br>')
+
+    return struct
 
 
 def create_output_folder(path, subs: dict):
@@ -126,7 +136,7 @@ def create_output_folder(path, subs: dict):
     check_folders(path)
 
     for k, v in subs.items():
-        if k in ['weights.txt', 'distances.txt']:
+        if k in ['weights.txt', 'tract_lengths.txt']:
             create_weights_distances(path, subs[k])
         if k in ['centres.txt', 'centers.txt', 'centre.txt', 'center.txt']:
             create_centers(path, subs[k])
@@ -202,4 +212,3 @@ def check_folders(path):
         if not os.path.exists(p):
             print(f'Creating file `{os.path.basename(p)}`...')
             Path(p).touch()
-
