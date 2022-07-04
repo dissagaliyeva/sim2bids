@@ -52,16 +52,13 @@ def find_separator(path):
     :param path:
     :return:
     """
+    if path.endswith('.mat'): return
 
     sniffer = csv.Sniffer()
 
     with open(path) as fp:
         delimiter = sniffer.sniff(fp.read(5000)).delimiter
     return delimiter
-
-
-def save_files(subs, output):
-    pass
 
 
 def create_layout(subs=None, output='../output'):
@@ -91,23 +88,36 @@ def create_layout(subs=None, output='../output'):
 
 
 def create_sub(subs):
-    centers_found, sid = False, None
+    # centers_found, wd_found, sid = False, False, None
+    centers_found, wd_found = False, False
     struct = []
+
+    sub_struct = """|___ sub-{} <br>
+    &emsp;&emsp;&emsp;|___ net <br>
+    &emsp;&emsp;&emsp;|___ spatial <br>
+    &emsp;&emsp;&emsp;|___ ts <br>
+    """
 
     for k, v in subs.items():
         name, desc = subs[k]['fname'], subs[k]['desc']
 
         if subs[k]['name'] in ['weights.txt', 'tract_lengths.txt', 'tract_length.txt', 'distances.txt']:
-            if sid is None:
-                sid = subs[k]['sid']
-                struct.append(f"""|___ sub-{sid} <br>
-                &emsp;&emsp;&emsp;|___ net <br>
-                """)
+            if not wd_found:
+                struct += [f'|___ sub-{SID} <br>', '&emsp;&emsp;&emsp;|___ net <br>']
+                wd_found = True
 
-            struct.append(f'&emsp;&emsp;&emsp;&emsp;|___ sub-{sid}_desc-{desc}_{name}.json <br>')
-            struct.append(f'&emsp;&emsp;&emsp;&emsp;|___ sub-{sid}_desc-{desc}_{name}.tsv <br>')
+            struct.append(f'&emsp;&emsp;&emsp;&emsp;|___ sub-{SID}_desc-{desc}_{name}.json <br>')
+            struct.append(f'&emsp;&emsp;&emsp;&emsp;|___ sub-{SID}_desc-{desc}_{name}.tsv <br>')
 
-        elif subs[k]['name'] in ['centres.txt', 'centers.txt']:
+        if subs[k]['path'].endswith('.mat'):
+            if not wd_found:
+                struct.append(sub_struct.format(SID))
+
+            # sub-AA_desc-50healthy-delta-speed20-G0.1-bold_ts
+            struct.append(f'&emsp;&emsp;&emsp;&emsp;|___ sub-{SID}_desc-{desc}_{name}.json <br>')
+            struct.append(f'&emsp;&emsp;&emsp;&emsp;|___ sub-{SID}_desc-{desc}_{name}.tsv <br>')
+
+        if subs[k]['name'] in ['centres.txt', 'centers.txt']:
             centers_found = True
             struct.append(f"""|___ coord <br>
             &emsp;&emsp;&emsp;|___ desc-{desc}_nodes.json <br>
@@ -116,7 +126,9 @@ def create_sub(subs):
             &emsp;&emsp;&emsp;|___ desc-{desc}_labels.tsv <br>
             """)
 
-    struct[0] = struct[0].format(sid)
+    # TODO: verify correct consecutive order
+    # struct[0] = struct[0].format(SID)
+    # struct.append(['&emsp;&emsp;&emsp;|___ spatial <br>', '&emsp;&emsp;&emsp;|___ ts <br>'])
 
     if not centers_found:
         struct.append('|___ coord <br>')
