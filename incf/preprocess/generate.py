@@ -156,21 +156,18 @@ def create_output_folder(path, subs: dict):
 def create_weights_distances(path, subs):
     sub = os.path.join(path, f"sub-{subs['sid']}")
     net = os.path.join(sub, 'net')
+    spatial = os.path.join(sub, 'spatial')
+    ts = os.path.join(sub, 'ts')
 
-    if not os.path.exists(sub):
-        print(f'Creating folder `{sub}`')
-        os.mkdir(sub)
-
-    if not os.path.exists(net):
-        print(f'Creating folder `{net}`')
-        os.mkdir(net)
+    for folder in [sub, net, spatial, ts]:
+        if not os.path.exists(folder):
+            print(f'Creating folder `{folder}`')
+            os.mkdir(folder)
 
     fname = f'sub-{subs["sid"]}_desc-default_{subs["fname"]}'
 
     f = pd.read_csv(subs['path'], sep=subs['sep'], index_col=None, header=None)
     f.to_csv(os.path.join(net, fname + '.tsv'), sep='\t', header=None, index=None)
-
-    shape = f.shape
 
     # get info on centers
     coord_files = os.path.exists(os.path.join(path, 'coord', f'desc-{subs["desc"]}_labels.json'))
@@ -179,8 +176,7 @@ def create_weights_distances(path, subs):
     else:
         coords = None
 
-    fpath = os.path.join(net, fname + '.json')
-    create_json(fpath, shape, desc='', ftype='wd', coords=coords)
+    create_json(os.path.join(net, fname + '.json'), f.shape, desc='', ftype='wd', coords=coords)
 
 
 def create_centers(path, subs):
