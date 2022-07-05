@@ -9,6 +9,8 @@ import json
 import sys
 import csv
 from scipy.io import loadmat
+import scipy
+import mat73
 
 sys.path.append('..')
 SID = None
@@ -116,8 +118,8 @@ def create_sub(subs):
         if subs[k]['path'].endswith('.mat'):
             if not wd_found:
                 struct.append(sub_struct.format(SID))
+                wd_found = True
 
-            # sub-AA_desc-50healthy-delta-speed20-G0.1-bold_ts
             struct.append(f'&emsp;&emsp;&emsp;&emsp;|___ sub-{SID}_desc-{desc}_{name}.json <br>')
             struct.append(f'&emsp;&emsp;&emsp;&emsp;|___ sub-{SID}_desc-{desc}_{name}.tsv <br>')
 
@@ -197,19 +199,27 @@ def create_centers(path, subs):
 
 
 def create_simulations(path, subs):
-    mat = loadmat(subs['path'], squeeze_me=True)
-    data = find_mat_array(mat)
+    try:
+        mat = loadmat(subs['path'], squeeze_me=True)
+    except NotImplementedError:
+        print(f'File `{subs["path"]}` uses MATLAB version 7.3. Using appropriate libraries...')
+    except scipy.io.matlab._miobase.MatReadError:
+        print(f'File `{subs["path"]}` is empty! Aborting file creation...')
+    else:
+        # mat = mat if not error else mat73.loadmat(subs['path'])
+        data = find_mat_array(mat)
+        if len(data) == 1:
+            data = mat[data]
+        # elif len(data) > 1:
 
-    if data is None:
-        print('Matlab file is empty!')
 
-    create_sub_folders(path)
-
-    fname = f'sub-{SID}_desc-{subs["desc"]}-{subs["fname"]}.tsv'
-    pd.DataFrame(mat[data]).to_csv(os.path.join(path, f'sub-{SID}', 'ts', fname), sep='\t', header=None, index=None)
-
-    fpath = os.path.join(path, 'coord', f'desc-{subs["desc"]}_times.json')
-    create_json(fpath, mat[data].shape, 'Time steps of the simulated time series.', 'simulations')
+        # create_sub_folders(path)
+        #
+        # fname = f'sub-{SID}_desc-{subs["desc"]}-{subs["fname"]}.tsv'
+        # pd.DataFrame(mat[data]).to_csv(os.path.join(path, f'sub-{SID}', 'ts', fname), sep='\t', header=None, index=None)
+        #
+        # fpath = os.path.join(path, 'coord', f'desc-{subs["desc"]}_times.json')
+        # create_json(fpath, mat[data].shape, 'Time steps of the simulated time series.', 'simulations')
 
 
 def create_json(fpath, shape, desc, ftype, coords=None):
@@ -228,9 +238,13 @@ def create_json(fpath, shape, desc, ftype, coords=None):
 
 
 def find_mat_array(mat):
+    data = []
+
     for k, v in mat.items():
         if type(v) not in [bytes, str, list]:
-            return k
+            data.append(k)
+
+    return data
 
 
 def create_sub_folders(path):
