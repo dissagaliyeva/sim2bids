@@ -11,3 +11,6 @@ def rm_tree(path: str = '../../output'):
         os.remove(path)
 
     print('Removed all test files...')
+
+
+# def
