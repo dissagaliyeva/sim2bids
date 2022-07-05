@@ -171,6 +171,7 @@ def create_weights_distances(path, subs):
 
     # get info on centers
     coord_files = os.path.exists(os.path.join(path, 'coord', f'desc-{subs["desc"]}_labels.json'))
+
     if coord_files:
         coords = [f'../coord/desc-{subs["desc"]}_labels.json', f'../coord/desc-{subs["desc"]}_nodes.json']
     else:
