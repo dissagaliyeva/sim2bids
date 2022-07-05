@@ -11,6 +11,7 @@ import csv
 from scipy.io import loadmat
 import scipy
 import mat73
+import h5py
 
 sys.path.append('..')
 SID = None
@@ -26,10 +27,9 @@ def check_file(og_path, values, output='../output', save=False):
 
         # get filename without file extension
         name = os.path.basename(val).split('.')[0]
-        sid = SID
 
         # create subjects
-        subs[val] = {'name': val, 'sid': sid, 'sep': find_separator(path),
+        subs[val] = {'name': val, 'sid': SID, 'sep': find_separator(path),
                      'desc': 'default', 'path': path, 'fname': name}
         if subs[val]['fname'] in ['tract_lengths', 'tract_length']:
             subs[val]['fname'] = 'distances'
@@ -153,20 +153,14 @@ def create_output_folder(path, subs: dict):
             create_centers(path, subs[k])
         if k.endswith('.mat'):
             create_simulations(path, subs[k])
+        if k.endswith('.h5'):
+            create_h5(path, subs[k])
 
 
 def create_weights_distances(path, subs):
-    sub = os.path.join(path, f"sub-{subs['sid']}")
-    net = os.path.join(sub, 'net')
-    spatial = os.path.join(sub, 'spatial')
-    ts = os.path.join(sub, 'ts')
+    sub, net, spatial, ts = create_sub_struct(path, subs)
 
-    for folder in [sub, net, spatial, ts]:
-        if not os.path.exists(folder):
-            print(f'Creating folder `{folder}`')
-            os.mkdir(folder)
-
-    fname = f'sub-{subs["sid"]}_desc-default_{subs["fname"]}'
+    fname = f'sub-{subs["sid"]}_desc-{subs["desc"]}_{subs["fname"]}'
 
     f = pd.read_csv(subs['path'], sep=subs['sep'], index_col=None, header=None)
     f.to_csv(os.path.join(net, fname + '.tsv'), sep='\t', header=None, index=None)
@@ -180,6 +174,20 @@ def create_weights_distances(path, subs):
         coords = None
 
     create_json(os.path.join(net, fname + '.json'), f.shape, desc='', ftype='wd', coords=coords)
+
+
+def create_sub_struct(path, subs):
+    sub = os.path.join(path, f"sub-{subs['sid']}")
+    net = os.path.join(sub, 'net')
+    spatial = os.path.join(sub, 'spatial')
+    ts = os.path.join(sub, 'ts')
+
+    for folder in [sub, net, spatial, ts]:
+        if not os.path.exists(folder):
+            print(f'Creating folder `{folder}`')
+            os.mkdir(folder)
+
+    return sub, net, spatial, ts
 
 
 def create_centers(path, subs):
@@ -245,6 +253,24 @@ def find_mat_array(mat):
             data.append(k)
 
     return data
+
+
+def create_h5(path, subs):
+    data = h5py.File(subs['path'])
+    vals = ['weights', 'tract_lengths', 'region_labels', 'centres']
+    sub, net, spatial, ts = create_sub_struct(path, subs)
+
+    default = 'sub-{}_desc-{}_{}.{}'
+    sid, desc, fname = subs['sid'], subs['desc'], subs['fname']
+
+    # TODO: finish the iteration
+    paths = [os.path.join(net, default.format(sid, desc, fname, 'tsv')),
+             os.path.join(net, default.format(sid, desc, fname, 'json')),
+             os.path.join(path, 'coord', default.format(sid, ))]
+
+    if len(set(vals).intersection(set(data.keys()))) == 4:
+        for val in vals:
+            pd.DataFrame(data[val][:]).to_csv()
 
 
 def create_sub_folders(path):
