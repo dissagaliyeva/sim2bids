@@ -34,6 +34,7 @@ class MainArea(param.Parameterized):
     def _select_path(self):
         if os.path.exists(self.text_input.value):
             self.cross_select.options = os.listdir(self.text_input.value)
+            self.static_text.value = ''
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
