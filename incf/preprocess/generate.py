@@ -55,7 +55,8 @@ def find_separator(path):
     :param path:
     :return:
     """
-    if path.endswith('.mat'): return
+    if path.endswith('.mat') or path.endswith('.h5'):
+        return
 
     sniffer = csv.Sniffer()
 
@@ -260,17 +261,20 @@ def create_h5(path, subs):
     vals = ['weights', 'tract_lengths', 'region_labels', 'centres']
     sub, net, spatial, ts = create_sub_struct(path, subs)
 
-    default = 'sub-{}_desc-{}_{}.{}'
-    sid, desc, fname = subs['sid'], subs['desc'], subs['fname']
+    default, nodes_labels = 'sub-{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
+    sid, desc, fname = subs['sid'], subs['desc'], subs['fname'].split('_')[0]
+    print(fname)
 
-    # TODO: finish the iteration
-    paths = [os.path.join(net, default.format(sid, desc, fname, 'tsv')),
-             os.path.join(net, default.format(sid, desc, fname, 'json')),
-             os.path.join(path, 'coord', default.format(sid, ))]
+    # 'coord', f'desc-{subs["desc"]}_nodes.tsv'
 
-    if len(set(vals).intersection(set(data.keys()))) == 4:
-        for val in vals:
-            pd.DataFrame(data[val][:]).to_csv()
+    # # TODO: finish the iteration
+    # paths = [os.path.join(net, default.format(sid, desc, fname, 'tsv')),
+    #          os.path.join(net, default.format(sid, desc, fname, 'json')),
+    #          os.path.join(path, 'coord', nodes_labels.format(desc, ''))]
+    #
+    # if len(set(vals).intersection(set(data.keys()))) == 4:
+    #     for val in vals:
+    #         pd.DataFrame(data[val][:]).to_csv()
 
 
 def create_sub_folders(path):
