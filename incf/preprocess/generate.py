@@ -4,6 +4,7 @@ import pandas as pd
 from pathlib import Path
 import incf.preprocess.preprocess as prep
 import incf.templates.templates as temp
+import incf.preprocess.simulations_h5 as h5
 
 import json
 import sys
@@ -15,6 +16,7 @@ import h5py
 
 sys.path.append('..')
 SID = None
+DEFAULT_TMPL, COORD_TMPL = 'sub-{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
 
 
 def check_file(og_path, values, output='../output', save=False):
@@ -155,7 +157,7 @@ def create_output_folder(path, subs: dict):
         if k.endswith('.mat'):
             create_simulations(path, subs[k])
         if k.endswith('.h5'):
-            create_h5(path, subs[k])
+            h5.create(path, subs[k])
 
 
 def create_weights_distances(path, subs):
@@ -174,7 +176,7 @@ def create_weights_distances(path, subs):
     else:
         coords = None
 
-    create_json(os.path.join(net, fname + '.json'), f.shape, desc='', ftype='wd', coords=coords)
+    to_json(os.path.join(net, fname + '.json'), f.shape, desc='', ftype='wd', coords=coords)
 
 
 def create_sub_struct(path, subs):
@@ -204,7 +206,7 @@ def create_centers(path, subs):
     for content in ['labels', 'nodes']:
         cols = 1 if content == 'labels' else 3
         fpath = os.path.join(path, 'coord', f'desc-{desc}_{content}.json')
-        create_json(fpath, [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
+        to_json(fpath, [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
 
 
 def create_simulations(path, subs):
@@ -228,21 +230,6 @@ def create_simulations(path, subs):
         #
         # fpath = os.path.join(path, 'coord', f'desc-{subs["desc"]}_times.json')
         # create_json(fpath, mat[data].shape, 'Time steps of the simulated time series.', 'simulations')
-
-
-def create_json(fpath, shape, desc, ftype, coords=None):
-    json_file = None
-
-    if ftype == 'simulations':
-        json_file = temp.merge_dicts(temp.JSON_template, temp.JSON_simulations)
-    elif ftype == 'centers':
-        json_file = temp.JSON_centers
-    elif ftype == 'wd':
-        json_file = temp.JSON_template
-
-    if json_file is not None:
-        with open(fpath, 'w') as f:
-            json.dump(temp.populate_dict(json_file, shape=shape, desc=desc, coords=coords), f)
 
 
 def find_mat_array(mat):
@@ -283,12 +270,30 @@ def create_h5(path, subs):
     if len(set(vals).intersection(set(data.keys()))) == 4:
         for idx, val in enumerate(vals):
             if val == 'region_labels':
-                create_json(paths[idx][1], (data[val][:].shape[0], 1), '', 'simulations', coords=coords)
-                pd.DataFrame([str(x).strip("b'") for x in data[val][:]]).to_csv(paths[idx][0],
-                                                                               sep='\t', header=None, index=None)
+                to_json(paths[idx][1], (data[val][:].shape[0], 1), '', 'simulations', coords=coords)
+                to_tsv([str(x).strip("b'") for x in data[val][:]], paths[idx][0])
             else:
-                pd.DataFrame(data[val][:]).to_csv(paths[idx][0], sep='\t', header=None, index=None)
-                create_json(paths[idx][1], data[val][:].shape, '', 'simulations', coords=coords)
+                to_tsv(data[val][:], paths[idx][0])
+                to_json(paths[idx][1], data[val][:].shape, '', 'simulations', coords=coords)
+
+
+def to_tsv(value, path):
+    pd.DataFrame(value).to_csv(path, sep='\t', header=None, index=None)
+
+
+def to_json(fpath, shape, desc, ftype, coords=None):
+    json_file = None
+
+    if ftype == 'simulations':
+        json_file = temp.merge_dicts(temp.JSON_template, temp.JSON_simulations)
+    elif ftype == 'centers':
+        json_file = temp.JSON_centers
+    elif ftype == 'wd':
+        json_file = temp.JSON_template
+
+    if json_file is not None:
+        with open(fpath, 'w') as f:
+            json.dump(temp.populate_dict(json_file, shape=shape, desc=desc, coords=coords), f)
 
 
 def create_sub_folders(path):
