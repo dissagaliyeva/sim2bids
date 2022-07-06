@@ -221,7 +221,6 @@ def create_simulations(path, subs):
             data = mat[data]
         # elif len(data) > 1:
 
-
         # create_sub_folders(path)
         #
         # fname = f'sub-{SID}_desc-{subs["desc"]}-{subs["fname"]}.tsv'
@@ -262,19 +261,34 @@ def create_h5(path, subs):
     sub, net, spatial, ts = create_sub_struct(path, subs)
 
     default, nodes_labels = 'sub-{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
-    sid, desc, fname = subs['sid'], subs['desc'], subs['fname'].split('_')[0]
-    print(fname)
+    sid, desc, fname = subs['sid'], subs['desc'], subs['fname'].split('_')[0].lower()
 
     # 'coord', f'desc-{subs["desc"]}_nodes.tsv'
 
-    # # TODO: finish the iteration
-    # paths = [os.path.join(net, default.format(sid, desc, fname, 'tsv')),
-    #          os.path.join(net, default.format(sid, desc, fname, 'json')),
-    #          os.path.join(path, 'coord', nodes_labels.format(desc, ''))]
-    #
-    # if len(set(vals).intersection(set(data.keys()))) == 4:
-    #     for val in vals:
-    #         pd.DataFrame(data[val][:]).to_csv()
+    # TODO: finish the iteration
+
+    paths = [
+        [os.path.join(net, default.format(sid, desc, fname, 'tsv')),
+         os.path.join(net, default.format(sid, desc, fname, 'json'))],
+        [os.path.join(net, default.format(sid, desc, 'distances', 'tsv')),
+         os.path.join(net, default.format(sid, desc, 'distances', 'json'))],
+        [os.path.join(path, 'coord', nodes_labels.format(desc, f'{fname}_labels', 'tsv')),
+         os.path.join(path, 'coord', nodes_labels.format(desc, f'{fname}_labels', 'json'))],
+        [os.path.join(path, 'coord', nodes_labels.format(desc, f'{fname}_nodes', 'tsv')),
+         os.path.join(path, 'coord', nodes_labels.format(desc, f'{fname}_nodes', 'json'))]
+    ]
+
+    coords = [f'../coords/{fname}_labels.json', f'../coords/{fname}_nodes.json']
+
+    if len(set(vals).intersection(set(data.keys()))) == 4:
+        for idx, val in enumerate(vals):
+            if val == 'region_labels':
+                create_json(paths[idx][1], (data[val][:].shape, 1), '', 'simulations', coords=coords)
+                pd.DataFrame([str(x).strip("b'") for x in data[val][:]]).to_csv(paths[idx][0],
+                                                                               sep='\t', header=None, index=None)
+            else:
+                pd.DataFrame(data[val][:]).to_csv(paths[idx][0], sep='\t', header=None, index=None)
+                create_json(paths[idx][1], data[val][:].shape, '', 'simulations', coords=coords)
 
 
 def create_sub_folders(path):
