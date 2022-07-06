@@ -268,10 +268,10 @@ def create_h5(path, subs):
     # TODO: finish the iteration
 
     paths = [
-        [os.path.join(net, default.format(sid, desc, fname, 'tsv')),
-         os.path.join(net, default.format(sid, desc, fname, 'json'))],
-        [os.path.join(net, default.format(sid, desc, 'distances', 'tsv')),
-         os.path.join(net, default.format(sid, desc, 'distances', 'json'))],
+        [os.path.join(net, default.format(sid, desc, f'{fname}-weights', 'tsv')),
+         os.path.join(net, default.format(sid, desc, f'{fname}-weights', 'json'))],
+        [os.path.join(net, default.format(sid, desc, f'{fname}-distances', 'tsv')),
+         os.path.join(net, default.format(sid, desc, f'{fname}-distances', 'json'))],
         [os.path.join(path, 'coord', nodes_labels.format(desc, f'{fname}_labels', 'tsv')),
          os.path.join(path, 'coord', nodes_labels.format(desc, f'{fname}_labels', 'json'))],
         [os.path.join(path, 'coord', nodes_labels.format(desc, f'{fname}_nodes', 'tsv')),
@@ -283,7 +283,7 @@ def create_h5(path, subs):
     if len(set(vals).intersection(set(data.keys()))) == 4:
         for idx, val in enumerate(vals):
             if val == 'region_labels':
-                create_json(paths[idx][1], (data[val][:].shape, 1), '', 'simulations', coords=coords)
+                create_json(paths[idx][1], (data[val][:].shape[0], 1), '', 'simulations', coords=coords)
                 pd.DataFrame([str(x).strip("b'") for x in data[val][:]]).to_csv(paths[idx][0],
                                                                                sep='\t', header=None, index=None)
             else:
