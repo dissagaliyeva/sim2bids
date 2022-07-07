@@ -15,22 +15,31 @@ SID = None
 
 
 def check_file(path, files, output='../output', save=False):
+    print(path, files)
+
     # TODO: call function to traverse files & verify which
     # TODO: notify if smth goes wrong
     traverse_files(path, files)
 
+    print(files)
     # TODO: call function to create subjects
 
     # TODO: create layout
 
-    if save:
-        save_output()
+    # if save:
+    #     save_output()
+
 
 def traverse_files(path, files):
-    #
-    pass
+    dir_walk(path)
 
 
+def dir_walk(path):
+    for root, dirs, files in os.walk(path, topdown=False):
+        for name in files:
+            print(os.path.join(root, name))
+        for name in dirs:
+            print(os.path.join(root, name))
 
     # # create dictionary to store values
     # subs = {}
@@ -83,19 +92,6 @@ def find_separator(path):
         except Exception:
             delimiter = sniffer.sniff(fp.read(100)).delimiter
     return delimiter
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # TSV = ['.mat', '.txt']
 #

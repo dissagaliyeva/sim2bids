@@ -5,6 +5,7 @@ import param
 import panel as pn
 import incf.preprocess.generate as gen
 import incf.preprocess.preprocess as prep
+from incf.convert import convert
 import json
 
 
@@ -21,14 +22,12 @@ def get_files(path='../output', ftype='.json'):
 class MainArea(param.Parameterized):
     # generate files button
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
-    text_input = pn.widgets.TextInput(name='Insert Path')
 
-    def __init__(self, path):
-        super().__init__()
-        self.path = path
-        self.cross_select = pn.widgets.CrossSelector(options=os.listdir())
+    def __init__(self, **params):
+        super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
+                         cross_select=pn.widgets.CrossSelector(options=os.listdir()),
+                         **params)
         self.static_text = pn.widgets.StaticText(margin=(50, 0, 0, 0))
-        self.sid = None
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
@@ -42,16 +41,15 @@ class MainArea(param.Parameterized):
 
         if len(self.cross_select.value) > 0:
             gen.SID = prep.create_uuid()
-            self.sid = gen.SID
-            self.static_text.value = gen.check_file(og_path=self.text_input.value,
-                                                    values=self.cross_select.value,
-                                                    output='../output', save=False)
+            self.sid = convert.SID
+            self.static_text.value = convert.check_file(path=self.text_input.value,
+                                                        files=self.cross_select.value,
+                                                        output='../output', save=False)
 
     def _generate_files(self, event=None):
-        gen.SID = self.sid
-        _ = gen.check_file(og_path=self.text_input.value,
-                           values=self.cross_select.value,
-                           output='../output', save=True)
+        _ = convert.check_file(path=self.text_input.value,
+                               files=self.cross_select.value,
+                               output='../output', save=True)
 
     def view(self):
         main = pn.Tabs(
@@ -61,9 +59,8 @@ class MainArea(param.Parameterized):
                                        self.static_text,
                                        pn.Param(self, parameters=['gen_btn'],
                                                 show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}))),
-            ('View Results', ViewResults(self.path).view()),
+            ('View Results', ViewResults().view()),
             ('User Guide', UserGuide().view()),
-            # ('Settings', Settings().view())
         )
 
         return pn.template.FastListTemplate(
@@ -78,6 +75,7 @@ class Settings(param.Parameterized):
     sub_options = ['Single subject', 'Multiple subjects']
     sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
                                              value=[], margin=(-20, 0, 0, 0))
+    text_input = pn.widgets.TextInput(name='Insert output folder path')
 
     @pn.depends('sub_select.value', watch=True)
     def _change_selection(self):
@@ -86,6 +84,7 @@ class Settings(param.Parameterized):
     def view(self):
         return pn.Column(
             '## Settings',
+            self.text_input,
             '#### Select subject count',
             self.sub_select
         )
@@ -106,9 +105,9 @@ class ViewResults(param.Parameterized):
     file_selection = pn.widgets.RadioButtonGroup(options=options, button_type='primary', value=[])
     select_options = pn.widgets.Select()
 
-    def __init__(self, path):
+    def __init__(self):
         super().__init__()
-        self.path = path
+        self.path = '../output'
         self.layout = None
         self.widget = pn.WidgetBox('### Select File', self.select_options)
 
