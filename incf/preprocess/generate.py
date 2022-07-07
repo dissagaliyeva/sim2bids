@@ -27,6 +27,9 @@ def check_file(og_path, values, output='../output', save=False):
         # get the absolute path
         path = os.path.join(og_path, val)
 
+        if os.path.isdir(path):
+            print('it is a directory!')
+
         # get filename without file extension
         name = os.path.basename(val).split('.')[0]
 
