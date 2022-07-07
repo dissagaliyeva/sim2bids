@@ -63,12 +63,12 @@ class MainArea(param.Parameterized):
                                                 show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}))),
             ('View Results', ViewResults(self.path).view()),
             ('User Guide', UserGuide().view()),
-            ('Settings', Settings().view())
+            # ('Settings', Settings().view())
         )
 
         return pn.template.FastListTemplate(
             title='Visualize | Transform | Download',
-            # sidebar=SideBar().view(),
+            sidebar=Settings().view(),
             site='INCF',
             main=main
         )
@@ -77,7 +77,7 @@ class MainArea(param.Parameterized):
 class Settings(param.Parameterized):
     sub_options = ['Single subject', 'Multiple subjects']
     sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
-                                             value=[], margin=(-10, 0, 0, 0))
+                                             value=[], margin=(-20, 0, 0, 0))
 
     @pn.depends('sub_select.value', watch=True)
     def _change_selection(self):
@@ -86,7 +86,8 @@ class Settings(param.Parameterized):
     def view(self):
         return pn.Column(
             '## Settings',
-            pn.Column('### Select subject count', self.sub_select)
+            '#### Select subject count',
+            self.sub_select
         )
 
 

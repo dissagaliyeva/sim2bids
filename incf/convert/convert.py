@@ -7,9 +7,7 @@ import incf.templates.templates as temp
 import json
 import sys
 import csv
-from scipy.io import loadmat
 import scipy
-import mat73
 import h5py
 
 sys.path.append('..')
@@ -17,36 +15,53 @@ SID = None
 
 
 def check_file(path, files, output='../output', save=False):
-    # create dictionary to store values
-    subs = {}
+    # TODO: call function to traverse files & verify which
+    # TODO: notify if smth goes wrong
+    traverse_files(path, files)
 
-    # iterate over files and save their values
-    for file in files:
-        # get absolute path
-        abs_path = os.path.join(path, file)
+    # TODO: call function to create subjects
 
-        # get filename without file extension
-        name = os.path.basename(file).split('.')[0]
+    # TODO: create layout
 
-        # create subjects
-        subs[file] = {'name': file, 'sid': SID, 'sep': find_separator(abs_path),
-                     'desc': 'default', 'path': abs_path, 'fname': name}
-
-        # rename file name to distances
-        if subs[file]['fname'] in ['tract_lengths', 'tract_length']:
-            subs[file]['fname'] = 'distances'
-
-        # add new id to make sure there's no overlap in folder creation
-        prep.IDS.append(subs[file]['sid'])
-
-    # create folders if required
     if save:
-        create_output_folder(output, subs)
+        save_output()
 
-    # generate folder structure layout
-    layout = create_layout(subs, output)
+def traverse_files(path, files):
+    #
+    pass
 
-    return layout
+
+
+    # # create dictionary to store values
+    # subs = {}
+    #
+    # # iterate over files and save their values
+    # for file in files:
+    #     # get absolute path
+    #     abs_path = os.path.join(path, file)
+    #
+    #     # get filename without file extension
+    #     name = os.path.basename(file).split('.')[0]
+    #
+    #     # create subjects
+    #     subs[file] = {'name': file, 'sid': SID, 'sep': find_separator(abs_path),
+    #                  'desc': 'default', 'path': abs_path, 'fname': name}
+    #
+    #     # rename file name to distances
+    #     if subs[file]['fname'] in ['tract_lengths', 'tract_length']:
+    #         subs[file]['fname'] = 'distances'
+    #
+    #     # add new id to make sure there's no overlap in folder creation
+    #     prep.IDS.append(subs[file]['sid'])
+    #
+    # # create folders if required
+    # if save:
+    #     create_output_folder(output, subs)
+    #
+    # # generate folder structure layout
+    # layout = create_layout(subs, output)
+    #
+    # return layout
 
 
 def find_separator(path):
