@@ -20,8 +20,11 @@ DEFAULT_TMPL, COORD_TMPL = 'sub-{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
 
 
 def check_file(og_path, values, output='../output', save=False):
+    print(values)
+
     # create dictionary to store values
     subs = {}
+    sid = SID
 
     for val in values:
         # get the absolute path
@@ -34,7 +37,7 @@ def check_file(og_path, values, output='../output', save=False):
         name = os.path.basename(val).split('.')[0]
 
         # create subjects
-        subs[val] = {'name': val, 'sid': SID, 'sep': find_separator(path),
+        subs[val] = {'name': val, 'sid': sid, 'sep': find_separator(path),
                      'desc': 'default', 'path': path, 'fname': name}
         if subs[val]['fname'] in ['tract_lengths', 'tract_length']:
             subs[val]['fname'] = 'distances'
