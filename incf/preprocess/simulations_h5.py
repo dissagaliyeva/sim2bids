@@ -3,14 +3,15 @@ import h5py
 import incf.preprocess.generate as gen
 
 COLS = ['weights', 'tract_lengths', 'region_labels', 'centres']
+TXT_COLS = ['areas', 'centres', 'cortical', 'hemispheres', 'orientations', 'region_labels', 'tract_lengths', 'weights']
 
 
 class XML:
-    def __init__(self, path, output_folder):
+    def __init__(self, path, output):
         self.path = path
         self.params = []
-        self.output_folder = output_folder
-        self.file, self.keys = None, None
+        self.output = output
+        self.file, self.keys, self.eq = None, None, None
         self.template = """<?xml version="1.0" ?>
 <Lems xmlns="http://www.neuroml.org/lems/0.7.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/lems/0.7.6 https://raw.githubusercontent.com/LEMS/LEMS/development/Schemas/LEMS/LEMS_v0.7.6.xsd">
     <Component {}/>
@@ -21,29 +22,41 @@ class XML:
         if self.path.endswith('.h5'):
             self.file = h5py.File(self.path)
             self.keys = list(self.file.keys())
+            self.eq = list(self.check_keys())
 
-            for k in self.keys:
+            for k in self.eq:
                 self.params.append('{}="{}"'.format(k, self.file[k][:][0]))
 
-            print(f'Found following parameters:\n{self.keys}')
+            if len(self.params) > 0:
+                print(f'Found following parameters:\n{self.params}')
+                self.populate_template()
+
+    def check_keys(self):
+        return set(self.keys).difference(set(TXT_COLS))
+
+    def populate_template(self):
+        if len(self.params) > 0:
+            self.template = self.template.format(' '.join(self.params))
             self.create_xml()
 
     def create_xml(self):
-        if len(self.params) > 0:
-            self.template = self.template.format(' '.join(self.params))
-            with open(self.output_folder, 'w') as f:
-                f.write(self.template)
+        with open(self.output, 'w') as f:
+            f.write(self.template)
 
 
 def create(path, subs):
     # open h5 file
     data = h5py.File(subs['path'])
+    subs['fname'] = subs['fname'].split('_')[0].lower()
 
     # create subject-specific folders
     _, net, _, _ = gen.create_sub_struct(path, subs)
 
     # check if `param` values exist
     create_params(check_params(data), [path, net], subs, data)
+
+    # check for `param` folder population
+    XML(subs['path'], os.path.join(path, 'param', f'desc-{subs["desc"]}-{subs["fname"]}.xml'))
 
 
 def check_params(data):
@@ -53,7 +66,7 @@ def check_params(data):
 
 def get_paths(paths, subs):
     path, net = paths
-    sid, desc, fname = subs['sid'], subs['desc'], subs['fname'].split('_')[0].lower()
+    sid, desc, fname = subs['sid'], subs['desc'], subs['fname']
 
     paths = [
         [os.path.join(net, gen.DEFAULT_TMPL.format(sid, desc, f'{fname}-weights', 'tsv')),

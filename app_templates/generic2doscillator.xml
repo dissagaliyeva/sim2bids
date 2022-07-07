@@ -1,4 +1,4 @@
 <?xml version="1.0" ?>
 <Lems xmlns="http://www.neuroml.org/lems/0.7.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/lems/0.7.6 https://raw.githubusercontent.com/LEMS/LEMS/development/Schemas/LEMS/LEMS_v0.7.6.xsd">
-    <Component I="0.0" a="-2.0" alpha="1.0" b="-10.0" beta="1.0" c="0.0" d="0.02" e="3.0" f="1.0" g="0.0" gamma="1.0" tau="1.0"/>
+    <Component d="0.02" alpha="1.0" b="-10.0" e="3.0" g="0.0" gamma="1.0" I="0.0" f="1.0" tau="1.0" c="0.0" beta="1.0" a="-2.0"/>
 </Lems>

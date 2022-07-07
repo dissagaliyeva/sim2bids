@@ -20,15 +20,15 @@ def get_files(path='../output', ftype='.json'):
 
 class MainArea(param.Parameterized):
     # generate files button
-    # gen_btn = pn.widgets.Button(name='Generate files', button_type='primary')
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
-    txt = param.String()
+    text_input = pn.widgets.TextInput(name='Insert Path')
 
-    def __init__(self, **params):
-        super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
-                         cross_select=pn.widgets.CrossSelector(options=os.listdir()),
-                         **params)
+    def __init__(self, path):
+        super().__init__()
+        self.path = path
+        self.cross_select = pn.widgets.CrossSelector(options=os.listdir())
         self.static_text = pn.widgets.StaticText(margin=(50, 0, 0, 0))
+        self.sid = None
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
@@ -61,34 +61,62 @@ class MainArea(param.Parameterized):
                                        self.static_text,
                                        pn.Param(self, parameters=['gen_btn'],
                                                 show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}))),
-            ('View Results', ViewResults().view()),
-            ('User Guide', UserGuide().view()))
+            ('View Results', ViewResults(self.path).view()),
+            ('User Guide', UserGuide().view()),
+            ('Settings', Settings().view())
+        )
 
         return pn.template.FastListTemplate(
             title='Visualize | Transform | Download',
+            # sidebar=SideBar().view(),
             site='INCF',
             main=main
         )
 
 
+class Settings(param.Parameterized):
+    sub_options = ['Single subject', 'Multiple subjects']
+    sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
+                                             value=[], margin=(-10, 0, 0, 0))
+
+    @pn.depends('sub_select.value', watch=True)
+    def _change_selection(self):
+        pass
+
+    def view(self):
+        return pn.Column(
+            '## Settings',
+            pn.Column('### Select subject count', self.sub_select)
+        )
+
+
+#     def __init__(self):
+#         """
+#         checkbox_group = pn.widgets.CheckBoxGroup(
+#     name='Checkbox Group', value=['Apple', 'Pear'], options=['Apple', 'Banana', 'Pear', 'Strawberry'],
+#     inline=True)
+#
+# checkbox_group
+#         """
+#         super().__init__(select=pn.widgets.Select(options=self.sel_options, ))
+
 class ViewResults(param.Parameterized):
     options = ['JSON files', 'TSV files']
+    file_selection = pn.widgets.RadioButtonGroup(options=options, button_type='primary', value=[])
+    select_options = pn.widgets.Select()
 
-    def __init__(self, **params):
-        super().__init__(file_selection=pn.widgets.RadioButtonGroup(options=self.options,
-                                                                    button_type='primary', value=[]),
-                         select_options=pn.widgets.Select(),
-                         )
-
+    def __init__(self, path):
+        super().__init__()
+        self.path = path
         self.layout = None
         self.widget = pn.WidgetBox('### Select File', self.select_options)
 
     @pn.depends('file_selection.value', watch=True)
     def _change_filetype(self):
         if self.file_selection.value == 'JSON files':
-            self.select_options.options = get_files()
+            self.select_options.options = get_files(path=self.path)
         elif self.file_selection.value == 'TSV files':
-            self.select_options.options = get_files(ftype='.tsv')
+            self.select_options.options = get_files(path=self.path, ftype='.tsv')
 
     @pn.depends('select_options.value', watch=True)
     def _change_file(self):
@@ -113,6 +141,49 @@ class ViewResults(param.Parameterized):
 
     def view(self):
         return pn.Column(self.file_selection, self.widget)
+
+
+# class ViewResults(param.Parameterized):
+#     options = ['JSON files', 'TSV files']
+#
+#     def __init__(self, path):
+#         super().__init__(file_selection=pn.widgets.RadioButtonGroup(options=self.options,
+#                                                                     button_type='primary', value=[]),
+#                          select_options=pn.widgets.Select())
+#         self.path = path
+#         self.layout = None
+#         self.widget = pn.WidgetBox('### Select File', self.select_options)
+#
+#     @pn.depends('file_selection.value', watch=True)
+#     def _change_filetype(self):
+#         if self.file_selection.value == 'JSON files':
+#             self.select_options.options = get_files(path=self.path)
+#         elif self.file_selection.value == 'TSV files':
+#             self.select_options.options = get_files(path=self.path, ftype='.tsv')
+#
+#     @pn.depends('select_options.value', watch=True)
+#     def _change_file(self):
+#         if len(self.widget) > 2:
+#             self.widget.pop(-1)
+#
+#         if self.file_selection.value == 'JSON files':
+#             try:
+#                 file = json.load(open(self.select_options.value))
+#             except Exception:
+#                 print(f'File `{self.select_options.value}` is empty!')
+#             else:
+#                 self.widget.append(pn.widgets.JSONEditor(value=file, height=350))
+#
+#         elif self.file_selection.value == 'TSV files':
+#             try:
+#                 file = pd.read_csv(self.select_options.value, sep='\t', header=None, index_col=None)
+#             except Exception:
+#                 print(f'File `{self.select_options.value}` is empty!')
+#             else:
+#                 self.widget.append(pn.widgets.Tabulator(file))
+#
+#     def view(self):
+#         return pn.Column(self.file_selection, self.widget)
 
 
 # def verify_keys(json1, json2):
