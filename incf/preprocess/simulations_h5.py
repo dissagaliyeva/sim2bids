@@ -20,6 +20,7 @@ class XML:
 
     def parse_file(self):
         if self.path.endswith('.h5'):
+            print(True)
             self.file = h5py.File(self.path)
             self.keys = list(self.file.keys())
             self.eq = list(self.check_keys())
@@ -40,6 +41,7 @@ class XML:
             self.create_xml()
 
     def create_xml(self):
+        print(self.output)
         with open(self.output, 'w') as f:
             f.write(self.template)
 

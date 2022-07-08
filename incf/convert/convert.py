@@ -37,9 +37,9 @@ def traverse_files(path, files):
 def dir_walk(path):
     for root, dirs, files in os.walk(path, topdown=False):
         for name in files:
-            print(os.path.join(root, name))
+            print('Files', os.path.join(root, name))
         for name in dirs:
-            print(os.path.join(root, name))
+            print('Dirs', os.path.join(root, name))
 
     # # create dictionary to store values
     # subs = {}
