@@ -41,20 +41,20 @@ class MainArea(param.Parameterized):
 
         if len(self.cross_select.value) > 0:
             gen.SID = prep.create_uuid()
-            self.sid = gen.SID
-            self.static_text.value = gen.check_file(self.text_input.value, self.cross_select.value,
-                                                    output='../output', save=False)
-            # self.sid = convert.SID
-            # self.static_text.value = convert.check_file(path=self.text_input.value,
-            #                                             files=self.cross_select.value,
-            #                                             output='../output', save=False)
+            # self.sid = gen.SID
+            # self.static_text.value = gen.check_file(self.text_input.value, self.cross_select.value,
+            #                                         output='../output', save=False)
+            self.sid = convert.SID
+            self.static_text.value = convert.check_file(path=self.text_input.value,
+                                                        files=self.cross_select.value,
+                                                        output='../output', save=False)
 
     def _generate_files(self, event=None):
-        _ = gen.check_file(self.text_input.value, self.cross_select.value,
-                           output='../output', save=True)
-        # _ = convert.check_file(path=self.text_input.value,
-        #                        files=self.cross_select.value,
-        #                        output='../output', save=True)
+        # _ = gen.check_file(self.text_input.value, self.cross_select.value,
+        #                    output='../output', save=True)
+        _ = convert.check_file(path=self.text_input.value,
+                               files=self.cross_select.value,
+                               output='../output', save=True)
 
     def view(self):
         main = pn.Tabs(
@@ -81,6 +81,8 @@ class Settings(param.Parameterized):
     sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
                                              value=[], margin=(-20, 0, 0, 0))
     text_input = pn.widgets.TextInput(name='Insert output folder path')
+
+
 
     @pn.depends('sub_select.value', watch=True)
     def _change_selection(self):
