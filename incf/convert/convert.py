@@ -9,9 +9,12 @@ import sys
 import csv
 import scipy
 import h5py
+import panel as pn
 
 sys.path.append('..')
 SID = None
+DURATION = 3000
+# pn.state.notifications.info('This is a info notification.', duration=3000)
 
 
 def check_file(path, files, output='../output', save=False):
@@ -21,7 +24,6 @@ def check_file(path, files, output='../output', save=False):
     # TODO: notify if smth goes wrong
     traverse_files(path, files)
 
-    print(files)
     # TODO: call function to create subjects
 
     # TODO: create layout
@@ -31,7 +33,11 @@ def check_file(path, files, output='../output', save=False):
 
 
 def traverse_files(path, files):
-    dir_walk(path)
+    for file in files:
+        fpath = os.path.join(path, file)
+
+        if os.path.isdir(fpath):
+            pn.state.notifications.info(f'Found directory at {fpath}.', duration=3000)
 
 
 def dir_walk(path):
@@ -70,8 +76,7 @@ def dir_walk(path):
     # # generate folder structure layout
     # layout = create_layout(subs, output)
     #
-    # return layout
-
+    # return layout*+
 
 def find_separator(path):
     """
