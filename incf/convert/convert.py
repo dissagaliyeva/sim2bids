@@ -14,6 +14,7 @@ import panel as pn
 sys.path.append('..')
 SID = None
 DURATION = 3000
+TRAVERSE_FOLDERS = True
 # pn.state.notifications.info('This is a info notification.', duration=3000)
 
 
@@ -36,8 +37,8 @@ def traverse_files(path, files):
     for file in files:
         fpath = os.path.join(path, file)
 
-        if os.path.isdir(fpath):
-            pn.state.notifications.info(f'Found directory at {fpath}.', duration=DURATION)
+        if os.path.isdir(fpath) and TRAVERSE_FOLDERS:
+            pn.state.notifications.info(f'Found directory {file}. Traversing...', duration=DURATION)
 
 
 def dir_walk(path):
