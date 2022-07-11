@@ -40,14 +40,19 @@ class MainArea(param.Parameterized):
         self.static_text.value = ''
 
         if len(self.cross_select.value) > 0:
-            gen.SID = prep.create_uuid()
-            # self.sid = gen.SID
-            # self.static_text.value = gen.check_file(self.text_input.value, self.cross_select.value,
-            #                                         output='../output', save=False)
-            self.sid = convert.SID
-            self.static_text.value = convert.check_file(path=self.text_input.value,
-                                                        files=self.cross_select.value,
-                                                        output='../output', save=False)
+            # Step 1: traverse files and check for problems
+            output = convert.check_input(path=self.text_input.value, files=self.cross_select.value)
+
+            # reload folder selection if an error occurred
+            if output == 'reset':
+                self.cross_select.value = []
+                self.cross_select.options = os.listdir(self.text_input.value)
+            else:
+                convert.SID = prep.create_uuid()
+                self.sid = convert.SID
+                self.static_text.value = convert.check_file(path=self.text_input.value,
+                                                            files=self.cross_select.value,
+                                                            output='../output', save=False)
 
     def _generate_files(self, event=None):
         # _ = gen.check_file(self.text_input.value, self.cross_select.value,
@@ -77,25 +82,25 @@ class MainArea(param.Parameterized):
 
 
 class Settings(param.Parameterized):
-    sub_options = ['Single subject', 'Multiple subjects']
+    sub_options = ['Single simulation', 'Multiple simulations']
     sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
-                                             value=[], margin=(-20, 0, 0, 0))
+                                             value='Single simulation', margin=(-20, 0, 0, 0))
+    convert.SUB_COUNT = sub_select.value
     text_input = pn.widgets.TextInput(name='Insert output folder path')
 
-    checkbox_options = ['Traverse sub-folders', 'Option 2', 'Option 3']
-    checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse sub-folders'],
+    checkbox_options = ['Traverse subfolders', 'Option 2', 'Option 3']
+    checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders'],
                                               options=checkbox_options,
                                               margin=(-20, 0, 0, 0))
 
     @pn.depends('sub_select.value', watch=True)
     def _change_selection(self):
-        pass
+        convert.SUB_COUNT = self.sub_select.value
 
     @pn.depends('checkbox_group.value', watch=True)
     def _change_checkbox(self):
         # set whether to traverse sub-folders
         convert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
-
 
     def view(self):
         return pn.Column(
@@ -107,16 +112,6 @@ class Settings(param.Parameterized):
             self.checkbox_group
         )
 
-
-#     def __init__(self):
-#         """
-#         checkbox_group = pn.widgets.CheckBoxGroup(
-#     name='Checkbox Group', value=['Apple', 'Pear'], options=['Apple', 'Banana', 'Pear', 'Strawberry'],
-#     inline=True)
-#
-# checkbox_group
-#         """
-#         super().__init__(select=pn.widgets.Select(options=self.sel_options, ))
 
 class ViewResults(param.Parameterized):
     options = ['JSON files', 'TSV files']
