@@ -37,7 +37,7 @@ def traverse_files(path, files):
         fpath = os.path.join(path, file)
 
         if os.path.isdir(fpath):
-            pn.state.notifications.info(f'Found directory at {fpath}.', duration=3000)
+            pn.state.notifications.info(f'Found directory at {fpath}.', duration=DURATION)
 
 
 def dir_walk(path):
