@@ -15,15 +15,51 @@ sys.path.append('..')
 SID = None
 DURATION = 3000
 TRAVERSE_FOLDERS = True
+SUB_COUNT = None
 # pn.state.notifications.info('This is a info notification.', duration=3000)
 
 
-def check_file(path, files, output='../output', save=False):
-    print(path, files)
+def check_input(path, files):
+    all_files = []
 
-    # TODO: call function to traverse files & verify which
-    # TODO: notify if smth goes wrong
-    traverse_files(path, files)
+    for file in files:
+        fpath = os.path.join(path, file)
+
+        if os.path.isdir(fpath) and TRAVERSE_FOLDERS:
+            all_files += append_files(fpath)
+
+            if SUB_COUNT is None:
+                pn.state.notifications.error('Please select subject count on the left', duration=DURATION)
+                return 'reset'
+
+    # verify there are unique files if SUB_COUNT = `single`
+    if SUB_COUNT == 'Single simulation':
+        if not check_compatibility(all_files):
+            pn.state.notifications.error('There are multiple simulation inputs. Please select `Multiple simulations`'
+                                         'option on the left.', duration=DURATION)
+            return 'reset'
+
+    pn.state.notifications.success('Processing input data...', duration=DURATION)
+    return 'success'
+
+
+def append_files(path):
+    all_files = []
+    for root, dirs, files in os.walk(path, topdown=True):
+        for file in files:
+            all_files.append(os.path.basename(file))
+    return all_files
+
+
+def check_compatibility(files):
+    return len(set(files)) == len(files)
+
+
+def check_file(path, files, output='../output', save=False):
+    # TODO: call to gather all files together
+    check_content(path, files)
+
+
 
     # TODO: call function to create subjects
 
@@ -32,13 +68,8 @@ def check_file(path, files, output='../output', save=False):
     # if save:
     #     save_output()
 
-
-def traverse_files(path, files):
-    for file in files:
-        fpath = os.path.join(path, file)
-
-        if os.path.isdir(fpath) and TRAVERSE_FOLDERS:
-            pn.state.notifications.info(f'Found directory {file}. Traversing...', duration=DURATION)
+def check_content(path, files):
+    pass
 
 
 def dir_walk(path):
