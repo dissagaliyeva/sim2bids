@@ -16,7 +16,7 @@ SID = None
 DURATION = 3000
 TRAVERSE_FOLDERS = True
 SUB_COUNT = None
-# pn.state.notifications.info('This is a info notification.', duration=3000)
+OUTPUT = None
 
 
 def check_input(path, files):
@@ -59,8 +59,6 @@ def check_file(path, files, output='../output', save=False):
     # TODO: call to gather all files together
     check_content(path, files)
 
-
-
     # TODO: call function to create subjects
 
     # TODO: create layout
@@ -68,47 +66,10 @@ def check_file(path, files, output='../output', save=False):
     # if save:
     #     save_output()
 
+
 def check_content(path, files):
     pass
 
-
-def dir_walk(path):
-    for root, dirs, files in os.walk(path, topdown=False):
-        for name in files:
-            print('Files', os.path.join(root, name))
-        for name in dirs:
-            print('Dirs', os.path.join(root, name))
-
-    # # create dictionary to store values
-    # subs = {}
-    #
-    # # iterate over files and save their values
-    # for file in files:
-    #     # get absolute path
-    #     abs_path = os.path.join(path, file)
-    #
-    #     # get filename without file extension
-    #     name = os.path.basename(file).split('.')[0]
-    #
-    #     # create subjects
-    #     subs[file] = {'name': file, 'sid': SID, 'sep': find_separator(abs_path),
-    #                  'desc': 'default', 'path': abs_path, 'fname': name}
-    #
-    #     # rename file name to distances
-    #     if subs[file]['fname'] in ['tract_lengths', 'tract_length']:
-    #         subs[file]['fname'] = 'distances'
-    #
-    #     # add new id to make sure there's no overlap in folder creation
-    #     prep.IDS.append(subs[file]['sid'])
-    #
-    # # create folders if required
-    # if save:
-    #     create_output_folder(output, subs)
-    #
-    # # generate folder structure layout
-    # layout = create_layout(subs, output)
-    #
-    # return layout*+
 
 def find_separator(path):
     """
