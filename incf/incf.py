@@ -82,13 +82,20 @@ class Settings(param.Parameterized):
                                              value=[], margin=(-20, 0, 0, 0))
     text_input = pn.widgets.TextInput(name='Insert output folder path')
 
+    checkbox_options = ['Traverse sub-folders', 'Option 2', 'Option 3']
     checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse sub-folders'],
-                                              options=['Traverse sub-folders', 'Option 2', 'Option 3'],
+                                              options=checkbox_options,
                                               margin=(-20, 0, 0, 0))
 
     @pn.depends('sub_select.value', watch=True)
     def _change_selection(self):
         pass
+
+    @pn.depends('checkbox_group.value', watch=True)
+    def _change_checkbox(self):
+        # set whether to traverse sub-folders
+        convert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
+
 
     def view(self):
         return pn.Column(
