@@ -55,8 +55,6 @@ class MainArea(param.Parameterized):
                                                             output='../output', save=False)
 
     def _generate_files(self, event=None):
-        # _ = gen.check_file(self.text_input.value, self.cross_select.value,
-        #                    output='../output', save=True)
         _ = convert.check_file(path=self.text_input.value,
                                files=self.cross_select.value,
                                output='../output', save=True)
@@ -101,6 +99,17 @@ class Settings(param.Parameterized):
     def _change_checkbox(self):
         # set whether to traverse sub-folders
         convert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
+
+    @pn.depends('text_input.value', watch=True)
+    def _store_output(self):
+        output = self.text_input.value
+
+        if len(output) > 0:
+            if not os.path.exists(output):
+                pn.state.notifications.error(f'Folder `{output}` does not exist!', duration=convert.DURATION)
+            else:
+                pn.state.notifications.success(f'Folder `{output}` is selected as output folder',
+                                               duration=convert.DURATION)
 
     def view(self):
         return pn.Column(

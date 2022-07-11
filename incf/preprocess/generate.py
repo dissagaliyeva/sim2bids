@@ -20,8 +20,6 @@ DEFAULT_TMPL, COORD_TMPL = 'sub-{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
 
 
 def check_file(og_path, values, output='../output', save=False):
-    print(values)
-
     # create dictionary to store values
     subs = {}
     sid = SID
