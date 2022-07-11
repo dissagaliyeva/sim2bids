@@ -52,12 +52,10 @@ class MainArea(param.Parameterized):
                 self.sid = convert.SID
                 self.static_text.value = convert.check_file(path=self.text_input.value,
                                                             files=self.cross_select.value,
-                                                            output='../output', save=False)
+                                                            save=False)
 
     def _generate_files(self, event=None):
-        _ = convert.check_file(path=self.text_input.value,
-                               files=self.cross_select.value,
-                               output='../output', save=True)
+        _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value, save=True)
 
     def view(self):
         main = pn.Tabs(
@@ -84,7 +82,8 @@ class Settings(param.Parameterized):
     sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
                                              value='Single simulation', margin=(-20, 0, 0, 0))
     convert.SUB_COUNT = sub_select.value
-    text_input = pn.widgets.TextInput(name='Insert output folder path')
+    text_input = pn.widgets.TextInput(name='Insert output folder path', value='../output')
+    convert.OUTPUT = text_input.value
 
     checkbox_options = ['Traverse subfolders', 'Option 2', 'Option 3']
     checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders'],
@@ -102,6 +101,7 @@ class Settings(param.Parameterized):
 
     @pn.depends('text_input.value', watch=True)
     def _store_output(self):
+        print('Triggered')
         output = self.text_input.value
 
         if len(output) > 0:
@@ -110,6 +110,7 @@ class Settings(param.Parameterized):
             else:
                 pn.state.notifications.success(f'Folder `{output}` is selected as output folder',
                                                duration=convert.DURATION)
+                convert.OUTPUT = output
 
     def view(self):
         return pn.Column(
