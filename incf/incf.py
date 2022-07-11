@@ -82,7 +82,9 @@ class Settings(param.Parameterized):
                                              value=[], margin=(-20, 0, 0, 0))
     text_input = pn.widgets.TextInput(name='Insert output folder path')
 
-
+    checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse sub-folders'],
+                                              options=['Traverse sub-folders', 'Option 2', 'Option 3'],
+                                              margin=(-20, 0, 0, 0))
 
     @pn.depends('sub_select.value', watch=True)
     def _change_selection(self):
@@ -93,7 +95,9 @@ class Settings(param.Parameterized):
             '## Settings',
             self.text_input,
             '#### Select subject count',
-            self.sub_select
+            self.sub_select,
+            '#### Select additional settings',
+            self.checkbox_group
         )
 
 
