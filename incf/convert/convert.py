@@ -15,8 +15,8 @@ sys.path.append('..')
 SID = None
 DURATION = 3000
 TRAVERSE_FOLDERS = True
-SUB_COUNT = None
-OUTPUT = None
+SUB_COUNT = 'Single simulation'
+OUTPUT = '../output'
 
 
 def check_input(path, files):
@@ -27,10 +27,6 @@ def check_input(path, files):
 
         if os.path.isdir(fpath) and TRAVERSE_FOLDERS:
             all_files += append_files(fpath)
-
-            if SUB_COUNT is None:
-                pn.state.notifications.error('Please select subject count on the left', duration=DURATION)
-                return 'reset'
 
     # verify there are unique files if SUB_COUNT = `single`
     if SUB_COUNT == 'Single simulation':
@@ -43,11 +39,24 @@ def check_input(path, files):
     return 'success'
 
 
-def append_files(path):
+def append_files(path, include=None):
+    """
+    Append all files in a specified file using recursive walk. It implements a
+    top-down approach of traversing the directory.
+
+    :param path:
+    :param include:
+    :return:
+    """
+
     all_files = []
     for root, dirs, files in os.walk(path, topdown=True):
         for file in files:
-            all_files.append(os.path.basename(file))
+            if include is None:
+                all_files.append(os.path.basename(file))
+            else:
+                if file in include or len(include) == 0:
+                    all_files.append(os.path.join(root, file))
     return all_files
 
 
@@ -55,20 +64,30 @@ def check_compatibility(files):
     return len(set(files)) == len(files)
 
 
-def check_file(path, files, output='../output', save=False):
-    # TODO: call to gather all files together
-    check_content(path, files)
+def check_file(path, files, save=False):
+    subs = None
 
-    # TODO: call function to create subjects
+    if SUB_COUNT == 'Single simulation':
+        subs = get_content(path, files)
+    else:
+        subs = get_content(path, files, single=False)
 
     # TODO: create layout
-
+    # create_layout(subs)
+    #
     # if save:
-    #     save_output()
+    #     save_output(subs, OUTPUT)
 
 
-def check_content(path, files):
-    pass
+def get_content(path, files, single=True):
+    all_files = []
+    if single:
+        for file in files:
+            if os.path.isdir(os.path.join(path, file)):
+                all_files += append_files(os.path.join(path, file), [])
+            else:
+                all_files.append(os.path.join(path, file))
+    return all_files
 
 
 def find_separator(path):
