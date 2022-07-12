@@ -52,8 +52,11 @@ def append_files(path, include=None):
     all_files = []
     for root, dirs, files in os.walk(path, topdown=True):
         for file in files:
-            if include is None or (file in include and not os.path.isdir(file)):
+            if include is None:
                 all_files.append(os.path.basename(file))
+            else:
+                if file in include or len(include) == 0:
+                    all_files.append(os.path.join(root, file))
     return all_files
 
 
@@ -65,7 +68,7 @@ def check_file(path, files, save=False):
     subs = None
 
     if SUB_COUNT == 'Single simulation':
-        subs = get_content(path, files, single=True)
+        subs = get_content(path, files)
     else:
         subs = get_content(path, files, single=False)
 
@@ -77,11 +80,14 @@ def check_file(path, files, save=False):
 
 
 def get_content(path, files, single=True):
+    all_files = []
     if single:
-        # for file in files:
-
-        f = append_files(path, include=files)
-        print(f)
+        for file in files:
+            if os.path.isdir(os.path.join(path, file)):
+                all_files += append_files(os.path.join(path, file), [])
+            else:
+                all_files.append(os.path.join(path, file))
+    return all_files
 
 
 def find_separator(path):
