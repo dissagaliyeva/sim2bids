@@ -24,21 +24,33 @@ class MainArea(param.Parameterized):
     # generate files button
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
 
+    # sidebar components
+    sub_options = ['Single simulation', 'Multiple simulations']
+    sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
+                                             value='Single simulation', margin=(-20, 0, 0, 0))
+    convert.SUB_COUNT = sub_select.value
+    output_path = pn.widgets.TextInput(name='Insert output folder path', value='../output')
+    convert.OUTPUT = output_path.value
+
+    checkbox_options = ['Traverse subfolders', 'Option 2', 'Option 3']
+    checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders'],
+                                              options=checkbox_options,
+                                              margin=(-20, 0, 0, 0))
+
     def __init__(self, **params):
         super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
                          cross_select=pn.widgets.CrossSelector(options=os.listdir()),
                          **params)
         self.future_struct = pn.widgets.StaticText(margin=(0, 0, 50, 20))
         self.current_struct = pn.widgets.StaticText(margin=(0, 0, 50, 20))
-        self.settings = Settings()
-        self.current_struct.value = struct.get_current_output(self.settings.output_path.value)
+        self.current_struct.value = struct.get_current_output(self.output_path.value)
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
         if os.path.exists(self.text_input.value):
             self.cross_select.options = os.listdir(self.text_input.value)
             self.future_struct.value = ''
-            self.current_struct.value = struct.get_current_output(self.settings.output_path.value)
+            self.current_struct.value = struct.get_current_output(self.output_path.value)
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
@@ -63,6 +75,29 @@ class MainArea(param.Parameterized):
     def _generate_files(self, event=None):
         _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value, save=True)
 
+    @pn.depends('sub_select.value', watch=True)
+    def _change_selection(self):
+        self.cross_select.options = os.listdir(self.text_input.value)
+        self.cross_select.value = []
+        convert.SUB_COUNT = self.sub_select.value
+
+    @pn.depends('checkbox_group.value', watch=True)
+    def _change_checkbox(self):
+        # set whether to traverse sub-folders
+        convert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
+
+    @pn.depends('output_path.value', watch=True)
+    def _store_output(self):
+        output = self.output_path.value
+
+        if len(output) > 0:
+            if not os.path.exists(output):
+                pn.state.notifications.error(f'Folder `{output}` does not exist!', duration=convert.DURATION)
+            else:
+                pn.state.notifications.success(f'Folder `{output}` is selected as output folder',
+                                               duration=convert.DURATION)
+                convert.OUTPUT = output
+
     def view(self):
         main = pn.Tabs(
             ('Select Files', pn.Column(pn.pane.Markdown(GET_STARTED),
@@ -77,51 +112,7 @@ class MainArea(param.Parameterized):
             ('User Guide', UserGuide().view()),
         )
 
-        return pn.template.FastListTemplate(
-            title='Visualize | Transform | Download',
-            sidebar=self.settings.view(),
-            site='INCF',
-            main=main
-        )
-
-
-class Settings(param.Parameterized):
-    sub_options = ['Single simulation', 'Multiple simulations']
-    sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
-                                             value='Single simulation', margin=(-20, 0, 0, 0))
-    convert.SUB_COUNT = sub_select.value
-    output_path = pn.widgets.TextInput(name='Insert output folder path', value='../output')
-    convert.OUTPUT = output_path.value
-
-    checkbox_options = ['Traverse subfolders', 'Option 2', 'Option 3']
-    checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders'],
-                                              options=checkbox_options,
-                                              margin=(-20, 0, 0, 0))
-
-    @pn.depends('sub_select.value', watch=True)
-    def _change_selection(self):
-        convert.SUB_COUNT = self.sub_select.value
-
-    @pn.depends('checkbox_group.value', watch=True)
-    def _change_checkbox(self):
-        # set whether to traverse sub-folders
-        convert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
-
-    @pn.depends('output_path.value', watch=True)
-    def _store_output(self):
-        print('Triggered')
-        output = self.output_path.value
-
-        if len(output) > 0:
-            if not os.path.exists(output):
-                pn.state.notifications.error(f'Folder `{output}` does not exist!', duration=convert.DURATION)
-            else:
-                pn.state.notifications.success(f'Folder `{output}` is selected as output folder',
-                                               duration=convert.DURATION)
-                convert.OUTPUT = output
-
-    def view(self):
-        return pn.Column(
+        sidebar = pn.Column(
             '## Settings',
             self.output_path,
             '#### Select subject count',
@@ -129,6 +120,59 @@ class Settings(param.Parameterized):
             '#### Select additional settings',
             self.checkbox_group
         )
+
+        return pn.template.FastListTemplate(
+            title='Visualize | Transform | Download',
+            sidebar=sidebar,
+            site='INCF',
+            main=main
+        )
+
+
+# class Settings(param.Parameterized):
+#     sub_options = ['Single simulation', 'Multiple simulations']
+#     sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
+#                                              value='Single simulation', margin=(-20, 0, 0, 0))
+#     convert.SUB_COUNT = sub_select.value
+#     output_path = pn.widgets.TextInput(name='Insert output folder path', value='../output')
+#     convert.OUTPUT = output_path.value
+#
+#     checkbox_options = ['Traverse subfolders', 'Option 2', 'Option 3']
+#     checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders'],
+#                                               options=checkbox_options,
+#                                               margin=(-20, 0, 0, 0))
+#
+#     @pn.depends('sub_select.value', watch=True)
+#     def _change_selection(self):
+#         convert.SUB_COUNT = self.sub_select.value
+#
+#     @pn.depends('checkbox_group.value', watch=True)
+#     def _change_checkbox(self):
+#         # set whether to traverse sub-folders
+#         convert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
+#
+#     @pn.depends('output_path.value', watch=True)
+#     def _store_output(self):
+#         print('Triggered')
+#         output = self.output_path.value
+#
+#         if len(output) > 0:
+#             if not os.path.exists(output):
+#                 pn.state.notifications.error(f'Folder `{output}` does not exist!', duration=convert.DURATION)
+#             else:
+#                 pn.state.notifications.success(f'Folder `{output}` is selected as output folder',
+#                                                duration=convert.DURATION)
+#                 convert.OUTPUT = output
+#
+#     def view(self):
+#         return pn.Column(
+#             '## Settings',
+#             self.output_path,
+#             '#### Select subject count',
+#             self.sub_select,
+#             '#### Select additional settings',
+#             self.checkbox_group
+#         )
 
 
 class ViewResults(param.Parameterized):
