@@ -17,6 +17,11 @@ DURATION = 3000
 TRAVERSE_FOLDERS = True
 SUB_COUNT = 'Single simulation'
 OUTPUT = '../output'
+DESC = 'default'
+
+
+def check_compatibility(files):
+    return len(set(files)) == len(files)
 
 
 def check_input(path, files):
@@ -26,7 +31,7 @@ def check_input(path, files):
         fpath = os.path.join(path, file)
 
         if os.path.isdir(fpath) and TRAVERSE_FOLDERS:
-            all_files += append_files(fpath)
+            all_files += traverse_files(fpath, basename=True)
 
     # verify there are unique files if SUB_COUNT = `single`
     if SUB_COUNT == 'Single simulation':
@@ -39,41 +44,41 @@ def check_input(path, files):
     return 'success'
 
 
-def append_files(path, include=None):
+def traverse_files(path: str, basename: bool = False) -> list:
     """
-    Append all files in a specified file using recursive walk. It implements a
-    top-down approach of traversing the directory.
+    Recursively traverse a specified folder and sub-folders. If `basename` is enabled,
+    save only the file names. Otherwise, save absolute paths.
 
-    :param path:
-    :param include:
-    :return:
+    :param path: str
+        Path to the folder location to traverse.
+    :param basename: bool
+        Whether to save values by their absolute paths (False) or basename (True).
+    :return: list
+        Returns a list of basename or absolute paths.
     """
 
-    all_files = []
-    for root, dirs, files in os.walk(path, topdown=True):
+    contents = []
+
+    for root, _, files in os.walk(path, topdown=True):
         for file in files:
-            if include is None:
-                all_files.append(os.path.basename(file))
+            if basename:
+                contents.append(get_filename(file))
             else:
-                if file in include or len(include) == 0:
-                    all_files.append(os.path.join(root, file))
-    return all_files
+                contents.append(os.path.join(root, file))
 
-
-def check_compatibility(files):
-    return len(set(files)) == len(files)
+    return contents
 
 
 def check_file(path, files, save=False):
     subs = None
 
     if SUB_COUNT == 'Single simulation':
-        subs = get_content(path, files)
+        subs = prepare_subs(get_content(path, files))
     else:
         subs = get_content(path, files, single=False)
 
     # TODO: create layout
-    # create_layout(subs)
+    create_layout(subs)
     #
     # if save:
     #     save_output(subs, OUTPUT)
@@ -84,10 +89,33 @@ def get_content(path, files, single=True):
     if single:
         for file in files:
             if os.path.isdir(os.path.join(path, file)):
-                all_files += append_files(os.path.join(path, file), [])
+                all_files += traverse_files(os.path.join(path, file))
             else:
                 all_files.append(os.path.join(path, file))
-    return all_files
+        return all_files
+
+
+def prepare_subs(file_paths):
+    subs = {}
+    for file_path in file_paths:
+        name = get_filename(file_path)
+        subs[name] = {
+            'name': name,
+            'sid': SID,
+            'sep': find_separator(file_path),
+            'desc': DESC,
+            'path': file_path,
+            'ext': get_file_ext(file_path)
+        }
+    return subs
+
+
+def get_filename(path):
+    return os.path.basename(path)
+
+
+def get_file_ext(path):
+    return path.split('.')[-1]
 
 
 def find_separator(path):
@@ -109,6 +137,7 @@ def find_separator(path):
         except Exception:
             delimiter = sniffer.sniff(fp.read(100)).delimiter
     return delimiter
+
 
 # TSV = ['.mat', '.txt']
 #

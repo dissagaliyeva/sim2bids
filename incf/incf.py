@@ -5,6 +5,7 @@ import param
 import panel as pn
 import incf.preprocess.generate as gen
 import incf.preprocess.preprocess as prep
+import incf.preprocess.structure as struct
 from incf.convert import convert
 import json
 
@@ -27,17 +28,21 @@ class MainArea(param.Parameterized):
         super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
                          cross_select=pn.widgets.CrossSelector(options=os.listdir()),
                          **params)
-        self.static_text = pn.widgets.StaticText(margin=(50, 0, 0, 0))
+        self.future_struct = pn.widgets.StaticText(margin=(0, 0, 50, 20))
+        self.current_struct = pn.widgets.StaticText(margin=(0, 0, 50, 20))
+        self.settings = Settings()
+        self.current_struct.value = struct.get_current_output(self.settings.output_path.value)
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
         if os.path.exists(self.text_input.value):
             self.cross_select.options = os.listdir(self.text_input.value)
-            self.static_text.value = ''
+            self.future_struct.value = ''
+            self.current.value = struct.get_current_output(self.settings.output_path)
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
-        self.static_text.value = ''
+        self.future_struct.value = ''
 
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
@@ -50,9 +55,10 @@ class MainArea(param.Parameterized):
             else:
                 convert.SID = prep.create_uuid()
                 self.sid = convert.SID
-                self.static_text.value = convert.check_file(path=self.text_input.value,
-                                                            files=self.cross_select.value,
-                                                            save=False)
+                self.future_struct.value = convert.check_file(path=self.text_input.value,
+                                                              files=self.cross_select.value,
+                                                              save=False)
+                self.current_struct = struct.get_current_output(self.text_input.value)
 
     def _generate_files(self, event=None):
         _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value, save=True)
@@ -62,7 +68,9 @@ class MainArea(param.Parameterized):
             ('Select Files', pn.Column(pn.pane.Markdown(GET_STARTED),
                                        self.text_input,
                                        self.cross_select,
-                                       self.static_text,
+                                       pn.Row(pn.Column('### To be generated structure', self.future_struct),
+                                              pn.Column('### Current structure', self.current_struct),
+                                              margin=(50, 0, 0, 0)),
                                        pn.Param(self, parameters=['gen_btn'],
                                                 show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}))),
             ('View Results', ViewResults().view()),
@@ -71,7 +79,7 @@ class MainArea(param.Parameterized):
 
         return pn.template.FastListTemplate(
             title='Visualize | Transform | Download',
-            sidebar=Settings().view(),
+            sidebar=self.settings.view(),
             site='INCF',
             main=main
         )
@@ -82,8 +90,8 @@ class Settings(param.Parameterized):
     sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
                                              value='Single simulation', margin=(-20, 0, 0, 0))
     convert.SUB_COUNT = sub_select.value
-    text_input = pn.widgets.TextInput(name='Insert output folder path', value='../output')
-    convert.OUTPUT = text_input.value
+    output_path = pn.widgets.TextInput(name='Insert output folder path', value='../output')
+    convert.OUTPUT = output_path.value
 
     checkbox_options = ['Traverse subfolders', 'Option 2', 'Option 3']
     checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders'],
@@ -99,10 +107,10 @@ class Settings(param.Parameterized):
         # set whether to traverse sub-folders
         convert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
 
-    @pn.depends('text_input.value', watch=True)
+    @pn.depends('output_path.value', watch=True)
     def _store_output(self):
         print('Triggered')
-        output = self.text_input.value
+        output = self.output_path.value
 
         if len(output) > 0:
             if not os.path.exists(output):
@@ -115,7 +123,7 @@ class Settings(param.Parameterized):
     def view(self):
         return pn.Column(
             '## Settings',
-            self.text_input,
+            self.output_path,
             '#### Select subject count',
             self.sub_select,
             '#### Select additional settings',
