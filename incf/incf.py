@@ -38,7 +38,7 @@ class MainArea(param.Parameterized):
         if os.path.exists(self.text_input.value):
             self.cross_select.options = os.listdir(self.text_input.value)
             self.future_struct.value = ''
-            self.current.value = struct.get_current_output(self.settings.output_path)
+            self.current_struct.value = struct.get_current_output(self.settings.output_path.value)
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
