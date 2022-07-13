@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import incf.preprocess.preprocess as prep
 import incf.templates.templates as temp
+import incf.preprocess.structure as struct
 
 import json
 import sys
@@ -70,18 +71,15 @@ def traverse_files(path: str, basename: bool = False) -> list:
 
 
 def check_file(path, files, save=False):
-    subs = None
-
     if SUB_COUNT == 'Single simulation':
         subs = prepare_subs(get_content(path, files))
     else:
         subs = get_content(path, files, single=False)
 
-    # TODO: create layout
-    create_layout(subs)
-    #
-    # if save:
-    #     save_output(subs, OUTPUT)
+    if save:
+        save_output(subs, OUTPUT)
+
+    return struct.create_layout(subs, OUTPUT)
 
 
 def get_content(path, files, single=True):
@@ -100,13 +98,17 @@ def prepare_subs(file_paths):
     for file_path in file_paths:
         name = get_filename(file_path)
         subs[name] = {
-            'name': name,
+            'fname': name,
             'sid': SID,
             'sep': find_separator(file_path),
             'desc': DESC,
             'path': file_path,
-            'ext': get_file_ext(file_path)
+            'ext': get_file_ext(file_path),
+            'name': name.split('.')[0]
         }
+
+        if subs[name]['name'] in ['tract_lengths', 'tract_length']:
+            subs[name]['name'] = 'distances'
     return subs
 
 
@@ -138,6 +140,9 @@ def find_separator(path):
             delimiter = sniffer.sniff(fp.read(100)).delimiter
     return delimiter
 
+
+def save_output(subs, output):
+    pass
 
 # TSV = ['.mat', '.txt']
 #

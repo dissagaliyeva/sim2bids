@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from itertools import islice
+from incf.convert import convert
 
 space = '&emsp;'
 branch = '&emsp;&emsp;'
@@ -9,7 +10,7 @@ last = '&emsp;&emsp;|___'
 
 
 def get_current_output(dir_path, level: int = -1, limit_to_directories: bool = False,
-                       length_limit: int = 1000) -> str:
+                       length_limit: int = 1000):
     """Given a directory Path object print a visual tree structure"""
     if not os.path.exists(dir_path):
         return ''
@@ -60,4 +61,90 @@ def get_current_output(dir_path, level: int = -1, limit_to_directories: bool = F
 
 
 def create_layout(subs=None, output='../output'):
-    pass
+    """
+    Create folder structure according to BEP034 and passed `subs` parameter.
+
+    :param output:
+    :param subs:
+    :return:
+    """
+
+    output = output.replace('.', '').replace('/', '')
+    layout = create_sub(subs)
+    layout = '&emsp;'.join(layout) if len(layout) > 1 else ''.join(layout)
+
+    return f"""
+    {output}/ <br>
+        &emsp;|___ code <br>
+        &emsp;|___ eq <br>
+        &emsp;|___ param <br>
+        &emsp;{layout}
+        &emsp;|___ README <br>
+        &emsp;|___ CHANGES <br>
+        &emsp;|___ dataset_description.json <br>
+        &emsp;|___ participants.tsv
+    """
+
+
+def create_sub(subs):
+    # centers_found, wd_found, sid = False, False, None
+    centers_found, wd_found, wd_count = False, False, 0
+
+    struct = []
+
+    # sub_struct = """|___ sub-{} <br>
+    # &emsp;&emsp;&emsp;|___ net <br>
+    # &emsp;&emsp;&emsp;|___ spatial <br>
+    # &emsp;&emsp;&emsp;|___ ts <br>
+    # """
+    sep = '&emsp;'
+    fold, file = sep * 2, sep * 4
+
+    structure = ['|___ sub-{} <br>', fold + '|___ net <br>',
+                 fold + '|___ spatial <br>', fold + '|___ ts <br>',
+                 file + '|___ sub-{}_desc-{}_{}.{} <br>',
+                 fold + '|___ coord <br>', file + '|___ desc-{}_{}.{} <br>']
+
+    sid = convert.SID
+
+    for k, v in subs.items():
+        name, desc = subs[k]['name'], subs[k]['desc']
+
+        if subs[k]['fname'] in ['weights.txt', 'tract_lengths.txt', 'tract_length.txt', 'distances.txt']:
+            wd_count += 1
+
+            if not wd_found:
+                struct += [structure[0].format(sid), structure[1]]
+                wd_found = True
+
+            struct += [structure[4].format(sid, desc, name, 'json'),
+                       structure[4].format(sid, desc, name, 'tsv')]
+
+            if wd_count == 2:
+                struct += [structure[2], structure[3]]
+
+        if subs[k]['path'].endswith('.mat'):
+            if not wd_found:
+                struct += [structure[0].format(sid), structure[1], structure[2], structure[3]]
+                wd_found = True
+
+            struct += [structure[4].format(sid, desc, name, '.json'),
+                       structure[4].format(sid, desc, name, '.tsv')]
+
+        if subs[k]['fname'] in ['centres.txt', 'centers.txt']:
+            centers_found = True
+            struct += [structure[5], structure[6].format(desc, 'nodes', 'json'),
+                       structure[6].format(desc, 'nodes', 'tsv'),
+                       structure[6].format(desc, 'labels', 'json'),
+                       structure[6].format(desc, 'labels', 'tsv')]
+
+    # # TODO: verify correct consecutive order
+    # # struct[0] = struct[0].format(SID)
+    # # struct.append(['&emsp;&emsp;&emsp;|___ spatial <br>', '&emsp;&emsp;&emsp;|___ ts <br>'])
+    #
+    if not centers_found:
+        struct.append('|___ coord <br>')
+
+    return struct
+
+
