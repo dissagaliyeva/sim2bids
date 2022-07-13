@@ -206,53 +206,5 @@ def create_h5(path, subs):
                 to_json(paths[idx][1], data[val][:].shape, '', 'simulations', coords=coords)
 
 
-def to_tsv(value, path):
-    pd.DataFrame(value).to_csv(path, sep='\t', header=None, index=None)
 
 
-def to_json(fpath, shape, desc, ftype, coords=None):
-    json_file = None
-
-    if ftype == 'simulations':
-        json_file = temp.merge_dicts(temp.JSON_template, temp.JSON_simulations)
-    elif ftype == 'centers':
-        json_file = temp.JSON_centers
-    elif ftype == 'wd':
-        json_file = temp.JSON_template
-
-    if json_file is not None:
-        with open(fpath, 'w') as f:
-            json.dump(temp.populate_dict(json_file, shape=shape, desc=desc, coords=coords), f)
-
-
-def create_sub_folders(path):
-    sub = os.path.join(path, f'sub-{SID}')
-    net = os.path.join(sub, 'net')
-    ts = os.path.join(sub, 'ts')
-    spatial = os.path.join(sub, 'spatial')
-
-    for file in [sub, net, ts, spatial]:
-        if not os.path.exists(file):
-            os.mkdir(file)
-
-
-def check_folders(path):
-    eq = os.path.join(path, 'eq')
-    code = os.path.join(path, 'code')
-    coord = os.path.join(path, 'coord')
-    param = os.path.join(path, 'param')
-
-    for p in [path, eq, code, coord, param]:
-        if not os.path.exists(p):
-            print(f'Creating folder `{os.path.basename(p)}`...')
-            os.mkdir(p)
-
-    read = os.path.join(path, 'README.txt')
-    part = os.path.join(path, 'participants.tsv')
-    desc = os.path.join(path, 'dataset_description.json')
-    chgs = os.path.join(path, 'CHANGES.txt')
-
-    for p in [read, part, desc, chgs]:
-        if not os.path.exists(p):
-            print(f'Creating file `{os.path.basename(p)}`...')
-            Path(p).touch()
