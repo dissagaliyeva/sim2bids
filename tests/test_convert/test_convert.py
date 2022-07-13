@@ -5,7 +5,7 @@ import os
 import unittest
 from mock import patch
 from incf.convert import convert
-from incf.util import rm_tree
+from incf.utils import rm_tree
 
 
 PATHS = ['../../data/timeseries_all.mat',

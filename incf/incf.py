@@ -70,10 +70,11 @@ class MainArea(param.Parameterized):
                 self.future_struct.value = convert.check_file(path=self.text_input.value,
                                                               files=self.cross_select.value,
                                                               save=False)
-                self.current_struct = struct.get_current_output(self.text_input.value)
+                self.current_struct.value = struct.get_current_output(self.output_path.value)
 
     def _generate_files(self, event=None):
         _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value, save=True)
+        self.current_struct.value = struct.get_current_output(self.output_path.value)
 
     @pn.depends('sub_select.value', watch=True)
     def _change_selection(self):
@@ -118,7 +119,8 @@ class MainArea(param.Parameterized):
             '#### Select subject count',
             self.sub_select,
             '#### Select additional settings',
-            self.checkbox_group
+            self.checkbox_group,
+            margin=(20, 20, 20, 20)
         )
 
         return pn.template.FastListTemplate(
@@ -129,52 +131,6 @@ class MainArea(param.Parameterized):
         )
 
 
-# class Settings(param.Parameterized):
-#     sub_options = ['Single simulation', 'Multiple simulations']
-#     sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
-#                                              value='Single simulation', margin=(-20, 0, 0, 0))
-#     convert.SUB_COUNT = sub_select.value
-#     output_path = pn.widgets.TextInput(name='Insert output folder path', value='../output')
-#     convert.OUTPUT = output_path.value
-#
-#     checkbox_options = ['Traverse subfolders', 'Option 2', 'Option 3']
-#     checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders'],
-#                                               options=checkbox_options,
-#                                               margin=(-20, 0, 0, 0))
-#
-#     @pn.depends('sub_select.value', watch=True)
-#     def _change_selection(self):
-#         convert.SUB_COUNT = self.sub_select.value
-#
-#     @pn.depends('checkbox_group.value', watch=True)
-#     def _change_checkbox(self):
-#         # set whether to traverse sub-folders
-#         convert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
-#
-#     @pn.depends('output_path.value', watch=True)
-#     def _store_output(self):
-#         print('Triggered')
-#         output = self.output_path.value
-#
-#         if len(output) > 0:
-#             if not os.path.exists(output):
-#                 pn.state.notifications.error(f'Folder `{output}` does not exist!', duration=convert.DURATION)
-#             else:
-#                 pn.state.notifications.success(f'Folder `{output}` is selected as output folder',
-#                                                duration=convert.DURATION)
-#                 convert.OUTPUT = output
-#
-#     def view(self):
-#         return pn.Column(
-#             '## Settings',
-#             self.output_path,
-#             '#### Select subject count',
-#             self.sub_select,
-#             '#### Select additional settings',
-#             self.checkbox_group
-#         )
-
-
 class ViewResults(param.Parameterized):
     options = ['JSON files', 'TSV files']
     file_selection = pn.widgets.RadioButtonGroup(options=options, button_type='primary', value=[])
@@ -182,7 +138,7 @@ class ViewResults(param.Parameterized):
 
     def __init__(self):
         super().__init__()
-        self.path = '../output'
+        self.path = convert.OUTPUT
         self.layout = None
         self.widget = pn.WidgetBox('### Select File', self.select_options)
 

@@ -4,6 +4,8 @@ from pathlib import Path
 import incf.preprocess.preprocess as prep
 import incf.templates.templates as temp
 import incf.preprocess.structure as struct
+import incf.preprocess.weights_distances as wdc
+import incf.utils as utils
 
 import json
 import sys
@@ -142,7 +144,52 @@ def find_separator(path):
 
 
 def save_output(subs, output):
-    pass
+    # verify there are no conflicting folders
+    conflict = len(os.listdir(output)) > 0
+
+    def save():
+        for k, v in subs.items():
+            if k in ['weights.txt', 'distances.txt']:
+                wdc.save(subs[k], output)
+            elif k in ['centres.txt']:
+                wdc.save(subs[k], output, center=True)
+            elif k.endswith('.mat'):
+                pass
+            elif k.endswith('.h5'):
+                pass
+
+    if SUB_COUNT == 'Single simulation':
+        # overwrite existing content
+        if conflict:
+            pn.state.notifications.info('Output folder contains files. Removing them...', duration=DURATION)
+            utils.rm_tree(output)
+
+        # verify folders exist
+        struct.check_folders(output)
+
+        # save output files
+        save()
+
+
+def to_tsv(value, path):
+    pd.DataFrame(value).to_csv(path, sep='\t', header=None, index=None)
+
+
+def to_json(fpath, shape, desc, ftype, coords=None):
+    json_file = None
+
+    if ftype == 'simulations':
+        json_file = temp.merge_dicts(temp.JSON_template, temp.JSON_simulations)
+    elif ftype == 'centers':
+        json_file = temp.JSON_centers
+    elif ftype == 'wd':
+        json_file = temp.JSON_template
+
+    if json_file is not None:
+        with open(fpath, 'w') as f:
+            json.dump(temp.populate_dict(json_file, shape=shape, desc=desc, coords=coords), f)
+
+
 
 # TSV = ['.mat', '.txt']
 #
