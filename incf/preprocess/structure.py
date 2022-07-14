@@ -73,9 +73,10 @@ def create_layout(subs=None, output='../output'):
 
     output = output.replace('.', '').replace('/', '')
     layout = create_sub(subs)
+
     layout = '&emsp;'.join(layout) if len(layout) > 1 else ''.join(layout)
 
-    return f"""
+    out = f"""
     {output}/ <br>
         &emsp;|___ code <br>
         &emsp;|___ eq <br>
@@ -86,6 +87,8 @@ def create_layout(subs=None, output='../output'):
         &emsp;|___ dataset_description.json <br>
         &emsp;|___ participants.tsv
     """
+    print(out)
+    return out
 
 
 def create_sub(subs):
