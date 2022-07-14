@@ -1,20 +1,17 @@
+import csv
+import json
 import os
+import sys
+
 import pandas as pd
-from pathlib import Path
-import incf.preprocess.preprocess as prep
-import incf.templates.templates as temp
+import panel as pn
+
+import incf.preprocess.simulations_h5 as h5
+import incf.preprocess.simulations_matlab as mat
 import incf.preprocess.structure as struct
 import incf.preprocess.weights_distances as wdc
-import incf.preprocess.simulations_matlab as mat
-import incf.preprocess.simulations_h5 as h5
+import incf.templates.templates as temp
 import incf.utils as utils
-
-import json
-import sys
-import csv
-import scipy
-import h5py
-import panel as pn
 
 sys.path.append('..')
 SID = None
@@ -220,153 +217,3 @@ def to_json(path, shape, desc, ftype, coords=None):
     if json_file is not None:
         with open(path, 'w') as f:
             json.dump(temp.populate_dict(json_file, shape=shape, desc=desc, coords=coords), f)
-
-
-
-# TSV = ['.mat', '.txt']
-#
-#
-# def to_tsv(paths: [str, list], output='../output'):
-#     """Two file extensions will be passed: .mat, .txt
-#
-#     Parameters
-#     ----------
-#     paths :
-#         param output:
-#     test :
-#         return:
-#     paths: [str :
-#
-#     list] :
-#
-#     output :
-#          (Default value = '../../output')
-#
-#     Returns
-#     -------
-#
-#     """
-#
-#     # create folder if not present
-#     if not os.path.exists(output):
-#         print(f'Creating folder `{output}`')
-#         os.mkdir(output)
-#
-#     # convert to list
-#     paths = [paths] if isinstance(paths, str) else paths
-#
-#     # get file types
-#     file_ext = check_filetype(paths)
-#     print(file_ext)
-#
-#     if file_ext not in TSV:
-#         raise ValueError(f'Incorrect file extension: {file_ext}. Expecting to get .mat or .txt files only.')
-#
-#     if file_ext == TSV[0]:
-#         [mat_to_tsv(path, output) for path in paths]
-#     elif file_ext == TSV[1]:
-#         [txt_to_tsv(path, output) for path in paths]
-#
-#
-# def mat_to_tsv(mat_path, output):
-#     """
-#
-#     Parameters
-#     ----------
-#     mat_path :
-#
-#     output :
-#
-#
-#     Returns
-#     -------
-#
-#     """
-#
-#     if os.stat(mat_path).st_size == 0:
-#         print(f'File `{mat_path}` is empty. Skipping...')
-#         return
-#
-#     output = output.replace('/', '\\')
-#
-#     mat = loadmat(mat_path)
-#
-#     f_name = os.path.join(output, os.path.splitext(os.path.basename(mat_path))[0])
-#
-#     for col in ['data', 'CON01T1_ROIts', 'CON01T1_ROIts_DK68',
-#                 'FC_cc_DK68', 'FC_cc', 'ROI_ID_table']:
-#         if col in mat.keys():
-#             name = f'{f_name}_{col}.tsv'
-#
-#             pd.DataFrame(mat[col]).to_csv(os.path.join(name),
-#                                           index=False, sep='\t', header=False)
-#             print(f'Converted MATLAB -> TSV @ `{name}`')
-#
-#
-# # TODO: come back to it when get enough data
-# def txt_to_tsv(txt_path, output):
-#     """
-#
-#     Parameters
-#     ----------
-#     txt_path :
-#
-#     output :
-#
-#
-#     Returns
-#     -------
-#
-#     """
-#
-#     if not os.path.exists(output):
-#         os.mkdir(output)
-#     file = pd.read_csv(txt_path)
-#     file.to_csv(os.path.join(output, 'distances.tsv'), index=False, sep='\t', header=False)
-#
-#
-# def check_filetype(files: [str, list]) -> str:
-#     """
-#
-#     Parameters
-#     ----------
-#     files: [str :
-#
-#     list] :
-#
-#
-#     Returns
-#     -------
-#
-#     """
-#     # check filetype
-#     if isinstance(files, str):
-#         return get_filetype(files)
-#
-#     # traverse the whole array and verify they all have the same file extension
-#     diff = np.unique([get_filetype(file) for file in files])
-#
-#     if len(diff) == 1:
-#         return diff[0]
-#     else:
-#         raise TypeError(f'Files are not of the same type. Accepted files: {TSV}')
-#
-#
-# def get_filetype(file):
-#     """
-#
-#     Parameters
-#     ----------
-#     file :
-#
-#
-#     Returns
-#     -------
-#
-#     """
-#     return os.path.splitext(os.path.basename(file))[1]
-#
-#
-# # to_tsv(['../../data/timeseries_all.mat', '../../data/ses-preop/FC.mat'])
-# # print(os.path.exists('../../data/timeseries_all.mat'))
-# # to_tsv('../../data/txt_files/weights.txt')

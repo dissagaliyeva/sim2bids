@@ -1,6 +1,5 @@
 import random
 import string
-# import numpy as np
 
 IDS = []
 
