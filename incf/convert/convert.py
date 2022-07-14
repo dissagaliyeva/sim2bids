@@ -6,6 +6,7 @@ import incf.templates.templates as temp
 import incf.preprocess.structure as struct
 import incf.preprocess.weights_distances as wdc
 import incf.preprocess.simulations_matlab as mat
+import incf.preprocess.simulations_h5 as h5
 import incf.utils as utils
 
 import json
@@ -168,7 +169,7 @@ def save_output(subs, output):
             elif k.endswith('.mat'):
                 mat.save(subs[k], output)
             elif k.endswith('.h5'):
-                pass
+                h5.save(subs[k], output)
 
     if SUB_COUNT == 'Single simulation':
         # overwrite existing content
