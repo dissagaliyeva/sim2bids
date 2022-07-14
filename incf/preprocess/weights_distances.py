@@ -44,7 +44,7 @@ def save_centers(subs, output):
     # save to json
     for content in ['labels', 'nodes']:
         cols = 1 if content == 'labels' else 3
-        convert.to_json(os.path.join(output, 'coord', convert.COORD_TMPL.format(desc, format, 'json')),
+        convert.to_json(os.path.join(output, 'coord', convert.COORD_TMPL.format(desc, content, 'json')),
                         [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
 
 
