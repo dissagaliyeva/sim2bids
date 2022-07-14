@@ -76,8 +76,7 @@ def create_layout(subs=None, output='../output'):
 
     layout = '&emsp;'.join(layout) if len(layout) > 1 else ''.join(layout)
 
-    out = f"""
-    {output}/ <br>
+    return f"""{output}/ <br>
         &emsp;|___ code <br>
         &emsp;|___ eq <br>
         &emsp;|___ param <br>
@@ -87,8 +86,6 @@ def create_layout(subs=None, output='../output'):
         &emsp;|___ dataset_description.json <br>
         &emsp;|___ participants.tsv
     """
-    print(out)
-    return out
 
 
 def create_sub(subs):
@@ -133,8 +130,8 @@ def create_sub(subs):
                 struct += [structure[0].format(sid), structure[1], structure[2], structure[3]]
                 wd_found = True
 
-            struct += [structure[4].format(sid, desc, name, '.json'),
-                       structure[4].format(sid, desc, name, '.tsv')]
+            struct += [structure[4].format(sid, desc, name, 'json'),
+                       structure[4].format(sid, desc, name, 'tsv')]
 
         if subs[k]['fname'] in ['centres.txt', 'centers.txt']:
             centers_found = True
