@@ -23,8 +23,6 @@ def save_wd(subs, output):
     # add coordinates if exists
     coords = None
 
-    print(convert.CENTERS)
-
     if convert.CENTERS:
         coords = [f'../coord/desc-{subs["desc"]}_labels.json', f'../coord/desc-{subs["desc"]}_nodes.json']
 

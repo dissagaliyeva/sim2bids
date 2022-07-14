@@ -5,6 +5,7 @@ import incf.preprocess.preprocess as prep
 import incf.templates.templates as temp
 import incf.preprocess.structure as struct
 import incf.preprocess.weights_distances as wdc
+import incf.preprocess.simulations_matlab as mat
 import incf.utils as utils
 
 import json
@@ -87,7 +88,6 @@ def check_file(path, files, save=False):
 
     # return struct.create_layout(subs, OUTPUT)
     out = struct.create_layout(subs, OUTPUT)
-    print('out:', out)
     return out
 
 
@@ -166,7 +166,7 @@ def save_output(subs, output):
             elif k in ['centres.txt']:
                 wdc.save(subs[k], output, center=True)
             elif k.endswith('.mat'):
-                pass
+                mat.save(subs[k], output)
             elif k.endswith('.h5'):
                 pass
 
