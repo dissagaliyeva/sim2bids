@@ -37,17 +37,18 @@ def check_input(path, files):
         fpath = os.path.join(path, file)
 
         if os.path.isdir(fpath) and TRAVERSE_FOLDERS:
-            all_files += traverse_files(fpath, basename=True)
+            files = traverse_files(fpath, basename=True)
+            all_files += files
 
     # verify there are unique files if SUB_COUNT = `single`
     if SUB_COUNT == 'Single simulation':
         if not check_compatibility(all_files):
             pn.state.notifications.error('There are multiple simulation inputs. Please select `Multiple simulations`'
                                          'option on the left.', duration=DURATION)
-            return 'reset'
+            return 'reset', all_files
 
     pn.state.notifications.success('Processing input data...', duration=DURATION)
-    return 'success'
+    return 'success', files
 
 
 def traverse_files(path: str, basename: bool = False) -> list:
@@ -91,14 +92,9 @@ def check_file(path, files, save=False):
 
 
 def get_content(path, files, single=True):
-    global CENTERS
-
     all_files = []
     if single:
         for file in files:
-            if file == 'centres.txt':
-                CENTERS = True
-
             if os.path.isdir(os.path.join(path, file)):
                 all_files += traverse_files(os.path.join(path, file))
             else:
@@ -107,9 +103,12 @@ def get_content(path, files, single=True):
 
 
 def prepare_subs(file_paths):
+    global CENTERS
+
     subs = {}
     for file_path in file_paths:
         name = get_filename(file_path)
+
         subs[name] = {
             'fname': name,
             'sid': SID,
@@ -162,7 +161,7 @@ def save_output(subs, output):
 
     def save():
         for k, v in subs.items():
-            if k in ['weights.txt', 'distances.txt']:
+            if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
                 wdc.save(subs[k], output)
             elif k in ['centres.txt']:
                 wdc.save(subs[k], output, center=True)

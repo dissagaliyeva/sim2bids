@@ -41,7 +41,7 @@ class MainArea(param.Parameterized):
         super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
                          cross_select=pn.widgets.CrossSelector(options=os.listdir()),
                          **params)
-        self.future_struct = pn.widgets.StaticText(margin=(0, 0, 50, 20))
+        self.future_struct = pn.widgets.StaticText(margin=(50, 0, 50, 20))
         # self.current_struct = pn.widgets.StaticText(margin=(0, 0, 50, 20))
         # self.current_struct.value = struct.get_current_output(self.output_path.value)
 
@@ -58,7 +58,7 @@ class MainArea(param.Parameterized):
 
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
-            output = convert.check_input(path=self.text_input.value, files=self.cross_select.value)
+            output, files = convert.check_input(path=self.text_input.value, files=self.cross_select.value)
 
             # reload folder selection if an error occurred
             if output == 'reset':
@@ -70,6 +70,11 @@ class MainArea(param.Parameterized):
                 self.future_struct.value = convert.check_file(path=self.text_input.value,
                                                               files=self.cross_select.value,
                                                               save=False)
+                print(files)
+                if 'centres.txt' in files:
+                    convert.CENTERS = True
+                else:
+                    convert.CENTERS = False
                 # self.current_struct.value = struct.get_current_output(self.output_path.value)
 
     def _generate_files(self, event=None):
