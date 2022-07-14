@@ -42,15 +42,15 @@ class MainArea(param.Parameterized):
                          cross_select=pn.widgets.CrossSelector(options=os.listdir()),
                          **params)
         self.future_struct = pn.widgets.StaticText(margin=(0, 0, 50, 20))
-        self.current_struct = pn.widgets.StaticText(margin=(0, 0, 50, 20))
-        self.current_struct.value = struct.get_current_output(self.output_path.value)
+        # self.current_struct = pn.widgets.StaticText(margin=(0, 0, 50, 20))
+        # self.current_struct.value = struct.get_current_output(self.output_path.value)
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
         if os.path.exists(self.text_input.value):
             self.cross_select.options = os.listdir(self.text_input.value)
             self.future_struct.value = ''
-            self.current_struct.value = struct.get_current_output(self.output_path.value)
+            # self.current_struct.value = struct.get_current_output(self.output_path.value)
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
@@ -70,11 +70,11 @@ class MainArea(param.Parameterized):
                 self.future_struct.value = convert.check_file(path=self.text_input.value,
                                                               files=self.cross_select.value,
                                                               save=False)
-                self.current_struct.value = struct.get_current_output(self.output_path.value)
+                # self.current_struct.value = struct.get_current_output(self.output_path.value)
 
     def _generate_files(self, event=None):
         _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value, save=True)
-        self.current_struct.value = struct.get_current_output(self.output_path.value)
+        # self.current_struct.value = struct.get_current_output(self.output_path.value)
 
     @pn.depends('sub_select.value', watch=True)
     def _change_selection(self):
@@ -104,9 +104,10 @@ class MainArea(param.Parameterized):
             ('Select Files', pn.Column(pn.pane.Markdown(GET_STARTED),
                                        self.text_input,
                                        self.cross_select,
-                                       pn.Row(pn.Column('### To be generated structure', self.future_struct),
-                                              pn.Column('### Current structure', self.current_struct),
-                                              margin=(50, 0, 0, 0)),
+                                       self.future_struct,
+                                       # pn.Row(pn.Column('### To be generated structure', self.future_struct),
+                                       #        pn.Column('### Current structure', self.current_struct),
+                                       #        margin=(50, 0, 0, 0)),
                                        pn.Param(self, parameters=['gen_btn'],
                                                 show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}))),
             ('View Results', ViewResults().view()),

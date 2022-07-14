@@ -89,23 +89,23 @@ def create_output_folder(path, subs: dict):
             h5.create(path, subs[k])
 
 
-def create_weights_distances(path, subs):
-    sub, net, spatial, ts = create_sub_struct(path, subs)
-
-    fname = f'sub-{subs["sid"]}_desc-{subs["desc"]}_{subs["fname"]}'
-
-    f = pd.read_csv(subs['path'], sep=subs['sep'], index_col=None, header=None)
-    f.to_csv(os.path.join(net, fname + '.tsv'), sep='\t', header=None, index=None)
-
-    # get info on centers
-    coord_files = os.path.exists(os.path.join(path, 'coord', f'desc-{subs["desc"]}_labels.json'))
-
-    if coord_files:
-        coords = [f'../coord/desc-{subs["desc"]}_labels.json', f'../coord/desc-{subs["desc"]}_nodes.json']
-    else:
-        coords = None
-
-    to_json(os.path.join(net, fname + '.json'), f.shape, desc='', ftype='wd', coords=coords)
+# def create_weights_distances(path, subs):
+    # sub, net, spatial, ts = create_sub_struct(path, subs)
+    #
+    # fname = f'sub-{subs["sid"]}_desc-{subs["desc"]}_{subs["fname"]}'
+    #
+    # f = pd.read_csv(subs['path'], sep=subs['sep'], index_col=None, header=None)
+    # f.to_csv(os.path.join(net, fname + '.tsv'), sep='\t', header=None, index=None)
+    #
+    # # get info on centers
+    # coord_files = os.path.exists(os.path.join(path, 'coord', f'desc-{subs["desc"]}_labels.json'))
+    #
+    # if coord_files:
+    #     coords = [f'../coord/desc-{subs["desc"]}_labels.json', f'../coord/desc-{subs["desc"]}_nodes.json']
+    # else:
+    #     coords = None
+    #
+    # to_json(os.path.join(net, fname + '.json'), f.shape, desc='', ftype='wd', coords=coords)
 
 
 def create_sub_struct(path, subs):

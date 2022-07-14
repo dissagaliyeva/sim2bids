@@ -21,6 +21,9 @@ TRAVERSE_FOLDERS = True
 SUB_COUNT = 'Single simulation'
 OUTPUT = '../output'
 DESC = 'default'
+CENTERS = False
+
+DEFAULT_TMPL, COORD_TMPL = 'sub-{}_desc-{}_{}.', 'desc-{}_{}.{}'
 
 
 def check_compatibility(files):
@@ -81,13 +84,21 @@ def check_file(path, files, save=False):
     if save:
         save_output(subs, OUTPUT)
 
-    return struct.create_layout(subs, OUTPUT)
+    # return struct.create_layout(subs, OUTPUT)
+    out = struct.create_layout(subs, OUTPUT)
+    print('out:', out)
+    return out
 
 
 def get_content(path, files, single=True):
+    global CENTERS
+
     all_files = []
     if single:
         for file in files:
+            if file == 'centres.txt':
+                CENTERS = True
+
             if os.path.isdir(os.path.join(path, file)):
                 all_files += traverse_files(os.path.join(path, file))
             else:
@@ -140,6 +151,8 @@ def find_separator(path):
             delimiter = sniffer.sniff(fp.read(5000)).delimiter
         except Exception:
             delimiter = sniffer.sniff(fp.read(100)).delimiter
+
+    delimiter = '\s' if delimiter == ' ' else delimiter
     return delimiter
 
 
@@ -171,11 +184,30 @@ def save_output(subs, output):
         save()
 
 
-def to_tsv(value, path):
-    pd.DataFrame(value).to_csv(path, sep='\t', header=None, index=None)
+def create_sub_struct(path, subs):
+    sub = os.path.join(path, f"sub-{subs['sid']}")
+    net = os.path.join(sub, 'net')
+    spatial = os.path.join(sub, 'spatial')
+    ts = os.path.join(sub, 'ts')
+
+    for folder in [sub, net, spatial, ts]:
+        if not os.path.exists(folder):
+            print(f'Creating folder `{folder}`')
+            os.mkdir(folder)
+
+    return sub, net, spatial, ts
 
 
-def to_json(fpath, shape, desc, ftype, coords=None):
+def get_shape(file, sep):
+    return pd.read_csv(file, sep=sep, index_col=None, header=None).shape
+
+
+def to_tsv(path, file=None):
+    params = {'sep': '\t', 'header': None, 'index': None}
+    pd.DataFrame(file).to_csv(path, **params)
+
+
+def to_json(path, shape, desc, ftype, coords=None):
     json_file = None
 
     if ftype == 'simulations':
@@ -186,7 +218,7 @@ def to_json(fpath, shape, desc, ftype, coords=None):
         json_file = temp.JSON_template
 
     if json_file is not None:
-        with open(fpath, 'w') as f:
+        with open(path, 'w') as f:
             json.dump(temp.populate_dict(json_file, shape=shape, desc=desc, coords=coords), f)
 
 
