@@ -1,6 +1,6 @@
 import os
 import h5py
-import incf.preprocess.generate as gen
+from incf.convert import convert
 
 COLS = ['weights', 'tract_lengths', 'region_labels', 'centres']
 TXT_COLS = ['areas', 'centres', 'cortical', 'hemispheres', 'orientations', 'region_labels', 'tract_lengths', 'weights']
@@ -46,13 +46,13 @@ class XML:
             f.write(self.template)
 
 
-def create(path, subs):
+def save(subs, path):
     # open h5 file
     data = h5py.File(subs['path'])
     subs['fname'] = subs['fname'].split('_')[0].lower()
 
     # create subject-specific folders
-    _, net, _, _ = gen.create_sub_struct(path, subs)
+    _, net, _, _ = convert.create_sub_struct(path, subs)
 
     # check if `param` values exist
     create_params(check_params(data), [path, net], subs, data)
@@ -70,22 +70,22 @@ def get_paths(paths, subs):
     path, net = paths
     sid, desc, fname = subs['sid'], subs['desc'], subs['fname']
 
+    # DEFAULT_TMPL, COORD_TMPL = 'sub-{}_desc-{}_{}.', 'desc-{}_{}.{}'
     paths = [
-        [os.path.join(net, gen.DEFAULT_TMPL.format(sid, desc, f'{fname}-weights', 'tsv')),
-         os.path.join(net, gen.DEFAULT_TMPL.format(sid, desc, f'{fname}-weights', 'json'))],
-        [os.path.join(net, gen.DEFAULT_TMPL.format(sid, desc, f'{fname}-distances', 'tsv')),
-         os.path.join(net, gen.DEFAULT_TMPL.format(sid, desc, f'{fname}-distances', 'json'))],
-        [os.path.join(path, 'coord', gen.COORD_TMPL.format(desc, f'{fname}_labels', 'tsv')),
-         os.path.join(path, 'coord', gen.COORD_TMPL.format(desc, f'{fname}_labels', 'json'))],
-        [os.path.join(path, 'coord', gen.COORD_TMPL.format(desc, f'{fname}_nodes', 'tsv')),
-         os.path.join(path, 'coord', gen.COORD_TMPL.format(desc, f'{fname}_nodes', 'json'))]
+        [os.path.join(net, convert.DEFAULT_TMPL.format(sid, desc, f'{fname}-weights') + 'tsv'),
+         os.path.join(net, convert.DEFAULT_TMPL.format(sid, desc, f'{fname}-weights') + 'json')],
+        [os.path.join(net, convert.DEFAULT_TMPL.format(sid, desc, f'{fname}-distances') + 'tsv'),
+         os.path.join(net, convert.DEFAULT_TMPL.format(sid, desc, f'{fname}-distances') + 'json')],
+        [os.path.join(path, 'coord', convert.COORD_TMPL.format(desc, f'{fname}_labels', 'tsv')),
+         os.path.join(path, 'coord', convert.COORD_TMPL.format(desc, f'{fname}_labels', 'json'))],
+        [os.path.join(path, 'coord', convert.COORD_TMPL.format(desc, f'{fname}_nodes', 'tsv')),
+         os.path.join(path, 'coord', convert.COORD_TMPL.format(desc, f'{fname}_nodes', 'json'))]
     ]
 
     return paths, [f'../coords/{fname}_labels.json', f'../coords/{fname}_nodes.json']
 
 
 def create_params(exists, paths, subs, data):
-
     if exists:
         paths, coords = get_paths(paths, subs)
 
@@ -93,6 +93,6 @@ def create_params(exists, paths, subs, data):
         for idx, col in enumerate(COLS):
             shape = data[col][:].shape if col != 'region_labels' else (data[col][:].shape[0], 1)
             data_value = data[col][:] if col != 'region_labels' else [str(x).strip("b'") for x in data[col][:]]
-            gen.to_tsv(data_value, paths[idx][0])
-            gen.to_json(paths[idx][1], shape, desc='', ftype='simulations', coords=coords)
+            convert.to_tsv(paths[idx][0], data_value)
+            convert.to_json(paths[idx][1], shape, desc='', ftype='simulations', coords=coords)
 
