@@ -1,13 +1,12 @@
+import json
 import os
 
 import pandas as pd
-import param
 import panel as pn
-import incf.preprocess.generate as gen
+import param
+
 import incf.preprocess.preprocess as prep
-import incf.preprocess.structure as struct
 from incf.convert import convert
-import json
 
 
 def get_files(path='../output', ftype='.json'):

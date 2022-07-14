@@ -1,9 +1,11 @@
+import os
+
+import mat73
+import panel as pn
 import scipy
 import scipy.io.matlab._miobase
 from scipy.io import loadmat
-import os
-import mat73
-import panel as pn
+
 from incf.convert import convert
 
 
