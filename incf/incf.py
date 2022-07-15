@@ -27,7 +27,7 @@ class MainArea(param.Parameterized):
     output_path = pn.widgets.TextInput(value='../output', margin=(-20, 10, 0, 10))
     convert.OUTPUT = output_path.value
 
-    desc = pn.widgets.TextInput(value='default', margin=(-20, 10, 0, 10))
+    desc = pn.widgets.TextInput(value='default', max_length=30, margin=(-20, 10, 0, 10))
     convert.DESC = desc.value
 
     checkbox_options = ['Traverse subfolders', 'Option 2', 'Option 3']
@@ -114,7 +114,7 @@ class MainArea(param.Parameterized):
             '## Settings',
             '#### Provide output path',
             self.output_path,
-            '#### Provide short simulation description',
+            '#### Provide short description (max 30 chars)',
             self.desc,
             '#### Select additional settings',
             self.checkbox_group,
