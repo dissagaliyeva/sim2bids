@@ -24,10 +24,6 @@ class MainArea(param.Parameterized):
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
 
     # sidebar components
-    sub_options = ['Single simulation', 'Multiple simulations']
-    sub_select = pn.widgets.RadioButtonGroup(options=sub_options, button_type='default',
-                                             value='Single simulation', margin=(-20, 0, 0, 0))
-    convert.SUB_COUNT = sub_select.value
     output_path = pn.widgets.TextInput(name='Insert output folder path', value='../output')
     convert.OUTPUT = output_path.value
 
@@ -40,20 +36,17 @@ class MainArea(param.Parameterized):
         super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
                          cross_select=pn.widgets.CrossSelector(options=os.listdir()),
                          **params)
-        self.future_struct = pn.widgets.StaticText(margin=(50, 0, 50, 20))
-        # self.current_struct = pn.widgets.StaticText(margin=(0, 0, 50, 20))
-        # self.current_struct.value = struct.get_current_output(self.output_path.value)
+        self.structure = pn.widgets.StaticText(margin=(50, 0, 50, 20))
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
         if os.path.exists(self.text_input.value):
             self.cross_select.options = os.listdir(self.text_input.value)
-            self.future_struct.value = ''
-            # self.current_struct.value = struct.get_current_output(self.output_path.value)
+            self.structure.value = ''
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
-        self.future_struct.value = ''
+        self.structure.value = ''
 
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
@@ -66,25 +59,16 @@ class MainArea(param.Parameterized):
             else:
                 convert.SID = prep.create_uuid()
                 self.sid = convert.SID
-                self.future_struct.value = convert.check_file(path=self.text_input.value,
-                                                              files=self.cross_select.value,
-                                                              save=False)
-                print(files)
+                self.structure.value = convert.check_file(path=self.text_input.value,
+                                                          files=self.cross_select.value,
+                                                          save=False)
                 if 'centres.txt' in files:
                     convert.CENTERS = True
                 else:
                     convert.CENTERS = False
-                # self.current_struct.value = struct.get_current_output(self.output_path.value)
 
     def _generate_files(self, event=None):
         _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value, save=True)
-        # self.current_struct.value = struct.get_current_output(self.output_path.value)
-
-    @pn.depends('sub_select.value', watch=True)
-    def _change_selection(self):
-        self.cross_select.options = os.listdir(self.text_input.value)
-        self.cross_select.value = []
-        convert.SUB_COUNT = self.sub_select.value
 
     @pn.depends('checkbox_group.value', watch=True)
     def _change_checkbox(self):
@@ -108,10 +92,7 @@ class MainArea(param.Parameterized):
             ('Select Files', pn.Column(pn.pane.Markdown(GET_STARTED),
                                        self.text_input,
                                        self.cross_select,
-                                       self.future_struct,
-                                       # pn.Row(pn.Column('### To be generated structure', self.future_struct),
-                                       #        pn.Column('### Current structure', self.current_struct),
-                                       #        margin=(50, 0, 0, 0)),
+                                       self.structure,
                                        pn.Param(self, parameters=['gen_btn'],
                                                 show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}))),
             ('View Results', ViewResults().view()),
@@ -121,8 +102,6 @@ class MainArea(param.Parameterized):
         sidebar = pn.Column(
             '## Settings',
             self.output_path,
-            '#### Select subject count',
-            self.sub_select,
             '#### Select additional settings',
             self.checkbox_group,
             margin=(20, 20, 20, 20)
