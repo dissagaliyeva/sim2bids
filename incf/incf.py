@@ -24,13 +24,14 @@ class MainArea(param.Parameterized):
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
 
     # sidebar components
-    output_path = pn.widgets.TextInput(name='Insert output folder path', value='../output')
+    output_path = pn.widgets.TextInput(value='../output',
+                                       margin=(-20, 10, 0, 10))
     convert.OUTPUT = output_path.value
 
     checkbox_options = ['Traverse subfolders', 'Option 2', 'Option 3']
     checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders'],
                                               options=checkbox_options,
-                                              margin=(-20, 0, 0, 0))
+                                              margin=(-20, 10, 0, 10))
 
     def __init__(self, **params):
         super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
@@ -101,10 +102,10 @@ class MainArea(param.Parameterized):
 
         sidebar = pn.Column(
             '## Settings',
+            '#### Provide output path',
             self.output_path,
             '#### Select additional settings',
             self.checkbox_group,
-            margin=(20, 20, 20, 20)
         )
 
         return pn.template.FastListTemplate(
