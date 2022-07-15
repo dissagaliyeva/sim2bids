@@ -24,9 +24,11 @@ class MainArea(param.Parameterized):
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
 
     # sidebar components
-    output_path = pn.widgets.TextInput(value='../output',
-                                       margin=(-20, 10, 0, 10))
+    output_path = pn.widgets.TextInput(value='../output', margin=(-20, 10, 0, 10))
     convert.OUTPUT = output_path.value
+
+    desc = pn.widgets.TextInput(value='default', margin=(-20, 10, 0, 10))
+    convert.DESC = desc.value
 
     checkbox_options = ['Traverse subfolders', 'Option 2', 'Option 3']
     checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders'],
@@ -88,6 +90,14 @@ class MainArea(param.Parameterized):
                                                duration=convert.DURATION)
                 convert.OUTPUT = output
 
+    @pn.depends('desc.value', watch=True)
+    def _change_desc(self):
+        old, new = convert.DESC, self.desc.value
+
+        if old != new:
+            convert.DESC = new
+            pn.state.notifications.success(f'Changed description from `{old}` to `{new}`.', duration=convert.DURATION)
+
     def view(self):
         main = pn.Tabs(
             ('Select Files', pn.Column(pn.pane.Markdown(GET_STARTED),
@@ -104,6 +114,8 @@ class MainArea(param.Parameterized):
             '## Settings',
             '#### Provide output path',
             self.output_path,
+            '#### Provide short simulation description',
+            self.desc,
             '#### Select additional settings',
             self.checkbox_group,
         )
