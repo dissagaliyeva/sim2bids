@@ -7,10 +7,11 @@ TXT_COLS = ['areas', 'centres', 'cortical', 'hemispheres', 'orientations', 'regi
 
 
 class XML:
-    def __init__(self, path, output):
+    def __init__(self, path, output, save=True):
         self.path = path
         self.params = []
         self.output = output
+        self.save = save
         self.file, self.keys, self.eq = None, None, None
         self.template = """<?xml version="1.0" ?>
 <Lems xmlns="http://www.neuroml.org/lems/0.7.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/lems/0.7.6 https://raw.githubusercontent.com/LEMS/LEMS/development/Schemas/LEMS/LEMS_v0.7.6.xsd">
@@ -38,10 +39,10 @@ class XML:
     def populate_template(self):
         if len(self.params) > 0:
             self.template = self.template.format(' '.join(self.params))
-            self.create_xml()
+            if self.save:
+                self.create_xml()
 
     def create_xml(self):
-        print(self.output)
         with open(self.output, 'w') as f:
             f.write(self.template)
 
