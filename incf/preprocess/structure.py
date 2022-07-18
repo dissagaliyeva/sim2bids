@@ -1,65 +1,120 @@
 import os
+import h5py as h
 from pathlib import Path
 from incf.convert import convert
+from collections import OrderedDict
+from incf.preprocess import simulations_h5 as sim
+
+default_format, coord_format = 'sub-{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
 
 
-# space = '&emsp;'
-# branch = '&emsp;&emsp;'
-# tee = '&emsp;&emsp;|___'
-# last = '&emsp;&emsp;|___'
+class FolderStructure:
+    def __init__(self, path, subs):
+        self.path = path
+        self.subs = subs
+
+        self.components = OrderedDict({
+            'code': [],
+            'coord': [],
+            'eq': [],
+            'param': [],
+            'subjects': {},
+            'files': ['CHANGES.txt', 'dataset_description.json', 'participants.tsv', 'README.txt']
+        })
+
+        self.layout = []
+        self.default_format = 'sub-{}_desc-{}_{}.{}'
+        self.coord_format = 'desc-{}_{}.{}'
+        self.populate()
+
+    def common_structure(self, v, name=None):
+        name = v['name'] if name is None else name
+        return [self.default_format.format(v['sid'], v['desc'], name, 'tsv'),
+                self.default_format.format(v['sid'], v['desc'], name, 'json')]
+
+    def coord_structure(self, v):
+        return [self.coord_format.format(v['desc'], 'nodes', 'tsv'),
+                self.coord_format.format(v['desc'], 'nodes', 'json'),
+                self.coord_format.format(v['desc'], 'labels', 'tsv'),
+                self.coord_format.format(v['desc'], 'labels', 'json')]
+
+    def populate(self):
+        for k, v in self.subs.items():
+            sid = v['sid']
+            if sid not in self.components['subjects']:
+                self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
+
+            if k in ['weights.txt', 'tract_lengths.txt', 'distances.txt']:
+                self.components['subjects'][sid]['net'] += self.common_structure(v)
+            elif k in ['centres.txt', 'centers.txt']:
+                self.components['coord'] += self.coord_structure(v)
+            elif k.endswith('.mat'):
+                self.components['subjects'][sid]['ts'] += self.common_structure(v)
+                self.components['coord'] += [self.coord_format.format(v['desc'], 'times', 'tsv'),
+                                             self.coord_format.format(v['desc'], 'times', 'json')]
+            elif k.endswith('.h5'):
+                file = h.File(v['path'])
+                keys = file.keys()
+                name = v['fname'].split('_')[0].lower()
+
+                sid = v['sid']
+                if sid not in self.components['subjects']:
+                    self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
+
+                if sim.check_params(file):
+                    self.components['subjects'][sid]['net'] += self.common_structure(v, 'weights')
+                    self.components['subjects'][sid]['net'] += self.common_structure(v, 'distances')
+                    self.components['coord'] += self.coord_structure(v)
+                else:
+                    if len(list(keys)) > 0:
+                        self.components['param'] += [self.coord_format.format(v['desc'], name, 'xml'),
+                                                     self.coord_format.format(v['desc'], name, 'json')]
+        self.create_layout()
+
+    def join(self, files, form='files'):
+        subfile = '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;|___{}<br>'
+        file = '&emsp;&emsp;&emsp;&emsp;|___{}<br>'
+        joiner = lambda x: ''.join(x)
+
+        if form == 'files':
+            return joiner([file.format(f) for f in files])
+        return joiner([subfile.format(f) for f in files])
+
+    def create_layout(self):
+        fold = '&emsp;&emsp;|___{}/<br>'
+        subfold = '&emsp;&emsp;&emsp;&emsp;|___{}/<br>'
+        main_files = '|___{}<br>'
+
+        self.layout.append('|___ output/<br>')
+
+        for k, v in self.components.items():
+            if len(v) == 0:
+                self.layout.append(fold.format(k))
+            else:
+                if isinstance(v, list) and k != 'files':
+                    self.layout += [fold.format(k), self.join(v)]
+                elif isinstance(v, dict):
+                    for k2, v2 in v.items():
+                        self.layout += [fold.format(f'sub-{k2}'), subfold.format('net'),
+                                        self.join(v2['net'], 'subfile'), subfold.format('ts'),
+                                        self.join(v2['ts'], 'subfile'), subfold.format('spatial'),
+                                        self.join(v2['spatial'], 'subfile')]
+
+        self.layout += [main_files.format(x) for x in self.components['files']]
+        self.layout = ''.join(self.layout)
 
 
-# def get_current_output(dir_path, level: int = -1, limit_to_directories: bool = False,
-#                        length_limit: int = 1000):
-#     """Given a directory Path object print a visual tree structure"""
-#     if not os.path.exists(dir_path):
-#         return ''
-#
-#     struct = []
-#
-#     dir_path = Path(dir_path)  # accept string coerceable to Path
-#     files = 0
-#     directories = 0
-#
-#     def inner(dir_path: Path, prefix: str = '', level=-1):
-#         nonlocal files, directories
-#         if not level:
-#             return  # 0, stop iterating
-#         if limit_to_directories:
-#             contents = [d for d in dir_path.iterdir() if d.is_dir()]
-#         else:
-#             contents = list(dir_path.iterdir())
-#         pointers = [tee] * (len(contents) - 1) + [last]
-#         for pointer, path in zip(pointers, contents):
-#             if path.is_dir():
-#                 yield prefix + pointer + path.name
-#                 directories += 1
-#                 extension = branch if pointer == tee else space
-#                 yield from inner(path, prefix=prefix + extension, level=level - 1)
-#             elif not limit_to_directories:
-#                 yield prefix + pointer + path.name
-#                 files += 1
-#
-#     struct.append(dir_path.name)
-#
-#     iterator = inner(dir_path, level=level)
-#     for line in islice(iterator, length_limit):
-#         struct.append(line)
-#
-#     print(struct)
-#     return '<br>'.join(struct)
+def common_structure(v, name=None):
+    name = v['name'] if name is None else name
+    return [default_format.format(v['sid'], v['desc'], name, 'tsv'),
+            default_format.format(v['sid'], v['desc'], name, 'json')]
 
 
-# def get_current_output(path, indentation=2):
-#     tree = []
-#
-#     if os.path.exists(path) and len(os.listdir(path)) > 0:
-#         for root, dirs, files in os.walk(path):
-#             level = root.replace(path, '').count(os.sep)
-#             indent = '&emsp;' * indentation * level
-#             tree.append('{}{}/'.format(indent, os.path.basename(root)))
-#         tree = '<br>'.join(tree)
-#     return tree
+def coord_structure(v):
+    return [coord_format.format(v['desc'], 'nodes', 'tsv'),
+            coord_format.format(v['desc'], 'nodes', 'json'),
+            coord_format.format(v['desc'], 'labels', 'tsv'),
+            coord_format.format(v['desc'], 'labels', 'json')]
 
 
 def create_layout(subs=None, output='../output'):
@@ -72,73 +127,76 @@ def create_layout(subs=None, output='../output'):
     """
 
     output = output.replace('.', '').replace('/', '')
-    layout = create_sub(subs)
-
-    layout = '&emsp;'.join(layout) if len(layout) > 1 else ''.join(layout)
-
-    return f"""{output}/ <br>
-        &emsp;|___ code <br>
-        &emsp;|___ eq <br>
-        &emsp;|___ param <br>
-        &emsp;{layout}
-        &emsp;|___ README <br>
-        &emsp;|___ CHANGES <br>
-        &emsp;|___ dataset_description.json <br>
-        &emsp;|___ participants.tsv
-    """
+    return FolderStructure(output, subs).layout
 
 
-def create_sub(subs):
-    # centers_found, wd_found, sid = False, False, None
-    centers_found, wd_found, wd_count = False, False, 0
+    # layout = create_sub(subs)
+    #
+    # layout = '&emsp;'.join(layout) if len(layout) > 1 else ''.join(layout)
+    #
+    # return f"""{output}/ <br>
+    #     &emsp;|___ code <br>
+    #     &emsp;|___ eq <br>
+    #     &emsp;|___ param <br>
+    #     &emsp;{layout}
+    #     &emsp;|___ README <br>
+    #     &emsp;|___ CHANGES <br>
+    #     &emsp;|___ dataset_description.json <br>
+    #     &emsp;|___ participants.tsv
+    # """
 
-    struct = []
 
-    sep = '&emsp;'
-    fold, file = sep * 2, sep * 4
-
-    structure = ['|___ sub-{} <br>', fold + '|___ net <br>',
-                 fold + '|___ spatial <br>', fold + '|___ ts <br>',
-                 file + '|___ sub-{}_desc-{}_{}.{} <br>',
-                 fold + '|___ coord <br>', file + '|___ desc-{}_{}.{} <br>']
-
-    sid = convert.SID
-
-    for k, v in subs.items():
-        name, desc = subs[k]['name'], subs[k]['desc']
-
-        if subs[k]['fname'] in ['weights.txt', 'tract_lengths.txt', 'tract_length.txt', 'distances.txt']:
-            wd_count += 1
-
-            if not wd_found:
-                struct += [structure[0].format(sid), structure[1]]
-                wd_found = True
-
-            struct += [structure[4].format(sid, desc, name, 'json'),
-                       structure[4].format(sid, desc, name, 'tsv')]
-
-            if wd_count == 2:
-                struct += [structure[2], structure[3]]
-
-        if subs[k]['path'].endswith('.mat'):
-            if not wd_found:
-                struct += [structure[0].format(sid), structure[1], structure[2], structure[3]]
-                wd_found = True
-
-            struct += [structure[4].format(sid, desc, name, 'json'),
-                       structure[4].format(sid, desc, name, 'tsv')]
-
-        if subs[k]['fname'] in ['centres.txt', 'centers.txt']:
-            centers_found = True
-            struct += [structure[5], structure[6].format(desc, 'nodes', 'json'),
-                       structure[6].format(desc, 'nodes', 'tsv'),
-                       structure[6].format(desc, 'labels', 'json'),
-                       structure[6].format(desc, 'labels', 'tsv')]
-
-    if not centers_found:
-        struct.append('|___ coord <br>')
-
-    return struct
+# def create_sub(subs):
+#     # centers_found, wd_found, sid = False, False, None
+#     centers_found, wd_found, wd_count = False, False, 0
+#
+#     struct = []
+#
+#     sep = '&emsp;'
+#     fold, file = sep * 2, sep * 4
+#
+#     structure = ['|___ sub-{} <br>', fold + '|___ net <br>',
+#                  fold + '|___ spatial <br>', fold + '|___ ts <br>',
+#                  file + '|___ sub-{}_desc-{}_{}.{} <br>',
+#                  fold + '|___ coord <br>', file + '|___ desc-{}_{}.{} <br>']
+#
+#     sid = convert.SID
+#
+#     for k, v in subs.items():
+#         name, desc = subs[k]['name'], subs[k]['desc']
+#
+#         if subs[k]['fname'] in ['weights.txt', 'tract_lengths.txt', 'tract_length.txt', 'distances.txt']:
+#             wd_count += 1
+#
+#             if not wd_found:
+#                 struct += [structure[0].format(sid), structure[1]]
+#                 wd_found = True
+#
+#             struct += [structure[4].format(sid, desc, name, 'json'),
+#                        structure[4].format(sid, desc, name, 'tsv')]
+#
+#             if wd_count == 2:
+#                 struct += [structure[2], structure[3]]
+#
+#         if subs[k]['path'].endswith('.mat'):
+#             if not wd_found:
+#                 struct += [structure[0].format(sid), structure[1], structure[2], structure[3]]
+#                 wd_found = True
+#
+#             struct += [structure[4].format(sid, desc, name, 'json'),
+#                        structure[4].format(sid, desc, name, 'tsv')]
+#
+#         if subs[k]['fname'] in ['centres.txt', 'centers.txt']:
+#             centers_found = True
+#             struct += [structure[5], structure[6].format(desc, 'nodes', 'json'),
+#                        structure[6].format(desc, 'nodes', 'tsv'),
+#                        structure[6].format(desc, 'labels', 'json'),
+#                        structure[6].format(desc, 'labels', 'tsv')]
+#
+#     if not centers_found:
+#         struct.append('|___ coord <br>')
+#
+#     return struct
 
 
 def create_sub_folders(path):
