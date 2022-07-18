@@ -17,7 +17,7 @@ sys.path.append('..')
 SID = None
 DURATION = 3000
 TRAVERSE_FOLDERS = True
-SUB_COUNT = 'Single simulation'
+
 OUTPUT = '../output'
 DESC = 'default'
 CENTERS = False
@@ -40,11 +40,11 @@ def check_input(path, files):
             all_files += files
 
     # verify there are unique files if SUB_COUNT = `single`
-    if SUB_COUNT == 'Single simulation':
-        if not check_compatibility(all_files):
-            pn.state.notifications.error('There are multiple simulation inputs. Please select `Multiple simulations`'
-                                         'option on the left.', duration=DURATION)
-            return 'reset', all_files
+    # if SUB_COUNT == 'Single simulation':
+    #     if not check_compatibility(all_files):
+    #         pn.state.notifications.error('There are multiple simulation inputs. Please select `Multiple simulations`'
+    #                                      'option on the left.', duration=DURATION)
+    #         return 'reset', all_files
 
     pn.state.notifications.success('Processing input data...', duration=DURATION)
     return 'success', files
@@ -76,10 +76,7 @@ def traverse_files(path: str, basename: bool = False) -> list:
 
 
 def check_file(path, files, save=False):
-    if SUB_COUNT == 'Single simulation':
-        subs = prepare_subs(get_content(path, files))
-    else:
-        subs = get_content(path, files, single=False)
+    subs = prepare_subs(get_content(path, files))
 
     if save:
         save_output(subs, OUTPUT)
@@ -168,17 +165,16 @@ def save_output(subs, output):
             elif k.endswith('.h5'):
                 h5.save(subs[k], output)
 
-    if SUB_COUNT == 'Single simulation':
-        # overwrite existing content
-        if conflict:
-            pn.state.notifications.info('Output folder contains files. Removing them...', duration=DURATION)
-            utils.rm_tree(output)
+    # overwrite existing content
+    if conflict:
+        pn.state.notifications.info('Output folder contains files. Removing them...', duration=DURATION)
+        utils.rm_tree(output)
 
-        # verify folders exist
-        struct.check_folders(output)
+    # verify folders exist
+    struct.check_folders(output)
 
-        # save output files
-        save()
+    # save output files
+    save()
 
 
 def create_sub_struct(path, subs):
