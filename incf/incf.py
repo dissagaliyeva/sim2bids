@@ -40,6 +40,7 @@ class MainArea(param.Parameterized):
                          cross_select=pn.widgets.CrossSelector(options=os.listdir()),
                          **params)
         self.structure = pn.widgets.StaticText(margin=(50, 0, 50, 20))
+        prep.start = 1
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
