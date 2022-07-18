@@ -1,7 +1,7 @@
 import os
 from incf.convert import convert
 
-IDS = []
+IDS = {}
 start = 1
 
 
@@ -14,9 +14,12 @@ start = 1
 def create_uuid():
     global start
 
+    if start in IDS.keys():
+        start += 1
+
     new = f'0{start}' if start < 10 else start
-    start += 1
-    IDS.append(new)
+    IDS[start] = new
+    print(IDS)
     return new
 
 

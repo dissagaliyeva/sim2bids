@@ -61,8 +61,8 @@ class MainArea(param.Parameterized):
                 self.cross_select.value = []
                 self.cross_select.options = os.listdir(self.text_input.value)
             else:
-                convert.SID = prep.create_uuid()
-                self.sid = convert.SID
+                # convert.SID = prep.create_uuid()
+                # self.sid = convert.SID
                 self.structure.value = convert.check_file(path=self.text_input.value,
                                                           files=self.cross_select.value,
                                                           save=False)
