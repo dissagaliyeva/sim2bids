@@ -77,6 +77,7 @@ def traverse_files(path: str, basename: bool = False) -> list:
 
 def check_file(path, files, save=False):
     subs = prepare_subs(get_content(path, files))
+    print(subs)
 
     if save:
         save_output(subs, OUTPUT)
@@ -103,12 +104,13 @@ def prepare_subs(file_paths):
     subs = {}
     for file_path in file_paths:
         name = get_filename(file_path)
+        desc = DESC + 'h5' if file_path.endswith('h5') else DESC
 
         subs[name] = {
             'fname': name,
             'sid': SID,
             'sep': find_separator(file_path),
-            'desc': DESC,
+            'desc': desc,
             'path': file_path,
             'ext': get_file_ext(file_path),
             'name': name.split('.')[0]
