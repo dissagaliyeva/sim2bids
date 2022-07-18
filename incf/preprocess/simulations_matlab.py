@@ -39,12 +39,14 @@ def convert_mat(mat, subs, path):
         data = mat[data[0]]
 
         ts_path = os.path.join(path, f'sub-{sid}', 'ts')
-        coord_path = os.path.join(path, 'coord', f'desc-{subs["desc"]}_times.json')
+        coord_json = os.path.join(path, 'coord', f'desc-{desc}_times.json')
+        coord_tsv = os.path.join(path, 'coord', f'desc-{desc}_times.tsv')
 
         convert.create_sub_struct(path, subs)
         convert.to_tsv(os.path.join(ts_path, temp.format(sid, desc, name, 'tsv')), data)
         convert.to_json(os.path.join(ts_path, temp.format(sid, desc, name, 'json')), data.shape, '', 'simulations')
-        convert.to_json(coord_path, data.shape, 'Time steps of the simulated time series.', 'wd')
+        convert.to_json(coord_json, data.shape, 'Time steps of the simulated time series.', 'wd')
+        # convert.to_tsv(coord_tsv, data.shape, )
     else:
         print(data)
 

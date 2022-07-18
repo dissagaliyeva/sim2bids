@@ -38,37 +38,46 @@ class FolderStructure:
                 self.coord_format.format(v['desc'], 'labels', 'tsv'),
                 self.coord_format.format(v['desc'], 'labels', 'json')]
 
-    def populate(self):
-        for k, v in self.subs.items():
+    def iterate(self, k, v):
+        sid = v['sid']
+        if sid not in self.components['subjects']:
+            self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
+
+        if k in ['weights.txt', 'tract_lengths.txt', 'distances.txt']:
+            self.components['subjects'][sid]['net'] += self.common_structure(v)
+        elif k in ['centres.txt', 'centers.txt']:
+            self.components['coord'] += self.coord_structure(v)
+        elif k.endswith('.mat'):
+            self.components['subjects'][sid]['ts'] += self.common_structure(v)
+            self.components['coord'] += [self.coord_format.format(v['desc'], 'times', 'tsv'),
+                                         self.coord_format.format(v['desc'], 'times', 'json')]
+        elif k.endswith('.h5'):
+            file = h.File(v['path'])
+            keys = file.keys()
+            name = v['fname'].split('_')[0].lower()
+
             sid = v['sid']
             if sid not in self.components['subjects']:
                 self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
 
-            if k in ['weights.txt', 'tract_lengths.txt', 'distances.txt']:
-                self.components['subjects'][sid]['net'] += self.common_structure(v)
-            elif k in ['centres.txt', 'centers.txt']:
+            if sim.check_params(file):
+                self.components['subjects'][sid]['net'] += self.common_structure(v, 'weights')
+                self.components['subjects'][sid]['net'] += self.common_structure(v, 'distances')
                 self.components['coord'] += self.coord_structure(v)
-            elif k.endswith('.mat'):
-                self.components['subjects'][sid]['ts'] += self.common_structure(v)
-                self.components['coord'] += [self.coord_format.format(v['desc'], 'times', 'tsv'),
-                                             self.coord_format.format(v['desc'], 'times', 'json')]
-            elif k.endswith('.h5'):
-                file = h.File(v['path'])
-                keys = file.keys()
-                name = v['fname'].split('_')[0].lower()
+            else:
+                if len(list(keys)) > 0:
+                    self.components['param'] += [self.coord_format.format(v['desc'], name, 'xml'),
+                                                 self.coord_format.format(v['desc'], name, 'json')]
 
-                sid = v['sid']
-                if sid not in self.components['subjects']:
-                    self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
+    def populate(self):
+        for k, v in self.subs.items():
+            if 'sid' in v:
+                # traverse single-instance files
+                self.iterate(k, v)
+            else:
+                for k2, v2 in v.items():
+                    self.iterate(k2, v2)
 
-                if sim.check_params(file):
-                    self.components['subjects'][sid]['net'] += self.common_structure(v, 'weights')
-                    self.components['subjects'][sid]['net'] += self.common_structure(v, 'distances')
-                    self.components['coord'] += self.coord_structure(v)
-                else:
-                    if len(list(keys)) > 0:
-                        self.components['param'] += [self.coord_format.format(v['desc'], name, 'xml'),
-                                                     self.coord_format.format(v['desc'], name, 'json')]
         self.create_layout()
 
     def join(self, files, form='files'):

@@ -2,6 +2,7 @@ import csv
 import json
 import os
 import sys
+from collections import OrderedDict
 
 import pandas as pd
 import panel as pn
@@ -12,6 +13,7 @@ import incf.preprocess.structure as struct
 import incf.preprocess.weights_distances as wdc
 import incf.templates.templates as temp
 import incf.utils as utils
+from incf.convert.utils import Files
 
 sys.path.append('..')
 SID = None
@@ -38,13 +40,6 @@ def check_input(path, files):
         if os.path.isdir(fpath) and TRAVERSE_FOLDERS:
             files = traverse_files(fpath, basename=True)
             all_files += files
-
-    # verify there are unique files if SUB_COUNT = `single`
-    # if SUB_COUNT == 'Single simulation':
-    #     if not check_compatibility(all_files):
-    #         pn.state.notifications.error('There are multiple simulation inputs. Please select `Multiple simulations`'
-    #                                      'option on the left.', duration=DURATION)
-    #         return 'reset', all_files
 
     pn.state.notifications.success('Processing input data...', duration=DURATION)
     return 'success', files
@@ -76,29 +71,28 @@ def traverse_files(path: str, basename: bool = False) -> list:
 
 
 def check_file(path, files, save=False):
-    subs = prepare_subs(get_content(path, files))
+    # subs = prepare_subs(get_content(path, files))
+    subs = Files(path, files).subs
     print(subs)
 
     if save:
         save_output(subs, OUTPUT)
 
-    # return struct.create_layout(subs, OUTPUT)
-    out = struct.create_layout(subs, OUTPUT)
-    return out
+    return struct.create_layout(subs, OUTPUT)
 
 
-def get_content(path, files, single=True):
+def get_content(path, files):
     all_files = []
-    if single:
-        for file in files:
-            if os.path.isdir(os.path.join(path, file)):
-                all_files += traverse_files(os.path.join(path, file))
-            else:
-                all_files.append(os.path.join(path, file))
-        return all_files
+
+    for file in files:
+        if os.path.isdir(os.path.join(path, file)):
+            all_files += traverse_files(os.path.join(path, file))
+        else:
+            all_files.append(os.path.join(path, file))
+    return all_files
 
 
-def prepare_subs(file_paths):
+def prepare_subs(file_paths, sid):
     global CENTERS
 
     subs = {}
@@ -108,7 +102,7 @@ def prepare_subs(file_paths):
 
         subs[name] = {
             'fname': name,
-            'sid': SID,
+            'sid': sid,
             'sep': find_separator(file_path),
             'desc': desc,
             'path': file_path,
@@ -118,6 +112,7 @@ def prepare_subs(file_paths):
 
         if subs[name]['name'] in ['tract_lengths', 'tract_length']:
             subs[name]['name'] = 'distances'
+
     return subs
 
 
@@ -156,16 +151,16 @@ def save_output(subs, output):
     # verify there are no conflicting folders
     conflict = len(os.listdir(output)) > 0
 
-    def save():
-        for k, v in subs.items():
+    def save(sub):
+        for k, v in sub.items():
             if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
-                wdc.save(subs[k], output)
+                wdc.save(sub[k], output)
             elif k in ['centres.txt']:
-                wdc.save(subs[k], output, center=True)
+                wdc.save(sub[k], output, center=True)
             elif k.endswith('.mat'):
-                mat.save(subs[k], output)
+                mat.save(sub[k], output)
             elif k.endswith('.h5'):
-                h5.save(subs[k], output)
+                h5.save(sub[k], output)
 
     # overwrite existing content
     if conflict:
@@ -176,7 +171,8 @@ def save_output(subs, output):
     struct.check_folders(output)
 
     # save output files
-    save()
+    for k, v in subs.items():
+        save(v)
 
 
 def create_sub_struct(path, subs):
