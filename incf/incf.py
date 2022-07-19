@@ -40,12 +40,13 @@ class MainArea(param.Parameterized):
                          cross_select=pn.widgets.CrossSelector(options=os.listdir()),
                          **params)
         self.structure = pn.widgets.StaticText(margin=(50, 0, 50, 20))
-        prep.start = 1
+        self.subjects = None
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
         if os.path.exists(self.text_input.value):
             self.cross_select.options = os.listdir(self.text_input.value)
+            self.cross_select.value = []
             self.structure.value = ''
 
     @pn.depends('cross_select.value', watch=True)
@@ -54,17 +55,14 @@ class MainArea(param.Parameterized):
 
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
-            files = convert.check_input(path=self.text_input.value, files=self.cross_select.value)
-            self.structure.value = convert.check_file(path=self.text_input.value,
-                                                      files=self.cross_select.value,
-                                                      save=False)
-            if 'centres.txt' in files:
-                convert.CENTERS = True
-            else:
-                convert.CENTERS = False
+            # convert.check_input(path=self.text_input.value, files=self.cross_select.value)
+            self.subjects, self.structure.value = convert.check_file(path=self.text_input.value,
+                                                                     files=self.cross_select.value,
+                                                                     save=False)
 
     def _generate_files(self, event=None):
-        _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value, save=True)
+        _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value,
+                               subs=self.subjects, save=True)
 
     @pn.depends('checkbox_group.value', watch=True)
     def _change_checkbox(self):

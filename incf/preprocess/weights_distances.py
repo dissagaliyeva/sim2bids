@@ -11,14 +11,15 @@ def save(subs: dict, output: str, center: bool = False):
 
 
 def save_wd(subs, output):
+    DEFAULT_TMPL = 'sub-{}_desc-{}_{}.{}'
     # check and create folders & return paths to them
     sub, net, spatial, ts = convert.create_sub_struct(output, subs)
 
-    name = convert.DEFAULT_TMPL.format(subs['sid'], subs['desc'], subs['name'])
+    name = DEFAULT_TMPL.format(subs['sid'], subs['desc'], subs['name'], 'tsv')
     file = read_csv(subs['path'], subs['sep'])
 
     # save to tsv
-    convert.to_tsv(os.path.join(net, name + 'tsv'), file[:])
+    convert.to_tsv(os.path.join(net, name), file[:])
 
     # add coordinates if exists
     coords = None
@@ -26,7 +27,7 @@ def save_wd(subs, output):
     if convert.CENTERS:
         coords = [f'../coord/desc-{subs["desc"]}_labels.json', f'../coord/desc-{subs["desc"]}_nodes.json']
 
-    convert.to_json(os.path.join(net, name + 'json'), file.shape, desc='', ftype='wd', coords=coords)
+    convert.to_json(os.path.join(net, name.replace('tsv', 'json')), file.shape, desc='', ftype='wd', coords=coords)
 
 
 def save_centers(subs, output):
