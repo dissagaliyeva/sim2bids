@@ -54,22 +54,14 @@ class MainArea(param.Parameterized):
 
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
-            output, files = convert.check_input(path=self.text_input.value, files=self.cross_select.value)
-
-            # reload folder selection if an error occurred
-            if output == 'reset':
-                self.cross_select.value = []
-                self.cross_select.options = os.listdir(self.text_input.value)
+            files = convert.check_input(path=self.text_input.value, files=self.cross_select.value)
+            self.structure.value = convert.check_file(path=self.text_input.value,
+                                                      files=self.cross_select.value,
+                                                      save=False)
+            if 'centres.txt' in files:
+                convert.CENTERS = True
             else:
-                # convert.SID = prep.create_uuid()
-                # self.sid = convert.SID
-                self.structure.value = convert.check_file(path=self.text_input.value,
-                                                          files=self.cross_select.value,
-                                                          save=False)
-                if 'centres.txt' in files:
-                    convert.CENTERS = True
-                else:
-                    convert.CENTERS = False
+                convert.CENTERS = False
 
     def _generate_files(self, event=None):
         _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value, save=True)
