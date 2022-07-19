@@ -13,11 +13,11 @@ class Files:
         # decide whether input files are for one or more patients
         self.content = conv.get_content(path, files)
         self.basename = set(conv.traverse_files(path, basename=True))
-        self.multi = len(self.content) == len(self.basename)
+        self.single = len(self.content) == len(self.basename)
         self.traverse_files()
 
     def traverse_files(self):
-        if not self.multi:
+        if not self.single:
             for file in self.files:
                 if os.path.isdir(os.path.join(self.path, file)):
                     sid = prep.create_uuid()

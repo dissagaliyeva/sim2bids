@@ -77,7 +77,7 @@ class FolderStructure:
             else:
                 for k2, v2 in v.items():
                     self.iterate(k2, v2)
-
+        self.components['coord'] = list(set(self.components['coord']))
         self.create_layout()
 
     def join(self, files, form='files'):

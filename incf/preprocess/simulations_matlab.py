@@ -46,7 +46,7 @@ def convert_mat(mat, subs, path):
         convert.to_tsv(os.path.join(ts_path, temp.format(sid, desc, name, 'tsv')), data)
         convert.to_json(os.path.join(ts_path, temp.format(sid, desc, name, 'json')), data.shape, '', 'simulations')
         convert.to_json(coord_json, data.shape, 'Time steps of the simulated time series.', 'wd')
-        # convert.to_tsv(coord_tsv, data.shape, )
+        convert.to_tsv(coord_tsv)
     else:
         print(data)
 
