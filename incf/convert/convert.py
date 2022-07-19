@@ -3,6 +3,7 @@ import json
 import os
 import sys
 from collections import OrderedDict
+from pathlib import Path
 
 import pandas as pd
 import panel as pn
@@ -194,8 +195,11 @@ def get_shape(file, sep):
 
 
 def to_tsv(path, file=None):
-    params = {'sep': '\t', 'header': None, 'index': None}
-    pd.DataFrame(file).to_csv(path, **params)
+    if file is None:
+        Path(path).touch()
+    else:
+        params = {'sep': '\t', 'header': None, 'index': None}
+        pd.DataFrame(file).to_csv(path, **params)
 
 
 def to_json(path, shape, desc, ftype, coords=None):
