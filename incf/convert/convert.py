@@ -31,20 +31,19 @@ def check_compatibility(files):
     return len(set(files)) == len(files)
 
 
-def check_input(path, files):
-    global MULTI_INPUT
-    all_files = []
-
-    for file in files:
-        fpath = os.path.join(path, file)
-
-        if os.path.isdir(fpath) and TRAVERSE_FOLDERS:
-            files = traverse_files(fpath, basename=True)
-            all_files += files
-
-    MULTI_INPUT = False if check_compatibility(all_files) else True
-    pn.state.notifications.success('Processing input data...', duration=DURATION)
-    return files
+# def check_input(path, files):
+#     global MULTI_INPUT
+#     all_files = []
+#
+#     for file in files:
+#         fpath = os.path.join(path, file)
+#
+#         if os.path.isdir(fpath) and TRAVERSE_FOLDERS:
+#             files = traverse_files(fpath, basename=True)
+#             all_files += files
+#
+#     MULTI_INPUT = False if check_compatibility(all_files) else True
+#     pn.state.notifications.success('Processing input data...', duration=DURATION)
 
 
 def traverse_files(path: str, basename: bool = False) -> list:
@@ -72,13 +71,14 @@ def traverse_files(path: str, basename: bool = False) -> list:
     return contents
 
 
-def check_file(path, files, save=False):
-    subs = subj.Files(path, files).subs
+def check_file(path, files, subs=None, save=False):
+    if subs is None:
+        subs = subj.Files(path, files).subs
 
     if save:
         save_output(subs, OUTPUT)
 
-    return struct.create_layout(subs, OUTPUT)
+    return subs, struct.create_layout(subs, OUTPUT)
 
 
 def get_content(path, files):

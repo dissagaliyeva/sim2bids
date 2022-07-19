@@ -17,6 +17,9 @@ class Files:
         self.content = conv.get_content(path, files)
         self.basename = set(conv.traverse_files(path, basename=True))
         self.single = len(self.content) == len(self.basename)
+
+        # set multi-subject input to true
+        conv.MULTI_INPUT = False if self.single else True
         self.traverse_files()
 
     def traverse_files(self):
@@ -53,6 +56,8 @@ def prepare_subs(file_paths, sid):
 
         if subs[name]['name'] in ['tract_lengths', 'tract_length']:
             subs[name]['name'] = 'distances'
+        if subs[name]['name'] == 'centres':
+            conv.CENTERS = True
 
     return subs
 
