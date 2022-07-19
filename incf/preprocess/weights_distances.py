@@ -30,12 +30,13 @@ def save_wd(subs, output):
 
 
 def save_centers(subs, output):
+    COORD_TMPL = 'desc-{}_{}.{}'
     file = read_csv(subs['path'], subs['sep'])
     labels, nodes = file[0], file[[1, 2, 3]]
     desc = subs['desc']
 
-    lname = convert.COORD_TMPL.format(desc, 'labels', 'tsv')
-    nname = convert.COORD_TMPL.format(desc, 'nodes', 'tsv')
+    lname = COORD_TMPL.format(desc, 'labels', 'tsv')
+    nname = COORD_TMPL.format(desc, 'nodes', 'tsv')
 
     # save to tsv
     convert.to_tsv(os.path.join(output, 'coord', lname), labels)
@@ -44,7 +45,7 @@ def save_centers(subs, output):
     # save to json
     for content in ['labels', 'nodes']:
         cols = 1 if content == 'labels' else 3
-        convert.to_json(os.path.join(output, 'coord', convert.COORD_TMPL.format(desc, content, 'json')),
+        convert.to_json(os.path.join(output, 'coord', COORD_TMPL.format(desc, content, 'json')),
                         [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
 
 

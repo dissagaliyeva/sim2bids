@@ -71,16 +71,16 @@ def get_paths(paths, subs):
     path, net = paths
     sid, desc, fname = subs['sid'], subs['desc'], subs['fname']
 
-    # DEFAULT_TMPL, COORD_TMPL = 'sub-{}_desc-{}_{}.', 'desc-{}_{}.{}'
+    DEFAULT_TMPL, COORD_TMPL = 'sub-{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
     paths = [
-        [os.path.join(net, convert.DEFAULT_TMPL.format(sid, desc, f'{fname}-weights') + 'tsv'),
-         os.path.join(net, convert.DEFAULT_TMPL.format(sid, desc, f'{fname}-weights') + 'json')],
-        [os.path.join(net, convert.DEFAULT_TMPL.format(sid, desc, f'{fname}-distances') + 'tsv'),
-         os.path.join(net, convert.DEFAULT_TMPL.format(sid, desc, f'{fname}-distances') + 'json')],
-        [os.path.join(path, 'coord', convert.COORD_TMPL.format(desc, f'{fname}_labels', 'tsv')),
-         os.path.join(path, 'coord', convert.COORD_TMPL.format(desc, f'{fname}_labels', 'json'))],
-        [os.path.join(path, 'coord', convert.COORD_TMPL.format(desc, f'{fname}_nodes', 'tsv')),
-         os.path.join(path, 'coord', convert.COORD_TMPL.format(desc, f'{fname}_nodes', 'json'))]
+        [os.path.join(net, DEFAULT_TMPL.format(sid, desc, f'{fname}-weights', 'tsv')),
+         os.path.join(net, DEFAULT_TMPL.format(sid, desc, f'{fname}-weights', 'json'))],
+        [os.path.join(net, DEFAULT_TMPL.format(sid, desc, f'{fname}-distances', 'tsv')),
+         os.path.join(net, DEFAULT_TMPL.format(sid, desc, f'{fname}-distances', 'json'))],
+        [os.path.join(path, 'coord', COORD_TMPL.format(desc, f'{fname}_labels', 'tsv')),
+         os.path.join(path, 'coord', COORD_TMPL.format(desc, f'{fname}_labels', 'json'))],
+        [os.path.join(path, 'coord', COORD_TMPL.format(desc, f'{fname}_nodes', 'tsv')),
+         os.path.join(path, 'coord', COORD_TMPL.format(desc, f'{fname}_nodes', 'json'))],
     ]
 
     return paths, [f'../coords/{fname}_labels.json', f'../coords/{fname}_nodes.json']
