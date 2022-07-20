@@ -23,40 +23,70 @@ class Files:
         self.traverse_files()
 
     def traverse_files(self):
+        # folder structure inputs
         if not self.single:
+            main_folder = os.path.basename(self.path)
+
             for file in self.files:
                 if os.path.isdir(os.path.join(self.path, file)):
                     sid = prep.create_uuid()
-                    self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
+                    contents = conv.get_content(self.path, file)
+
+                    # traverse content
+                    for content in contents:
+                        # get path after the main folder
+                        path = find_str(content, main_folder, before=False)
+
+                        # split the folder to get individual file/folder
+                        split = path.split('\\')
+                        s0, s1 = split[0], split[1]
+
+                        # add new key
+                        if s0 not in self.subs:
+                            self.subs[s0] = {}
+
+                        if os.path.isdir(find_str(content, s1)) and s1 not in self.subs[s0]:
+                            self.subs[s0][s1] = []
+
+                        self.subs[s0][s1].append(os.path.basename(content))
 
         else:
             sid = prep.create_uuid()
             self.subs[sid] = prepare_subs(conv.get_content(self.path, self.files), sid)
 
-        print(self.subs)
+
+def find_str(path, word, before=True):
+    split = path.find(word) + len(word) + 1
+
+    if before:
+        return path[:split]
+    return path[split:]
 
 
 def prepare_subs(file_paths, sid):
-    desc = convert.DESC
-
     subs = {}
+
     for file_path in file_paths:
         name = get_filename(file_path)
-        desc = desc + 'h5' if file_path.endswith('h5') else desc
+        desc = convert.DESC + 'h5' if file_path.endswith('h5') else convert.DESC
 
         subs[name] = {
             'fname': name,
             'sid': sid,
-            'sep': find_separator(file_path),
             'desc': desc,
             'path': file_path,
             'ext': get_file_ext(file_path),
             'name': name.split('.')[0]
         }
 
-        if subs[name]['name'] in ['tract_lengths', 'tract_length']:
+        name = subs[name]['name']
+
+        if name.endswith('txt') or name.endswith('.csv'):
+            subs[name]['sep'] = find_separator(file_path)
+
+        if name in ['tract_lengths', 'tract_length']:
             subs[name]['name'] = 'distances'
-        if subs[name]['name'] == 'centres':
+        if name == 'centres':
             conv.CENTERS = True
 
     return subs
@@ -78,6 +108,7 @@ def find_separator(path):
     :param path:
     :return:
     """
+
     if path.endswith('.mat') or path.endswith('.h5'):
         return
 

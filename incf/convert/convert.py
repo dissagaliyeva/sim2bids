@@ -14,6 +14,7 @@ import incf.preprocess.structure as struct
 import incf.preprocess.weights_distances as wdc
 import incf.templates.templates as temp
 import incf.preprocess.subjects as subj
+import incf.preprocess.preprocess as prep
 import incf.utils as utils
 
 sys.path.append('..')
@@ -82,6 +83,9 @@ def check_file(path, files, subs=None, save=False):
 
 
 def get_content(path, files):
+    if isinstance(files, str):
+        return traverse_files(os.path.join(path, files))
+
     all_files = []
 
     for file in files:
@@ -111,6 +115,7 @@ def save_output(subs, output):
     if conflict:
         pn.state.notifications.info('Output folder contains files. Removing them...', duration=DURATION)
         utils.rm_tree(output)
+        prep.reset_index()
 
     # verify folders exist
     struct.check_folders(output)
