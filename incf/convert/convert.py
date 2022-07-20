@@ -47,11 +47,13 @@ def check_compatibility(files):
 #     pn.state.notifications.success('Processing input data...', duration=DURATION)
 
 
-def traverse_files(path: str, basename: bool = False) -> list:
+def traverse_files(path: str, files=None, basename: bool = False, recursive=False) -> list:
     """
     Recursively traverse a specified folder and sub-folders. If `basename` is enabled,
     save only the file names. Otherwise, save absolute paths.
 
+    :param recursive:
+    :param files:
     :param path: str
         Path to the folder location to traverse.
     :param basename: bool
@@ -60,6 +62,21 @@ def traverse_files(path: str, basename: bool = False) -> list:
         Returns a list of basename or absolute paths.
     """
 
+    if recursive:
+        return recursive_walk(path, basename)
+
+    contents = []
+
+    for file in files:
+        if os.path.isdir(os.path.join(path, file)):
+            contents += recursive_walk(path, basename)
+        else:
+            contents.append(file)
+
+    return contents
+
+
+def recursive_walk(path: str, basename: bool) -> list:
     contents = []
 
     for root, _, files in os.walk(path, topdown=True):
@@ -68,7 +85,6 @@ def traverse_files(path: str, basename: bool = False) -> list:
                 contents.append(subj.get_filename(file))
             else:
                 contents.append(os.path.join(root, file))
-
     return contents
 
 
@@ -82,15 +98,15 @@ def check_file(path, files, subs=None, save=False):
     return subs, struct.create_layout(subs, OUTPUT)
 
 
-def get_content(path, files):
+def get_content(path, files, basename=False):
     if isinstance(files, str):
-        return traverse_files(os.path.join(path, files))
+        return traverse_files(os.path.join(path, files), basename, recursive=True)
 
     all_files = []
 
     for file in files:
         if os.path.isdir(os.path.join(path, file)):
-            all_files += traverse_files(os.path.join(path, file))
+            all_files += traverse_files(os.path.join(path, file), basename=basename, recursive=True)
         else:
             all_files.append(os.path.join(path, file))
     return all_files

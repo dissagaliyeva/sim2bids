@@ -15,7 +15,7 @@ class Files:
 
         # decide whether input files are for one or more patients
         self.content = conv.get_content(path, files)
-        self.basename = set(conv.traverse_files(path, basename=True))
+        self.basename = set(conv.traverse_files(path, files, basename=True))
         self.single = len(self.content) == len(self.basename)
 
         # set multi-subject input to true
@@ -24,7 +24,7 @@ class Files:
 
     def traverse_files(self):
         # folder structure inputs
-        if not self.single:
+        if conv.MULTI_INPUT:
             main_folder = os.path.basename(self.path)
 
             for file in self.files:
@@ -40,15 +40,19 @@ class Files:
                         # split the folder to get individual file/folder
                         split = path.split('\\')
                         s0, s1 = split[0], split[1]
+                        s1_is_dir = os.path.isdir(find_str(content, s1))
 
-                        # add new key
-                        if s0 not in self.subs:
-                            self.subs[s0] = {}
-
-                        if os.path.isdir(find_str(content, s1)) and s1 not in self.subs[s0]:
-                            self.subs[s0][s1] = []
-
-                        self.subs[s0][s1].append(os.path.basename(content))
+                        if s1_is_dir:
+                            # add new key
+                            if s0 not in self.subs:
+                                self.subs[s0] = {}
+                            if s1 not in self.subs[s0]:
+                                self.subs[s0][s1] = []
+                            self.subs[s0][s1].append(os.path.basename(content))
+                        else:
+                            if s0 not in self.subs:
+                                self.subs[s0] = []
+                            self.subs[s0].append(os.path.basename(content))
 
         else:
             sid = prep.create_uuid()
@@ -79,14 +83,12 @@ def prepare_subs(file_paths, sid):
             'name': name.split('.')[0]
         }
 
-        name = subs[name]['name']
-
-        if name.endswith('txt') or name.endswith('.csv'):
+        if subs[name]['name'].endswith('.txt') or name.endswith('.csv'):
             subs[name]['sep'] = find_separator(file_path)
 
-        if name in ['tract_lengths', 'tract_length']:
+        if subs[name]['name'] in ['tract_lengths', 'tract_length']:
             subs[name]['name'] = 'distances'
-        if name == 'centres':
+        if subs[name]['name'] == 'centres':
             conv.CENTERS = True
 
     return subs
@@ -108,10 +110,6 @@ def find_separator(path):
     :param path:
     :return:
     """
-
-    if path.endswith('.mat') or path.endswith('.h5'):
-        return
-
     sniffer = csv.Sniffer()
 
     with open(path) as fp:
@@ -122,3 +120,4 @@ def find_separator(path):
 
     delimiter = '\s' if delimiter == ' ' else delimiter
     return delimiter
+
