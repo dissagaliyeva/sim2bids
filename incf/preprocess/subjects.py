@@ -1,5 +1,7 @@
 import os
 import csv
+import re
+
 from incf.convert import convert
 import os
 from collections import OrderedDict
@@ -25,38 +27,25 @@ class Files:
     def traverse_files(self):
         # folder structure inputs
         if conv.MULTI_INPUT:
-            main_folder = os.path.basename(self.path)
 
-            for file in self.files:
-                if os.path.isdir(os.path.join(self.path, file)):
-                    sid = prep.create_uuid()
-                    contents = conv.get_content(self.path, file)
+            for sel in self.files:
+                sid = prep.create_uuid() if re.findall('[0-9]+', sel) == 0 else sel
 
-                    # traverse content
-                    for content in contents:
-                        # get path after the main folder
-                        path = find_str(content, main_folder, before=False)
+                if sel not in self.subs.keys():
+                    self.subs[sel] = {}
 
-                        # split the folder to get individual file/folder
-                        split = path.split('\\')
-                        s0, s1 = split[0], split[1]
-                        s1_is_dir = os.path.isdir(find_str(content, s1))
-
-                        if s1_is_dir:
-                            # add new key
-                            if s0 not in self.subs:
-                                self.subs[s0] = {}
-                            if s1 not in self.subs[s0]:
-                                self.subs[s0][s1] = []
-                            self.subs[s0][s1].append(os.path.basename(content))
-                        else:
-                            if s0 not in self.subs:
-                                self.subs[s0] = []
-                            self.subs[s0].append(os.path.basename(content))
+                if 'ses-preop' in os.listdir(os.path.join(self.path, sel)):
+                    self.subs[sel].update(
+                        prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='preop'))
+                if 'ses-postop' in os.listdir(os.path.join(self.path, sel)):
+                    self.subs[sel].update(
+                        prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='postop'))
 
         else:
             sid = prep.create_uuid()
             self.subs[sid] = prepare_subs(conv.get_content(self.path, self.files), sid)
+
+        print(self.subs)
 
 
 def find_str(path, word, before=True):
@@ -67,28 +56,30 @@ def find_str(path, word, before=True):
     return path[split:]
 
 
-def prepare_subs(file_paths, sid):
+def prepare_subs(file_paths, sid, suffix=None):
     subs = {}
+    suffix = '' if suffix is None else '_' + suffix
 
     for file_path in file_paths:
         name = get_filename(file_path)
         desc = convert.DESC + 'h5' if file_path.endswith('h5') else convert.DESC
+        nsuffix = name.split('.')[0] + suffix
 
-        subs[name] = {
+        n = nsuffix + '.' + name.split('.')[1]
+
+        subs[n] = {
+            'name': nsuffix,
             'fname': name,
             'sid': sid,
             'desc': desc,
+            'sep': find_separator(file_path),
             'path': file_path,
             'ext': get_file_ext(file_path),
-            'name': name.split('.')[0]
         }
 
-        if subs[name]['name'].endswith('.txt') or name.endswith('.csv'):
-            subs[name]['sep'] = find_separator(file_path)
-
-        if subs[name]['name'] in ['tract_lengths', 'tract_length']:
-            subs[name]['name'] = 'distances'
-        if subs[name]['name'] == 'centres':
+        if subs[n]['name'] in ['tract_lengths', 'tract_length']:
+            subs[n]['name'] = 'distances'
+        if subs[n]['name'] == 'centres':
             conv.CENTERS = True
 
     return subs
@@ -110,6 +101,9 @@ def find_separator(path):
     :param path:
     :return:
     """
+    if path.split('.')[-1] in ['mat', 'zip', 'h5']:
+        return
+
     sniffer = csv.Sniffer()
 
     with open(path) as fp:
@@ -120,4 +114,3 @@ def find_separator(path):
 
     delimiter = '\s' if delimiter == ' ' else delimiter
     return delimiter
-
