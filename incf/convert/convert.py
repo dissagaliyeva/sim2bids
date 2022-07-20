@@ -83,6 +83,9 @@ def check_file(path, files, subs=None, save=False):
 
 
 def get_content(path, files):
+    if isinstance(files, str):
+        return traverse_files(os.path.join(path, files))
+
     all_files = []
 
     for file in files:
