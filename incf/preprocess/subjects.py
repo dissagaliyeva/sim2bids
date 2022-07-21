@@ -29,17 +29,20 @@ class Files:
         if conv.MULTI_INPUT:
 
             for sel in self.files:
-                sid = prep.create_uuid() if re.findall('[0-9]+', sel) == 0 else sel.replace('sub-', '')
+                sid = prep.create_uuid() if 'sub-' not in sel else sel.replace('sub-', '')
 
                 if sel not in self.subs.keys():
-                    self.subs[sel] = {}
+                    self.subs[sid] = {}
 
                 if 'ses-preop' in os.listdir(os.path.join(self.path, sel)):
-                    self.subs[sel].update(
-                        prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='preop'))
-                if 'ses-postop' in os.listdir(os.path.join(self.path, sel)):
-                    self.subs[sel].update(
-                        prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='postop'))
+                    self.subs[sid].update(prepare_subs(conv.get_content(self.path, sel), sid, suffix='preop'))
+                elif 'ses-postop' in os.listdir(os.path.join(self.path, sel)):
+                    self.subs[sid].update(prepare_subs(conv.get_content(self.path, sel), sid, suffix='postop'))
+                else:
+                    self.subs[sid] = prepare_subs(conv.get_content(self.path, sel), sid)
+
+
+
 
         else:
             sid = prep.create_uuid()
