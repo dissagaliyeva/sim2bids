@@ -29,7 +29,7 @@ class Files:
         if conv.MULTI_INPUT:
 
             for sel in self.files:
-                sid = prep.create_uuid() if re.findall('[0-9]+', sel) == 0 else sel
+                sid = prep.create_uuid() if re.findall('[0-9]+', sel) == 0 else sel.replace('sub-', '')
 
                 if sel not in self.subs.keys():
                     self.subs[sel] = {}
