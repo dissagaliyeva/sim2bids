@@ -100,7 +100,7 @@ def check_file(path, files, subs=None, save=False):
 
 def get_content(path, files, basename=False):
     if isinstance(files, str):
-        return traverse_files(os.path.join(path, files), basename, recursive=True)
+        return traverse_files(os.path.join(path, files), basename=basename, recursive=True)
 
     all_files = []
 
