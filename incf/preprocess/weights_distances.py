@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+
 import pandas as pd
 from incf.convert import convert
 
@@ -18,16 +20,20 @@ def save_wd(subs, output):
     name = DEFAULT_TMPL.format(subs['sid'], subs['desc'], subs['name'], 'tsv')
     file = read_csv(subs['path'], subs['sep'])
 
-    # save to tsv
-    convert.to_tsv(os.path.join(net, name), file[:])
-
     # add coordinates if exists
     coords = None
 
     if convert.CENTERS:
         coords = [f'../coord/desc-{subs["desc"]}_labels.json', f'../coord/desc-{subs["desc"]}_nodes.json']
 
-    convert.to_json(os.path.join(net, name.replace('tsv', 'json')), file.shape, desc='', ftype='wd', coords=coords)
+    if isinstance(file, str):
+        Path(os.path.join(net, name)).touch()
+        Path(os.path.join(net, name.replace('tsv', 'json'))).touch()
+
+    else:
+        # save to tsv
+        convert.to_tsv(os.path.join(net, name), file[:])
+        convert.to_json(os.path.join(net, name.replace('tsv', 'json')), file.shape, desc='', ftype='wd', coords=coords)
 
 
 def save_centers(subs, output):
@@ -51,4 +57,11 @@ def save_centers(subs, output):
 
 
 def read_csv(path, sep):
-    return pd.read_csv(path, sep=sep, header=None, index_col=False)
+    try:
+        f = pd.read_csv(path, sep=sep, header=None, index_col=False)
+    except pd.errors.EmptyDataError:
+        return ''
+    except ValueError:
+        return ''
+    else:
+        return f
