@@ -48,8 +48,6 @@ class Files:
             sid = prep.create_uuid()
             self.subs[sid] = prepare_subs(conv.get_content(self.path, self.files), sid)
 
-        print(self.subs)
-
 
 def find_str(path, word, before=True):
     split = path.find(word) + len(word) + 1
@@ -62,13 +60,23 @@ def find_str(path, word, before=True):
 def prepare_subs(file_paths, sid, suffix=None):
     subs = {}
     suffix = '' if suffix is None else '_' + suffix
+    accepted = ['tract_lengths.txt', 'weights.txt', 'centres.txt',
+                'tract_lengths_preop.txt', 'weights_preop.txt', 'centres_preop.txt',
+                'tract_lengths_postop.txt', 'weights_postop.txt', 'centres_postop.txt',
+                'distances.txt', 'distances_preop.txt', 'distances_postop.txt']
 
     for file_path in file_paths:
+        if file_path.endswith('txt') and get_filename(file_path) not in accepted:
+            continue
         name = get_filename(file_path)
         desc = convert.DESC + 'h5' if file_path.endswith('h5') else convert.DESC
-        nsuffix = name.split('.')[0] + suffix
 
-        n = nsuffix + '.' + name.split('.')[1]
+        if 'preop' in name or 'postop' in name:
+            nsuffix = name.split('.')[0] + suffix
+            n = nsuffix + '.' + name.split('.')[1]
+        else:
+            nsuffix = name.split('.')[0]
+            n = nsuffix + '.' + name.split('.')[1]
 
         subs[n] = {
             'name': nsuffix,
@@ -121,6 +129,8 @@ def find_separator(path):
             delimiter = sniffer.sniff(fp.read(5000)).delimiter
         except Exception:
             delimiter = sniffer.sniff(fp.read(100)).delimiter
+        except Exception:
+            delimiter = sniffer.sniff(fp.read(500)).delimiter
 
     delimiter = '\s' if delimiter == ' ' else delimiter
     return delimiter
