@@ -13,6 +13,7 @@ def save(subs: dict, output: str, center: bool = False):
 
 
 def save_wd(subs, output):
+    print('save_wd:', subs, end='\n\n')
     DEFAULT_TMPL = 'sub-{}_desc-{}_{}.{}'
     # check and create folders & return paths to them
     sub, net, spatial, ts = convert.create_sub_struct(output, subs)

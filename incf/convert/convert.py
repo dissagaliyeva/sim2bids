@@ -132,9 +132,11 @@ def save_output(subs, output):
 
     def save(sub):
         for k, v in sub.items():
-            if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
+            if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt',
+                     'weights_preop.txt', 'distances_preop.txt', 'tract_lengths_preop.txt',
+                     'weights_postop.txt', 'distances_postop.txt', 'tract_lengths_postop.txt']:
                 wdc.save(sub[k], output)
-            elif k in ['centres.txt']:
+            elif k in ['centres.txt', 'centres_preop.txt', 'centres_postop.txt']:
                 wdc.save(sub[k], output, center=True)
             elif k.endswith('.mat'):
                 mat.save(sub[k], output)

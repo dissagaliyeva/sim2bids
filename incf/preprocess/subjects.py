@@ -30,7 +30,6 @@ class Files:
     def traverse_files(self):
         # folder structure inputs
         if conv.MULTI_INPUT:
-
             for sel in self.files:
                 sid = prep.create_uuid() if re.findall('[0-9]+', sel) == 0 else sel.replace('sub-', '')
 
@@ -38,9 +37,14 @@ class Files:
                     self.subs[sel] = {}
 
                 if 'ses-preop' in os.listdir(os.path.join(self.path, sel)):
+                    print(f'SEL: {sel}')
+                    print(prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='preop'), end='\n\n')
                     self.subs[sel].update(
                         prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='preop'))
                 if 'ses-postop' in os.listdir(os.path.join(self.path, sel)):
+                    print(f'SEL: {sel}')
+                    print(prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='postop'), end='\n\n')
+
                     self.subs[sel].update(
                         prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='postop'))
 
@@ -73,13 +77,10 @@ def prepare_subs(file_paths, sid, suffix=None):
 
         if 'preop' in name or 'postop' in name:
             nsuffix = name.split('.')[0]
-            n = nsuffix + '.' + name.split('.')[1]
-
-            print('nsuffix:', nsuffix)
-            print('n:', n)
         else:
-            nsuffix = name.split('.')[0]
-            n = nsuffix + '.' + name.split('.')[1]
+            nsuffix = name.split('.')[0] + suffix
+
+        n = nsuffix + '.' + name.split('.')[1]
 
         subs[n] = {
             'name': nsuffix,
@@ -94,10 +95,10 @@ def prepare_subs(file_paths, sid, suffix=None):
         if subs[n]['name'] in ['tract_lengths', 'tract_length',
                                'tract_lengths_preop', 'tract_length_preop',
                                'tract_lengths_postop', 'tract_length_postop']:
-            subs[n]['name'] = f'distances{suffix}'
+            subs[n]['name'] = f'distances_preop' if 'preop' in name else 'distances_postop' \
+                if 'postop' in name else 'distances'
         if subs[n]['name'] in ['centres', 'centers', 'centres_preop', 'centres_postop']:
             conv.CENTERS = True
-
     return subs
 
 
@@ -118,7 +119,7 @@ def find_separator(path):
     """
     if path.split('.')[-1] in ['mat', 'zip', 'h5']:
         return
-    print('sep path:', path)
+
     try:
         f = pd.read_csv(path)
     except pd.errors.EmptyDataError:

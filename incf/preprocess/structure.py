@@ -43,9 +43,9 @@ class FolderStructure:
         if sid not in self.components['subjects']:
             self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
 
-        if k in ['weights.txt', 'distances.txt',
-                 'weights_preop.txt', 'distances_preop.txt',
-                 'weights_postop.txt', 'distances_postop.txt']:
+        if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt',
+                 'weights_preop.txt', 'distances_preop.txt', 'tract_lengths_preop.txt',
+                 'weights_postop.txt', 'distances_postop.txt', 'tract_lengths_postop.txt']:
             self.components['subjects'][sid]['net'] += self.common_structure(v)
         elif k in ['centers.txt', 'centers_preop.txt', 'centres_preop.txt',
                    'centers_postop.txt', 'centres_postop.txt', 'centers_postop.txt']:
