@@ -69,7 +69,10 @@ def prepare_subs(file_paths, sid, suffix=None):
                 'tract_lengths_postop.txt', 'weights_postop.txt', 'centres_postop.txt',
                 'distances.txt', 'distances_preop.txt', 'distances_postop.txt']
 
+    conv.verify_zip_files(file_paths)
+
     for file_path in file_paths:
+
         if file_path.endswith('txt') and get_filename(file_path) not in accepted:
             continue
         name = get_filename(file_path)

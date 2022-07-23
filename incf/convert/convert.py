@@ -1,21 +1,19 @@
-import csv
+import glob
 import json
 import os
 import sys
-from collections import OrderedDict
 from pathlib import Path
-import glob
 
 import pandas as pd
 import panel as pn
 
+import incf.preprocess.preprocess as prep
 import incf.preprocess.simulations_h5 as h5
 import incf.preprocess.simulations_matlab as mat
 import incf.preprocess.structure as struct
+import incf.preprocess.subjects as subj
 import incf.preprocess.weights_distances as wdc
 import incf.templates.templates as temp
-import incf.preprocess.subjects as subj
-import incf.preprocess.preprocess as prep
 import incf.utils as utils
 
 sys.path.append('..')
@@ -100,6 +98,21 @@ def extract_files(path):
         archive.extract(ext, path=parent)
         os.rename(os.path.join(parent, ext),
                   os.path.join(parent, ext.replace('.', f'_{suffix}.')))
+
+
+def verify_zip_files(paths):
+    for path in paths:
+        basename = subj.get_filename(path)
+        suffix = os.path.dirname(path).split('\\')[-1].split('-')[-1]
+
+        if basename.startswith('centres') and basename != f'centres_{suffix}.txt':
+            os.rename(path, path.replace(basename, f'centres_{suffix}.txt'))
+        elif basename.startswith('weights') and basename != f'weights_{suffix}.txt':
+            os.rename(path, path.replace(basename, f'weights_{suffix}.txt'))
+        elif basename.startswith('tract_lengths') and basename != f'tract_lengths_{suffix}.txt':
+            os.rename(path, path.replace(basename, f'distances_{suffix}.txt'))
+        elif basename.startswith('distances') and basename != f'distances_{suffix}.txt':
+            os.rename(path, path.replace(basename, f'distances_{suffix}.txt'))
 
 
 def check_file(path, files, subs=None, save=False):
