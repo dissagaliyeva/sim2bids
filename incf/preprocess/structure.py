@@ -43,7 +43,6 @@ class FolderStructure:
         if sid not in self.components['subjects']:
             self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
 
-        print(k, v, end='\n\n')
         if k in ['weights.txt', 'distances.txt',
                  'weights_preop.txt', 'distances_preop.txt',
                  'weights_postop.txt', 'distances_postop.txt']:

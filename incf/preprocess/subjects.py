@@ -72,8 +72,11 @@ def prepare_subs(file_paths, sid, suffix=None):
         desc = convert.DESC + 'h5' if file_path.endswith('h5') else convert.DESC
 
         if 'preop' in name or 'postop' in name:
-            nsuffix = name.split('.')[0] + suffix
+            nsuffix = name.split('.')[0]
             n = nsuffix + '.' + name.split('.')[1]
+
+            print('nsuffix:', nsuffix)
+            print('n:', n)
         else:
             nsuffix = name.split('.')[0]
             n = nsuffix + '.' + name.split('.')[1]
