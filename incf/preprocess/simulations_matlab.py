@@ -48,7 +48,7 @@ def convert_mat(mat, subs, path):
         convert.to_json(coord_json, data.shape, 'Time steps of the simulated time series.', 'wd')
         convert.to_tsv(coord_tsv)
     else:
-        print(data)
+        print('MATLAB weird files, `simulations_matlab.py` @51:', data)
 
 
 def find_mat_array(mat):
