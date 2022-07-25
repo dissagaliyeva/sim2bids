@@ -70,23 +70,28 @@ def recursive_walk(path: str, basename: bool) -> list:
                   'tract_lengths_postop.txt', 'weights_postop.txt', 'centres_postop.txt',
                   'distances.txt', 'distances_preop.txt', 'distances_postop.txt']
 
+    # present =
+    # zip_present = False
+
     for root, _, files in os.walk(path, topdown=True):
         exists = False
         for file in files:
             if file in to_extract:
                 exists = True
 
-            if not file.endswith('zip'):
+            if not file.endswith('.zip'):
                 if basename:
                     contents.append(subj.get_filename(file))
                 else:
                     contents.append(os.path.join(root, file))
-
-            if file.endswith('zip') and not exists:
-                if ZIP_CONTENT is None:
-                    ZIP_CONTENT = get_zip_content(os.path.join(root, file))
-                extract_files(os.path.join(root, file))
-                contents += glob.glob(os.path.join(root, '*txt'))
+            else:
+                if file.endswith('.zip'):
+                    print(file)
+                    if not exists:
+                        if ZIP_CONTENT is None:
+                            ZIP_CONTENT = get_zip_content(os.path.join(root, file))
+                        extract_files(os.path.join(root, file))
+                        contents += glob.glob(os.path.join(root, '*txt'))
 
     return contents
 

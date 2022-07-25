@@ -20,8 +20,10 @@ class Files:
 
         # decide whether input files are for one or more patients
         self.content = conv.get_content(path, files)
+        print('self.content:', self.content, end='\n\n')
         self.basename = set(conv.traverse_files(path, files, basename=True))
         self.single = len(self.content) == len(self.basename)
+        print('self.single:', self.single)
 
         # set multi-subject input to true
         conv.MULTI_INPUT = False if self.single else True
@@ -41,16 +43,18 @@ class Files:
                     conv.verify_zip_files(content)
                     self.subs[sel].update(
                         prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='preop'))
-                if 'ses-postop' in os.listdir(os.path.join(self.path, sel)):
+                elif 'ses-postop' in os.listdir(os.path.join(self.path, sel)):
                     content = conv.get_content(os.path.join(self.path), sel)
                     conv.verify_zip_files(content)
 
                     self.subs[sel].update(
                         prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='postop'))
+                else:
+                    self.subs[sel] = prepare_subs(conv.get_content(self.path, sel), sel)
 
         else:
             sid = prep.create_uuid()
-            self.subs[sid] = prepare_subs(conv.get_content(self.path, self.files), sid)
+            self.subs[sid] = prepare_subs(self.content, sid)
 
 
 def find_str(path, word, before=True):
@@ -118,7 +122,7 @@ def find_separator(path):
     :param path:
     :return:
     """
-    if path.split('.')[-1] in ['mat', 'zip', 'h5']:
+    if path.split('.')[-1] not in ['txt', 'csv']:
         return
 
     try:
