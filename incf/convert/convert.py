@@ -99,33 +99,34 @@ def rename_tract_lengths(file):
     return file
 
 
-# def check_file(path, files, subs=None, save=False):
-#     if subs is None:
-#         subs = subj.Files(path, files).subs
-#
-#     if save:
-#         save_output(subs, OUTPUT)
-#
-#         # remove zip folder contents
-#         if isinstance(ZIP_CONTENT, list):
-#             print('zipfiles:', ZIP_CONTENT)
-#             print('contents:', get_content(path, files))
-#
-#             for content in get_content(path, files):
-#                 print('content:', content)
-#                 file = content.split('\\')[-1].split('.')[0]
-#                 file = file.replace('_preop', '') if 'preop' in file else file.replace('_postop', '') if 'postop' in file else file
-#                 print('file:', file)
-#
-#                 if file in ZIP_CONTENT:
-#                     os.remove(content)
-#
-#                 ZIP_CONTENT = None
-#
-#     return subs, struct.create_layout(subs, OUTPUT)
+def check_file(path, files, subs=None, save=False):
+    if subs is None:
+        subs = subj.Files(path, files).subs
+
+    if save:
+        pass
+        # save_output(subs, OUTPUT)
+        #
+        # # remove zip folder contents
+        # if isinstance(ZIP_CONTENT, list):
+        #     print('zipfiles:', ZIP_CONTENT)
+        #     print('contents:', get_content(path, files))
+        #
+        #     for content in get_content(path, files):
+        #         print('content:', content)
+        #         file = content.split('\\')[-1].split('.')[0]
+        #         file = file.replace('_preop', '') if 'preop' in file else file.replace('_postop', '') if 'postop' in file else file
+        #         print('file:', file)
+        #
+        #         if file in ZIP_CONTENT:
+        #             os.remove(content)
+        #
+        #         ZIP_CONTENT = None
+
+    return subs, struct.create_layout(subs, OUTPUT)
 
 
-print(get_content('C:\\Users\\dinar\\Desktop\\gsoc_data', ['brain_tumor']))
+# print(get_content('C:\\Users\\dinar\\Desktop\\gsoc_data', ['brain_tumor']))
 
 
 
