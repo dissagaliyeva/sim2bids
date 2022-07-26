@@ -27,12 +27,9 @@ TRAVERSE_FOLDERS = True
 TO_EXTRACT = ['tract_lengths.txt', 'weights.txt', 'centres.txt']
 ACCEPTED_EXT = ['txt', 'csv', 'mat', 'h5']
 EXCLUDE = ['areas.txt', 'average_orientations.txt', 'cortical.txt', 'hemisphere.txt']
-
-"""
-'tract_lengths_preop.txt', 'weights_preop.txt', 'centres_preop.txt',
+SES_FILES = ['tract_lengths_preop.txt', 'weights_preop.txt', 'centres_preop.txt',
               'tract_lengths_postop.txt', 'weights_postop.txt', 'centres_postop.txt',
-              'distances.txt', 'distances_preop.txt', 'distances_postop.txt'
-"""
+              'distances.txt', 'distances_preop.txt', 'distances_postop.txt']
 
 
 def recursive_walk(path, basename=False):
@@ -40,7 +37,7 @@ def recursive_walk(path, basename=False):
 
     for root, _, files in os.walk(path):
         for file in files:
-            if file.endswith('.zip'):
+            if file.endswith('.zip') and len(set(os.listdir(root)).intersection(set(SES_FILES))) == 0:
                 content += z.extract_zip(os.path.join(root, file))
                 continue
 
