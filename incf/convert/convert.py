@@ -25,6 +25,8 @@ CENTERS = False
 MULTI_INPUT = False
 TRAVERSE_FOLDERS = True
 TO_EXTRACT = ['tract_lengths.txt', 'weights.txt', 'centres.txt']
+ACCEPTED_EXT = ['txt', 'csv', 'mat', 'h5']
+EXCLUDE = ['areas.txt', 'average_orientations.txt', 'cortical.txt', 'hemisphere.txt']
 
 """
 'tract_lengths_preop.txt', 'weights_preop.txt', 'centres_preop.txt',
@@ -42,18 +44,88 @@ def recursive_walk(path, basename=False):
                 content += z.extract_zip(os.path.join(root, file))
                 continue
 
-            if basename:
-                content.append(file)
-            else:
-                content.append(os.path.join(root, file))
+            file = rename_tract_lengths(file)
+            if file not in EXCLUDE:
+                if basename:
+                    content.append(file)
+                else:
+                    content.append(os.path.join(root, file))
 
     return content
 
 
+def get_content(path, files, basename=False):
+
+    # if provided path contains only one sub-folder, and it's needed to traverse that, return the whole content
+    # of the specified location.
+    if isinstance(files, str):
+        return recursive_walk(os.path.join(path, files))
+
+    # otherwise, traverse all folders and get contents
+    # Step 1: instantiate content holder
+    contents = []
+
+    # Step 2: traverse every selected input
+    for file in files:
+        # Step 3: combine path
+        file_path = os.path.join(path, file)
+
+        # Step 4: check whether the selection is a directory
+        if os.path.isdir(file_path):
+            # Step 4.1: traverse its content and append results
+            contents += recursive_walk(file_path, basename)
+
+        # Step 5: iterate single-files
+        # Step 5.1: get the file's extension
+        ext = os.path.basename(file).split('.')[-1]
+
+        # Step 5.2: check if it's among the accepted files
+        if ext in ACCEPTED_EXT:
+            # Step 5.3: rename `tract_lengths` to `distances`
+            file = rename_tract_lengths(file)
+
+            # Step 5.4: check if the file ends with txt, and it's not among the files that cannot be used
+            if (ext == 'txt' and file not in EXCLUDE) or ext != 'txt':
+                # Step 5.5: append file
+                contents.append(file)
+
+    # Step 6: return contents
+    return contents
 
 
+def rename_tract_lengths(file):
+    if 'tract_lengths' in file:
+        return file.replace('tract_lengths', 'distances')
+    return file
 
 
+# def check_file(path, files, subs=None, save=False):
+#     if subs is None:
+#         subs = subj.Files(path, files).subs
+#
+#     if save:
+#         save_output(subs, OUTPUT)
+#
+#         # remove zip folder contents
+#         if isinstance(ZIP_CONTENT, list):
+#             print('zipfiles:', ZIP_CONTENT)
+#             print('contents:', get_content(path, files))
+#
+#             for content in get_content(path, files):
+#                 print('content:', content)
+#                 file = content.split('\\')[-1].split('.')[0]
+#                 file = file.replace('_preop', '') if 'preop' in file else file.replace('_postop', '') if 'postop' in file else file
+#                 print('file:', file)
+#
+#                 if file in ZIP_CONTENT:
+#                     os.remove(content)
+#
+#                 ZIP_CONTENT = None
+#
+#     return subs, struct.create_layout(subs, OUTPUT)
+
+
+print(get_content('C:\\Users\\dinar\\Desktop\\gsoc_data', ['brain_tumor']))
 
 
 
