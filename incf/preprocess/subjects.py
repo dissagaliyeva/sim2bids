@@ -15,80 +15,81 @@ import incf.convert.convert as conv
 class Files:
     def __init__(self, path, files):
         self.path = path
-        self.files = files
+        self.selected_files = files
         self.subs = OrderedDict()
 
         # decide whether input files are for one or more patients
         self.content = conv.get_content(path, files)
-        print('self.content:', self.content, end='\n\n')
-        self.basename = set(conv.traverse_files(path, files, basename=True))
+        self.basename = set(conv.get_content(path, files, basename=True))
         self.single = len(self.content) == len(self.basename)
-        print('self.single:', self.single)
 
         # set multi-subject input to true
         conv.MULTI_INPUT = False if self.single else True
+
+        # traverse files and create subjects
         self.traverse_files()
 
     def traverse_files(self):
-        # folder structure inputs
+        # traverse multi-folder input
         if conv.MULTI_INPUT:
-            for sel in self.files:
-                sid = prep.create_uuid() if re.findall('[0-9]+', sel) == 0 else sel.replace('sub-', '')
+            files = self.selected_files
+            changed_path = False
 
-                if sel not in self.subs.keys():
-                    self.subs[sel] = {}
+            # Step 1: change directory to the folders if only one folder is listed
+            if len(self.selected_files) == 1:
+                changed_path = True
+                files = os.listdir(os.path.join(self.path, self.selected_files[0]))
 
-                if 'ses-preop' in os.listdir(os.path.join(self.path, sel)):
-                    content = conv.get_content(os.path.join(self.path), sel)
-                    conv.verify_zip_files(content)
-                    self.subs[sel].update(
-                        prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='preop'))
-                elif 'ses-postop' in os.listdir(os.path.join(self.path, sel)):
-                    content = conv.get_content(os.path.join(self.path), sel)
-                    conv.verify_zip_files(content)
+            # Step 1: traverse over the provided input
+            for file in files:
+                # Step 2: create individual ID; if it already has BIDS format, leave it as is but remove 'sub-'
+                sid = prep.create_uuid() if re.findall('[0-9]+', file) in [0, 1] else file.replace('sub-', '')
 
-                    self.subs[sel].update(
-                        prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='postop'))
+                # Step 3: create a dictionary to store values
+                if sid not in self.subs.keys():
+                    self.subs[sid] = {}
+
+                # Step 4: change path to the files
+                if changed_path:
+                    path = os.path.join(self.path, self.selected_files[0], file)
                 else:
-                    self.subs[sel] = prepare_subs(conv.get_content(self.path, sel), sel)
+                    path = os.path.join(self.path, file)
 
+                # Step 5: get all content
+                all_files = os.listdir(path)
+
+                # Step 6: traverse ses-preop if present
+                if 'ses-preop' in all_files:
+                    self.subs[sid].update(prepare_subs(conv.get_content(path, 'ses-preop'), sid))
+                # Step 7: traverse ses-postop if present
+                if 'ses-preop' in all_files:
+                    self.subs[sid].update(prepare_subs(conv.get_content(path, 'ses-preop'), sid))
+                # Step 8: if there are no `ses-preop` and `ses-postop`, traverse the folders as usual
+                if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
+                    self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
+
+        # traverse over single-subject and multi-subject in one folder structure
         else:
-            sid = prep.create_uuid()
-            self.subs[sid] = prepare_subs(self.content, sid)
+            # Step 1: check if the structure contains multi-subject
+            pass
 
 
-def find_str(path, word, before=True):
-    split = path.find(word) + len(word) + 1
-
-    if before:
-        return path[:split]
-    return path[split:]
-
-
-def prepare_subs(file_paths, sid, suffix=None):
+def prepare_subs(file_paths, sid):
     subs = {}
-    suffix = '' if suffix is None else '_' + suffix
+
     accepted = ['tract_lengths.txt', 'weights.txt', 'centres.txt',
                 'tract_lengths_preop.txt', 'weights_preop.txt', 'centres_preop.txt',
                 'tract_lengths_postop.txt', 'weights_postop.txt', 'centres_postop.txt',
                 'distances.txt', 'distances_preop.txt', 'distances_postop.txt']
 
     for file_path in file_paths:
-
         if file_path.endswith('txt') and get_filename(file_path) not in accepted:
             continue
         name = get_filename(file_path)
         desc = convert.DESC + 'h5' if file_path.endswith('h5') else convert.DESC
 
-        if 'preop' in name or 'postop' in name:
-            nsuffix = name.split('.')[0]
-        else:
-            nsuffix = name.split('.')[0] + suffix
-
-        n = nsuffix + '.' + name.split('.')[1]
-
-        subs[n] = {
-            'name': nsuffix,
+        subs[name] = {
+            'name': name.split('.')[0],
             'fname': name,
             'sid': sid,
             'desc': desc,
@@ -97,12 +98,9 @@ def prepare_subs(file_paths, sid, suffix=None):
             'ext': get_file_ext(file_path),
         }
 
-        if subs[n]['name'] in ['tract_lengths', 'tract_length',
-                               'tract_lengths_preop', 'tract_length_preop',
-                               'tract_lengths_postop', 'tract_length_postop']:
-            subs[n]['name'] = f'distances_preop' if 'preop' in name else 'distances_postop' \
-                if 'postop' in name else 'distances'
-        if subs[n]['name'] in ['centres', 'centers', 'centres_preop', 'centres_postop']:
+        if subs[name]['name'] in ['tract_lengths', 'tract_length']:
+            subs[name]['name'] = 'distances'
+        if subs[name]['name'] in ['centres', 'centers', 'centres_preop', 'centres_postop']:
             conv.CENTERS = True
     return subs
 
@@ -143,3 +141,151 @@ def find_separator(path):
 
     delimiter = '\s' if delimiter == ' ' else delimiter
     return delimiter
+
+
+
+
+
+
+
+
+# import os
+# import csv
+# import re
+#
+# import pandas as pd
+# import panel as pn
+#
+# from incf.convert import convert
+# import os
+# from collections import OrderedDict
+# import incf.preprocess.preprocess as prep
+# import incf.convert.convert as conv
+#
+#
+# class Files:
+#     def __init__(self, path, files):
+#         self.path = path
+#         self.files = files
+#         self.subs = OrderedDict()
+#
+#         # decide whether input files are for one or more patients
+#         self.content = conv.get_content(path, files)
+#         print('self.content:', self.content, end='\n\n')
+#         self.basename = set(conv.traverse_files(path, files, basename=True))
+#         self.single = len(self.content) == len(self.basename)
+#         print('self.single:', self.single)
+#
+#         # set multi-subject input to true
+#         conv.MULTI_INPUT = False if self.single else True
+#         self.traverse_files()
+#
+#     def traverse_files(self):
+#         # folder structure inputs
+#         if conv.MULTI_INPUT:
+#             for sel in self.files:
+#                 sid = prep.create_uuid() if re.findall('[0-9]+', sel) == 0 else sel.replace('sub-', '')
+#
+#                 if sel not in self.subs.keys():
+#                     self.subs[sel] = {}
+#
+#                 if 'ses-preop' in os.listdir(os.path.join(self.path, sel)):
+#                     self.subs[sel].update(
+#                         prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='preop'))
+#                 elif 'ses-postop' in os.listdir(os.path.join(self.path, sel)):
+#                     self.subs[sel].update(
+#                         prepare_subs(conv.get_content(os.path.join(self.path), sel), sid, suffix='postop'))
+#                 else:
+#                     self.subs[sel] = prepare_subs(conv.get_content(self.path, sel), sel)
+#
+#         else:
+#             sid = prep.create_uuid()
+#             self.subs[sid] = prepare_subs(self.content, sid)
+#
+#
+# def find_str(path, word, before=True):
+#     split = path.find(word) + len(word) + 1
+#
+#     if before:
+#         return path[:split]
+#     return path[split:]
+#
+#
+# def prepare_subs(file_paths, sid, suffix=None):
+#     subs = {}
+#     suffix = '' if suffix is None else '_' + suffix
+#     accepted = ['tract_lengths.txt', 'weights.txt', 'centres.txt',
+#                 'tract_lengths_preop.txt', 'weights_preop.txt', 'centres_preop.txt',
+#                 'tract_lengths_postop.txt', 'weights_postop.txt', 'centres_postop.txt',
+#                 'distances.txt', 'distances_preop.txt', 'distances_postop.txt']
+#
+#     for file_path in file_paths:
+#
+#         if file_path.endswith('txt') and get_filename(file_path) not in accepted:
+#             continue
+#         name = get_filename(file_path)
+#         desc = convert.DESC + 'h5' if file_path.endswith('h5') else convert.DESC
+#
+#         if 'preop' in name or 'postop' in name:
+#             nsuffix = name.split('.')[0]
+#         else:
+#             nsuffix = name.split('.')[0] + suffix
+#
+#         n = nsuffix + '.' + name.split('.')[1]
+#
+#         subs[n] = {
+#             'name': nsuffix,
+#             'fname': name,
+#             'sid': sid,
+#             'desc': desc,
+#             'sep': find_separator(file_path),
+#             'path': file_path,
+#             'ext': get_file_ext(file_path),
+#         }
+#
+#         if subs[n]['name'] in ['tract_lengths', 'tract_length',
+#                                'tract_lengths_preop', 'tract_length_preop',
+#                                'tract_lengths_postop', 'tract_length_postop']:
+#             subs[n]['name'] = f'distances_preop' if 'preop' in name else 'distances_postop' \
+#                 if 'postop' in name else 'distances'
+#         if subs[n]['name'] in ['centres', 'centers', 'centres_preop', 'centres_postop']:
+#             conv.CENTERS = True
+#     return subs
+#
+#
+# def get_filename(path):
+#     return os.path.basename(path)
+#
+#
+# def get_file_ext(path):
+#     return path.split('.')[-1]
+#
+#
+# def find_separator(path):
+#     """
+#     Find the separator/delimiter used in the file to ensure no exception
+#     is raised while reading files.
+#     :param path:
+#     :return:
+#     """
+#     if path.split('.')[-1] not in ['txt', 'csv']:
+#         return
+#
+#     try:
+#         f = pd.read_csv(path)
+#     except pd.errors.EmptyDataError:
+#         pn.state.notifications.error(f'File {os.path.basename(path)} is empty! Creating an empty file...')
+#         return ''
+#
+#     sniffer = csv.Sniffer()
+#
+#     with open(path) as fp:
+#         try:
+#             delimiter = sniffer.sniff(fp.read(5000)).delimiter
+#         except Exception:
+#             delimiter = sniffer.sniff(fp.read(100)).delimiter
+#         except Exception:
+#             delimiter = sniffer.sniff(fp.read(500)).delimiter
+#
+#     delimiter = '\s' if delimiter == ' ' else delimiter
+#     return delimiter
