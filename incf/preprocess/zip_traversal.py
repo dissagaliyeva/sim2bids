@@ -1,3 +1,9 @@
+import os
+import zipfile
+import incf.preprocess.subjects as subj
+import incf.convert.convert as conv
+
+
 def extract_zip(path):
     # get folder name
     basename = subj.get_filename(path)
@@ -14,7 +20,7 @@ def extract_zip(path):
     added = []
 
     # iterate over zip content and extract only the files that are included in TO_EXRACT
-    for ext in TO_EXTRACT:
+    for ext in conv.TO_EXTRACT:
         if ext in archive.namelist():
             # add the suffix to the newly extracted file
             new_filename = os.path.join(parent, add_suffix(ext, suffix))
