@@ -46,7 +46,7 @@ class Files:
             # Step 1: traverse over the provided input
             for file in files:
                 # Step 2: create individual ID; if it already has BIDS format, leave it as is but remove 'sub-'
-                sid = prep.create_uuid() if len(re.findall('[0-9]{2,}', file)) == 0 else file
+                sid = prep.create_uuid()
 
                 # Step 3: create a dictionary to store values
                 if sid not in self.subs.keys():
