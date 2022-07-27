@@ -23,6 +23,9 @@ class Files:
         self.basename = set(conv.get_content(path, files, basename=True))
         self.single = len(self.content) == len(self.basename)
 
+        print('self.content', self.content)
+        print('self.basename', self.basename)
+
         # set multi-subject input to true
         conv.MULTI_INPUT = False if self.single else True
 
@@ -77,7 +80,8 @@ class Files:
         # traverse over single-subject and multi-subject in one folder structure
         else:
             # Step 1: check if the structure contains multi-subject
-            match = find_matches(self.content)
+            match = find_matches(self.basename)
+
             if len(match) > 0:
                 for k, v in get_unique_subs(match, self.content).items():
                     sid = prep.create_uuid()
@@ -85,9 +89,21 @@ class Files:
                     if sid not in self.subs.keys():
                         self.subs[sid] = {}
 
-                    self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
+                    if len(self.selected_files) == 1:
+                        self.subs[sid].update(
+                            prepare_subs([os.path.join(self.path, self.selected_files[0], x) for x in v], sid))
+                    else:
+                        self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
             else:
-                print('Not a match')
+                sid = prep.create_uuid()
+                print('self.path:', self.path)
+                print('self.selected_files:', self.selected_files)
+
+                if len(self.selected_files) == 1 and os.path.isdir(os.path.join(self.path, self.selected_files[0])):
+                    self.subs[sid] = prepare_subs(conv.get_content(self.path, self.selected_files), sid)
+                else:
+                    paths = [os.path.join(self.path, file) for file in self.selected_files]
+                    self.subs[sid] = prepare_subs(paths, sid)
 
 
 def find_matches(paths):
@@ -134,6 +150,10 @@ def prepare_subs(file_paths, sid):
 
         if subs[name]['name'] in ['tract_lengths', 'tract_lengths_preop', 'tract_lengths_postop']:
             subs[name]['name'] = 'distances'
+
+        if 'tract_lengths' in file_path and not os.path.exists(file_path.replace('tract_lengths', 'distances')):
+            os.replace(file_path, file_path.replace('tract_lengths', 'distances'))
+
         if subs[name]['name'] in ['centres', 'centers', 'centres_preop', 'centres_postop']:
             conv.CENTERS = True
     return subs
