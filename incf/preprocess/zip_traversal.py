@@ -29,7 +29,8 @@ def extract_zip(path):
             new_file = os.path.join(parent, file.replace('.', f'_{suffix}.'))
             os.replace(os.path.join(parent, file), new_file)
 
-    if f'weights_{suffix}.txt' not in contents and f'distances_{suffix}.txt' not in contents and f'centres_{suffix}.txt' not in contents:
+    if f'weights_{suffix}.txt' not in contents and f'distances_{suffix}.txt' not in contents and \
+            f'centres_{suffix}.txt' not in contents:
         # open zip file
         archive = zipfile.ZipFile(path)
 
