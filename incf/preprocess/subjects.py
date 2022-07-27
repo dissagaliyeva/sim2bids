@@ -23,9 +23,6 @@ class Files:
         self.basename = set(conv.get_content(path, files, basename=True))
         self.single = len(self.content) == len(self.basename)
 
-        print('self.content', self.content)
-        print('self.basename', self.basename)
-
         # set multi-subject input to true
         conv.MULTI_INPUT = False if self.single else True
 
@@ -64,9 +61,11 @@ class Files:
                 # Step 6: traverse ses-preop if present
                 if 'ses-preop' in all_files:
                     self.subs[sid].update(prepare_subs(conv.get_content(path, 'ses-preop'), sid))
+
                 # Step 7: traverse ses-postop if present
                 if 'ses-postop' in all_files:
                     self.subs[sid].update(prepare_subs(conv.get_content(path, 'ses-postop'), sid))
+
                 # Step 8: if there are no `ses-preop` and `ses-postop`, traverse the folders as usual
                 if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
                     if changed_path:
@@ -96,8 +95,6 @@ class Files:
                         self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
             else:
                 sid = prep.create_uuid()
-                print('self.path:', self.path)
-                print('self.selected_files:', self.selected_files)
 
                 if len(self.selected_files) == 1 and os.path.isdir(os.path.join(self.path, self.selected_files[0])):
                     self.subs[sid] = prepare_subs(conv.get_content(self.path, self.selected_files), sid)
@@ -128,11 +125,6 @@ def get_unique_subs(match, contents):
 
 def prepare_subs(file_paths, sid):
     subs = {}
-
-    accepted = ['tract_lengths.txt', 'weights.txt', 'centres.txt',
-                'tract_lengths_preop.txt', 'weights_preop.txt', 'centres_preop.txt',
-                'tract_lengths_postop.txt', 'weights_postop.txt', 'centres_postop.txt',
-                'distances.txt', 'distances_preop.txt', 'distances_postop.txt']
 
     for file_path in file_paths:
         name = get_filename(file_path)
