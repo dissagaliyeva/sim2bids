@@ -43,7 +43,7 @@ class Files:
             # Step 1: traverse over the provided input
             for file in files:
                 # Step 2: create individual ID; if it already has BIDS format, leave it as is but remove 'sub-'
-                sid = prep.create_uuid() if len(re.findall('[0-9]{2,}', file)) == 0 else file.replace('sub-', '')
+                sid = prep.create_uuid() if len(re.findall('[0-9]{2,}', file)) == 0 else file
 
                 # Step 3: create a dictionary to store values
                 if sid not in self.subs.keys():
@@ -77,7 +77,37 @@ class Files:
         # traverse over single-subject and multi-subject in one folder structure
         else:
             # Step 1: check if the structure contains multi-subject
-            pass
+            match = find_matches(self.content)
+            if len(match) > 0:
+                for k, v in get_unique_subs(match, self.content).items():
+                    sid = prep.create_uuid()
+
+                    if sid not in self.subs.keys():
+                        self.subs[sid] = {}
+
+                    self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
+            else:
+                print('Not a match')
+
+
+def find_matches(paths):
+    unique_ids = []
+
+    for path in paths:
+        match = re.findall('^[A-Za-z]{2,}_[0-9]{2,}', path)
+        if len(match) > 0:
+            unique_ids.append(match[0])
+
+    return list(set(unique_ids))
+
+
+def get_unique_subs(match, contents):
+    subs = OrderedDict()
+
+    for idx in range(len(match)):
+        subs[match[idx]] = [x for x in contents if match[idx] in x]
+
+    return subs
 
 
 def prepare_subs(file_paths, sid):
@@ -145,4 +175,3 @@ def find_separator(path):
 
     delimiter = '\s' if delimiter == ' ' else delimiter
     return delimiter
-
