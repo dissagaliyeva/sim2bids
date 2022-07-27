@@ -26,6 +26,8 @@ class Files:
         # set multi-subject input to true
         conv.MULTI_INPUT = False if self.single else True
 
+        print(conv.MULTI_INPUT)
+
         # traverse files and create subjects
         self.traverse_files()
 
@@ -44,7 +46,6 @@ class Files:
             for file in files:
                 # Step 2: create individual ID; if it already has BIDS format, leave it as is but remove 'sub-'
                 sid = prep.create_uuid() if len(re.findall('[0-9]{2,}', file)) == 0 else file
-                print(re.findall('[0-9]{2,}', file))
 
                 # Step 3: create a dictionary to store values
                 if sid not in self.subs.keys():
@@ -67,7 +68,13 @@ class Files:
                     self.subs[sid].update(prepare_subs(conv.get_content(path, 'ses-postop'), sid))
                 # Step 8: if there are no `ses-preop` and `ses-postop`, traverse the folders as usual
                 if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
-                    self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
+                    if changed_path:
+                        path = path.replace(file, '')
+
+                    if not os.path.exists(os.path.join(path, file)):
+                        self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
+                    else:
+                        self.subs[sid] = prepare_subs(conv.get_content(path.replace(file, ''), file), sid)
 
         # traverse over single-subject and multi-subject in one folder structure
         else:
@@ -84,8 +91,6 @@ def prepare_subs(file_paths, sid):
                 'distances.txt', 'distances_preop.txt', 'distances_postop.txt']
 
     for file_path in file_paths:
-        if file_path.endswith('txt') and get_filename(file_path) not in accepted:
-            continue
         name = get_filename(file_path)
         desc = convert.DESC + 'h5' if file_path.endswith('h5') else convert.DESC
 
@@ -142,3 +147,4 @@ def find_separator(path):
 
     delimiter = '\s' if delimiter == ' ' else delimiter
     return delimiter
+
