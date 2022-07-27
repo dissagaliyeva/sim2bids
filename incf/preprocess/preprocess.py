@@ -12,7 +12,6 @@ def create_uuid():
         start += 1
 
     new = f'0{start}' if start < 10 else start
-    new = 'sub-' + str(new)
 
     IDS[start] = new
     return new

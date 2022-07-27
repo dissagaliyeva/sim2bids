@@ -23,6 +23,9 @@ class Files:
         self.basename = set(conv.get_content(path, files, basename=True))
         self.single = len(self.content) == len(self.basename)
 
+        print('self.content', self.content)
+        print('self.basename', self.basename)
+
         # set multi-subject input to true
         conv.MULTI_INPUT = False if self.single else True
 
@@ -43,7 +46,7 @@ class Files:
             # Step 1: traverse over the provided input
             for file in files:
                 # Step 2: create individual ID; if it already has BIDS format, leave it as is but remove 'sub-'
-                sid = prep.create_uuid() if len(re.findall('[0-9]{2,}', file)) == 0 else file.replace('sub-', '')
+                sid = prep.create_uuid() if len(re.findall('[0-9]{2,}', file)) == 0 else file
 
                 # Step 3: create a dictionary to store values
                 if sid not in self.subs.keys():
@@ -77,7 +80,50 @@ class Files:
         # traverse over single-subject and multi-subject in one folder structure
         else:
             # Step 1: check if the structure contains multi-subject
-            pass
+            match = find_matches(self.basename)
+
+            if len(match) > 0:
+                for k, v in get_unique_subs(match, self.content).items():
+                    sid = prep.create_uuid()
+
+                    if sid not in self.subs.keys():
+                        self.subs[sid] = {}
+
+                    if len(self.selected_files) == 1:
+                        self.subs[sid].update(
+                            prepare_subs([os.path.join(self.path, self.selected_files[0], x) for x in v], sid))
+                    else:
+                        self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
+            else:
+                sid = prep.create_uuid()
+                print('self.path:', self.path)
+                print('self.selected_files:', self.selected_files)
+
+                if len(self.selected_files) == 1 and os.path.isdir(os.path.join(self.path, self.selected_files[0])):
+                    self.subs[sid] = prepare_subs(conv.get_content(self.path, self.selected_files), sid)
+                else:
+                    paths = [os.path.join(self.path, file) for file in self.selected_files]
+                    self.subs[sid] = prepare_subs(paths, sid)
+
+
+def find_matches(paths):
+    unique_ids = []
+
+    for path in paths:
+        match = re.findall('^[A-Za-z]{2,}_[0-9]{2,}', path)
+        if len(match) > 0:
+            unique_ids.append(match[0])
+
+    return list(set(unique_ids))
+
+
+def get_unique_subs(match, contents):
+    subs = OrderedDict()
+
+    for idx in range(len(match)):
+        subs[match[idx]] = [x for x in contents if match[idx] in x]
+
+    return subs
 
 
 def prepare_subs(file_paths, sid):
@@ -104,6 +150,10 @@ def prepare_subs(file_paths, sid):
 
         if subs[name]['name'] in ['tract_lengths', 'tract_lengths_preop', 'tract_lengths_postop']:
             subs[name]['name'] = 'distances'
+
+        if 'tract_lengths' in file_path and not os.path.exists(file_path.replace('tract_lengths', 'distances')):
+            os.replace(file_path, file_path.replace('tract_lengths', 'distances'))
+
         if subs[name]['name'] in ['centres', 'centers', 'centres_preop', 'centres_postop']:
             conv.CENTERS = True
     return subs
@@ -145,4 +195,3 @@ def find_separator(path):
 
     delimiter = '\s' if delimiter == ' ' else delimiter
     return delimiter
-
