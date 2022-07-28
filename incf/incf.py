@@ -48,10 +48,14 @@ class MainArea(param.Parameterized):
             self.cross_select.options = os.listdir(self.text_input.value)
             self.cross_select.value = []
             self.structure.value = ''
+            prep.reset_index()
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
         self.structure.value = ''
+
+        if len(self.cross_select.value) == 0:
+            prep.reset_index()
 
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
