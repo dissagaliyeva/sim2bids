@@ -1,5 +1,6 @@
 import json
 import os
+from collections import OrderedDict
 
 import pandas as pd
 import panel as pn
@@ -7,6 +8,11 @@ import param
 
 import incf.preprocess.preprocess as prep
 from incf.convert import convert
+
+
+JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam','SourceCode',
+             'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
+UNITS = ['s', 'm', 'ms', 'degrees', 'radians']
 
 
 def get_files(path='../output', ftype='.json'):
@@ -127,12 +133,14 @@ class ViewResults(param.Parameterized):
     options = ['JSON files', 'TSV files']
     file_selection = pn.widgets.RadioButtonGroup(options=options, button_type='primary', value=[])
     select_options = pn.widgets.Select()
+    je_btn = param.Action(lambda self: self._update_je(), label='Update JSON file')
 
     def __init__(self):
         super().__init__()
         self.path = convert.OUTPUT
         self.layout = None
         self.widget = pn.WidgetBox('### Select File', self.select_options)
+        self.je_widget = pn.WidgetBox()
 
     @pn.depends('file_selection.value', watch=True)
     def _change_filetype(self):
@@ -152,7 +160,15 @@ class ViewResults(param.Parameterized):
             except Exception:
                 print(f'File `{self.select_options.value}` is empty!')
             else:
-                self.widget.append(pn.widgets.JSONEditor(value=file, height=350))
+                if len(self.je_widget) > 0:
+                    self.je_widget = pn.WidgetBox()
+
+                je = pn.widgets.JSONEditor(value=file, height=350, mode='view')
+                je_widget = get_settings(OrderedDict(je.value))
+                self.je_widget.append(pn.Row(je, pn.Column(je_widget,
+                                                           pn.Param(self, parameters=['je_btn'], show_name=False,
+                                                                    widgets={'je_btn': {'button_type': 'primary'}}))))
+                self.widget.append(self.je_widget)
 
         elif self.file_selection.value == 'TSV files':
             try:
@@ -162,123 +178,41 @@ class ViewResults(param.Parameterized):
             else:
                 self.widget.append(pn.widgets.Tabulator(file))
 
+    def _update_je(self, event=None):
+        txt_inputs = self.je_widget[0][1][0]
+        json_editor = self.je_widget[0][0]
+
+        for idx, inputs in enumerate(txt_inputs):
+            value = inputs.value
+            name = inputs.name.split(' ')[-1].replace(':', '')
+            self.je_widget[0][0].value[name] = value
+            self.widget.pop(-1)
+            self.widget.append(self.je_widget)
+
+            # save output
+            with open(self.select_options.value, 'w') as f:
+                json.dump(OrderedDict(self.je_widget[0][0].value), f)
+
     def view(self):
         return pn.Column(self.file_selection, self.widget)
 
 
-# class ViewResults(param.Parameterized):
-#     options = ['JSON files', 'TSV files']
-#
-#     def __init__(self, path):
-#         super().__init__(file_selection=pn.widgets.RadioButtonGroup(options=self.options,
-#                                                                     button_type='primary', value=[]),
-#                          select_options=pn.widgets.Select())
-#         self.path = path
-#         self.layout = None
-#         self.widget = pn.WidgetBox('### Select File', self.select_options)
-#
-#     @pn.depends('file_selection.value', watch=True)
-#     def _change_filetype(self):
-#         if self.file_selection.value == 'JSON files':
-#             self.select_options.options = get_files(path=self.path)
-#         elif self.file_selection.value == 'TSV files':
-#             self.select_options.options = get_files(path=self.path, ftype='.tsv')
-#
-#     @pn.depends('select_options.value', watch=True)
-#     def _change_file(self):
-#         if len(self.widget) > 2:
-#             self.widget.pop(-1)
-#
-#         if self.file_selection.value == 'JSON files':
-#             try:
-#                 file = json.load(open(self.select_options.value))
-#             except Exception:
-#                 print(f'File `{self.select_options.value}` is empty!')
-#             else:
-#                 self.widget.append(pn.widgets.JSONEditor(value=file, height=350))
-#
-#         elif self.file_selection.value == 'TSV files':
-#             try:
-#                 file = pd.read_csv(self.select_options.value, sep='\t', header=None, index_col=None)
-#             except Exception:
-#                 print(f'File `{self.select_options.value}` is empty!')
-#             else:
-#                 self.widget.append(pn.widgets.Tabulator(file))
-#
-#     def view(self):
-#         return pn.Column(self.file_selection, self.widget)
+def get_settings(json_editor):
+    widget = pn.WidgetBox()
 
+    for k, v in json_editor.items():
+        name = f'Specify {k}:'
 
-# def verify_keys(json1, json2):
-#     diff = set(json1).difference(set(json2))
-#     return diff == set(), diff
-# class ShowFiles(param.Parameterized):
-#     options = ['JSON files', 'TSV files']
-#     json_files = get_files()
-#     tsv_files = get_files(ftype='.tsv')
-#
-#     def __init__(self, **params):
-#         super().__init__(file_selection=pn.widgets.RadioButtonGroup(options=self.options,
-#                                                                     button_type='primary', value=[]),
-#                          select_options=pn.widgets.Select(),
-#                          json=pn.widgets.JSONEditor(),
-#                          tsv=pn.widgets.Tabulator())
-#
-#         self.layout = None
-#         self.json_keys = None
-#         self.widget = pn.WidgetBox('### Select File', self.select_options)
-#
-#     @pn.depends('file_selection.value', watch=True)
-#     def _change_filetype(self):
-#         if self.file_selection.value == 'JSON files':
-#             self.select_options.options = self.json_files
-#         elif self.file_selection.value == 'TSV files':
-#             self.select_options.options = self.tsv_files
-#
-#     @pn.depends('select_options.value', watch=True)
-#     def _change_file(self):
-#         if len(self.widget) > 2:
-#             self.widget.pop(-1)
-#
-#         if self.file_selection.value == 'JSON files':
-#             try:
-#                 file = json.load(open(self.select_options.value))
-#                 self.json_items = file.items()
-#
-#             except Exception:
-#                 print(f'File `{self.file_selection.value}` is empty!')
-#             else:
-#                 self.json.value = file
-#                 self.widget.append(self.json)
-#
-#         elif self.file_selection.value == 'TSV files':
-#             try:
-#                 file = pd.read_csv(self.select_options.value, sep='\t', header=None, index_col=None)
-#             except Exception:
-#                 print(f'File `{self.file_selection.value}` is empty!')
-#             else:
-#                 self.tsv.value = pn.widgets.Tabulator(file)
-#                 self.widget.append(self.tsv)
-#
-#     @pn.depends('json.value', watch=True)
-#     def _change_json_file(self):
-#         #         equal, diff = verify_keys(self.json_keys, self.json.value.keys())
-#         #         print(equal, diff)
-#         #         print(self.json.value.values())
-#         print(self.json.value.items())
-#         print(self.json_keys)
-#
-#     #         if equal:
-#     #             with open(os.path.join(self.select_options.value), 'a') as f:
-#     #                 json.dump(self.json.value, f)
-#     #         else:
-#     #             print(f'Not saving the results; `{diff}` columns are missing')
-#     def view(self):
-#         return pn.Column(self.file_selection, self.widget)
-#
-#
-# sf = ShowFiles(path='../output')
-# pn.serve(sf.view())
+        if k == 'Units':
+            widget.append(pn.widgets.Select(name=name, options=UNITS, value=''))
+        elif k not in ['NumberOfColumns', 'NumberOfRows', 'Units']:
+            if len(v) > 0 and k in ['CoordsColumns', 'CoordsRows']:
+                continue
+            widget.append(pn.widgets.TextInput(name=name))
+
+    # append button
+    return widget
+
 
 class UserGuide(param.Parameterized):
     # TODO: Try out 'Select' option from HoloViz
