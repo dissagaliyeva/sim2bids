@@ -158,7 +158,7 @@ class ViewResults(param.Parameterized):
             try:
                 file = json.load(open(self.select_options.value))
             except Exception:
-                print(f'File `{self.select_options.value}` is empty!')
+                pn.state.notifications.error(f'File `{self.select_options.value}` is empty!')
             else:
                 if len(self.je_widget) > 0:
                     self.je_widget = pn.WidgetBox()
@@ -174,7 +174,7 @@ class ViewResults(param.Parameterized):
             try:
                 file = pd.read_csv(self.select_options.value, sep='\t', header=None, index_col=None)
             except Exception:
-                print(f'File `{self.select_options.value}` is empty!')
+                pn.state.notifications.error(f'File `{self.select_options.value}` is empty!')
             else:
                 self.widget.append(pn.widgets.Tabulator(file))
 
