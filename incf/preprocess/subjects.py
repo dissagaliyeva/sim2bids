@@ -60,11 +60,17 @@ class Files:
 
                 # Step 6: traverse ses-preop if present
                 if 'ses-preop' in all_files:
-                    self.subs[sid].update(prepare_subs(conv.get_content(path, 'ses-preop'), sid))
+                    if 'ses-preop' not in self.subs[sid]:
+                        self.subs[sid]['ses-preop'] = OrderedDict()
+
+                    self.subs[sid]['ses-preop'].update(prepare_subs(conv.get_content(path, 'ses-preop'), sid))
 
                 # Step 7: traverse ses-postop if present
                 if 'ses-postop' in all_files:
-                    self.subs[sid].update(prepare_subs(conv.get_content(path, 'ses-postop'), sid))
+                    if 'ses-postop' not in self.subs[sid]:
+                        self.subs[sid]['ses-postop'] = OrderedDict()
+
+                    self.subs[sid]['ses-postop'].update(prepare_subs(conv.get_content(path, 'ses-postop'), sid))
 
                 # Step 8: if there are no `ses-preop` and `ses-postop`, traverse the folders as usual
                 if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
