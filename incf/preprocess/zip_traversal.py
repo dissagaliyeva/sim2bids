@@ -11,26 +11,26 @@ def extract_zip(path):
     parent = path.replace(basename, '')
 
     # get the suffix (ses-preop or ses-postop)
-    suffix = get_suffix(path)
+    # suffix = get_suffix(path)
 
     #
     contents = os.listdir(parent)
 
-    if [f'weights_{suffix}.txt', f'distances_{suffix}.txt', f'centres_{suffix}.txt'] in contents:
-        return
+    # if [f'weights_{suffix}.txt', f'distances_{suffix}.txt', f'centres_{suffix}.txt'] in contents:
+    #     return
 
     # rename existing files and skip zip file
     for file in contents:
         if file.endswith('.zip'): continue
 
-        basename = os.path.basename(file)
+        # basename = os.path.basename(file)
+        # if suffix not in basename and not basename.endswith('txt'):
+            # new_file = os.path.join(parent, file.replace('.', f'_{suffix}.'))
+            # os.replace(os.path.join(parent, file), new_file)
 
-        if suffix not in basename and not basename.endswith('txt'):
-            new_file = os.path.join(parent, file.replace('.', f'_{suffix}.'))
-            os.replace(os.path.join(parent, file), new_file)
-
-    if f'weights_{suffix}.txt' not in contents and f'distances_{suffix}.txt' not in contents and \
-            f'centres_{suffix}.txt' not in contents:
+    # if f'weights_{suffix}.txt' not in contents and f'distances_{suffix}.txt' not in contents and \
+    #         f'centres_{suffix}.txt' not in contents:
+    if f'weights.txt' not in contents and f'distances.txt' not in contents and f'centres.txt' not in contents:
         # open zip file
         archive = zipfile.ZipFile(path)
 
@@ -41,7 +41,7 @@ def extract_zip(path):
         for ext in conv.TO_EXTRACT:
             if ext in archive.namelist():
                 # add the suffix to the newly extracted file
-                new_filename = os.path.join(parent, add_suffix(ext, suffix))
+                new_filename = os.path.join(parent, ext)
 
                 if not os.path.exists(os.path.join(parent, ext)) and not os.path.exists(new_filename):
                     print('old path:', os.path.join(parent, ext))
@@ -51,15 +51,14 @@ def extract_zip(path):
 
                     # rename tract_lengths.txt to distances.txt
                     if ext.startswith('tract_lengths'):
-                        print('ext to be replaced:', ext)
                         new_filename = new_filename.replace('tract_lengths', 'distances')
-                        print('new path for replaced:', new_filename)
 
                     # rename the new file
                     os.replace(os.path.join(parent, ext), new_filename)
 
                     # remove tract_lengths: get the path
-                    tract_path = os.path.join(parent, f'tract_lengths_{suffix}.txt')
+                    # tract_path = os.path.join(parent, f'tract_lengths_{suffix}.txt')
+                    tract_path = os.path.join(parent, f'tract_lengths.txt')
 
                     # remove tract_lengths
                     if os.path.exists(tract_path):
@@ -71,23 +70,23 @@ def extract_zip(path):
         return added
 
 
-def verify_zip_rename(files):
-    match = ['weights', 'distances', 'centres']
-
-    for idx, file in enumerate(files):
-        basename = os.path.basename(file)
-        base_split = basename.split('.')[0]
-
-        if ('preop' not in basename or 'postop' not in basename) and base_split in match:
-            suffix = get_suffix(file)
-            files[idx] = add_suffix(file, suffix)
-
-    return list(set(files))
-
-
-def get_suffix(path):
-    return os.path.dirname(path).split('\\')[-1].split('-')[-1]
+# def verify_zip_rename(files):
+#     match = ['weights', 'distances', 'centres']
+#
+#     for idx, file in enumerate(files):
+#         basename = os.path.basename(file)
+#         base_split = basename.split('.')[0]
+#
+#         if ('preop' not in basename or 'postop' not in basename) and base_split in match:
+#             suffix = get_suffix(file)
+#             files[idx] = add_suffix(file, suffix)
+#
+#     return list(set(files))
 
 
-def add_suffix(filename, suffix):
-    return filename.replace('.', f'_{suffix}.')
+# def get_suffix(path):
+#     return os.path.dirname(path).split('\\')[-1].split('-')[-1]
+#
+#
+# def add_suffix(filename, suffix):
+#     return filename.replace('.', f'_{suffix}.')
