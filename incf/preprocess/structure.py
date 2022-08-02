@@ -38,27 +38,66 @@ class FolderStructure:
                 self.coord_format.format(v['desc'], 'labels', 'tsv'),
                 self.coord_format.format(v['desc'], 'labels', 'json')]
 
-    def iterate(self, k, v):
-        sid = v['sid']
-        if sid not in self.components['subjects']:
+    def iterate(self, k, v, ses=None, sid=None):
+        sid = v['sid'] if sid is None else sid
+
+        if sid not in self.components['subjects'] and ses is None:
             self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
+        elif ses is not None:
+            self.components['subjects'][sid] = OrderedDict(
+                {'ses-preop': {'net': [], 'ts': [], 'spatial': [], 'coord': []},
+                 'ses-postop': {'net': [], 'ts': [], 'spatial': [], 'coord': []}})
 
-        if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt',
-                 'weights_preop.txt', 'distances_preop.txt', 'tract_lengths_preop.txt',
-                 'weights_postop.txt', 'distances_postop.txt', 'tract_lengths_postop.txt']:
+        # save weights, distances, and centres
+        if ses is None:
+            if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
+                self.save_wd(v, sid)
+            elif k in ['centers.txt']:
+                self.save_centres(v)
+            elif k.endswith('.mat'):
+                self.save_mat(v, sid)
+            elif k.endswith('.h5'):
+                self.save_h5(v, sid)
+        else:
+            for k2, v2 in v.items():
+                if k2 in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
+                    self.save_wd(v2, sid, ses=ses)
+                elif k2 in ['centers.txt']:
+                    self.save_centres(v2, sid, ses=ses)
+                elif k2.endswith('.mat'):
+                    self.save_mat(v2, sid, ses=ses)
+                elif k2.endswith('.h5'):
+                    self.save_h5(v2, sid, ses=ses)
+
+    def save_wd(self, v, sid, ses=None):
+        if ses is None:
             self.components['subjects'][sid]['net'] += self.common_structure(v)
-        elif k in ['centers.txt', 'centers_preop.txt', 'centres_preop.txt',
-                   'centers_postop.txt', 'centres_postop.txt', 'centers_postop.txt']:
-            self.components['coord'] += self.coord_structure(v)
-        elif k.endswith('.mat'):
-            self.components['subjects'][sid]['ts'] += self.common_structure(v)
-            self.components['coord'] += [self.coord_format.format(v['desc'], 'times', 'tsv'),
-                                         self.coord_format.format(v['desc'], 'times', 'json')]
-        elif k.endswith('.h5'):
-            file = h.File(v['path'])
-            keys = file.keys()
-            name = v['fname'].split('_')[0].lower()
+        else:
+            self.components['subjects'][sid][ses]['net'] += self.common_structure(v)
 
+    def save_centres(self, v, sid, ses=None):
+        if ses is None:
+            self.components['coord'] += self.coord_structure(v)
+        else:
+            del self.components['coord']
+            self.components['subjects'][sid][ses]['coord'] += self.coord_structure(v)
+
+    def save_mat(self, v, sid, ses=None):
+        if ses is None:
+            self.components['subjects'][sid]['ts'] += self.common_structure(v)
+            self.components['subjects'][sid]['coord'] += [self.coord_format.format(v['desc'], 'times', 'tsv'),
+                                                          self.coord_format.format(v['desc'], 'times', 'json')]
+        else:
+            self.components['subjects'][sid][ses]['ts'] += self.common_structure(v)
+            self.components['subjects'][sid][ses]['coord'] += [self.coord_format.format(v['desc'], 'times', 'tsv'),
+                                                               self.coord_format.format(v['desc'], 'times', 'json')]
+
+    def save_h5(self, v, sid, ses=None):
+        file = h.File(v['path'])
+        keys = file.keys()
+        name = v['fname'].split('_')[0].lower()
+
+        if ses is None:
             sid = v['sid']
             if sid not in self.components['subjects']:
                 self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
@@ -79,8 +118,14 @@ class FolderStructure:
                 self.iterate(k, v)
             else:
                 for k2, v2 in v.items():
-                    self.iterate(k2, v2)
-        self.components['coord'] = list(set(self.components['coord']))
+                    if k2 == 'ses-preop':
+                        self.iterate(k2, v2, sid=k, ses='ses-preop')
+                    if k2 == 'ses-postop':
+                        self.iterate(k2, v2, sid=k, ses='ses-postop')
+                    else:
+                        self.iterate(k2, v2)
+                        self.components['coord'] = list(set(self.components['coord']))
+        print(self.components)
         self.create_layout()
 
     def join(self, files, form='files'):

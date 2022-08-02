@@ -44,8 +44,6 @@ def extract_zip(path):
                 new_filename = os.path.join(parent, ext)
 
                 if not os.path.exists(os.path.join(parent, ext)) and not os.path.exists(new_filename):
-                    print('old path:', os.path.join(parent, ext))
-
                     # extract new file
                     archive.extract(ext, path=parent)
 
