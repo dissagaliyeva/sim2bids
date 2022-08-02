@@ -47,6 +47,7 @@ class MainArea(param.Parameterized):
                          **params)
         self.structure = pn.widgets.StaticText(margin=(50, 0, 50, 20))
         self.subjects = None
+        self.length = 0
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
@@ -63,12 +64,16 @@ class MainArea(param.Parameterized):
         if len(self.cross_select.value) == 0:
             prep.reset_index()
 
+        if self.length != len(self.cross_select.value):
+            prep.reset_index()
+
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
             # convert.check_input(path=self.text_input.value, files=self.cross_select.value)
             self.subjects, self.structure.value = convert.check_file(path=self.text_input.value,
                                                                      files=self.cross_select.value,
                                                                      save=False)
+            self.length = len(self.cross_select.value)
 
     def _generate_files(self, event=None):
         _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value,

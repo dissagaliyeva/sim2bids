@@ -25,12 +25,9 @@ DURATION = 3000
 CENTERS = False
 MULTI_INPUT = False
 TRAVERSE_FOLDERS = True
-TO_EXTRACT = ['tract_lengths.txt', 'weights.txt', 'centres.txt']
+TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt', 'average_orientations.txt',
+              'areas.txt', 'cortical.txt', 'hemisphere.txt']
 ACCEPTED_EXT = ['txt', 'csv', 'mat', 'h5']
-EXCLUDE = ['areas.txt', 'average_orientations.txt', 'cortical.txt', 'hemisphere.txt']
-SES_FILES = ['tract_lengths_preop.txt', 'weights_preop.txt', 'centres_preop.txt',
-              'tract_lengths_postop.txt', 'weights_postop.txt', 'centres_postop.txt',
-              'distances.txt', 'distances_preop.txt', 'distances_postop.txt']
 
 
 def recursive_walk(path, basename=False):
@@ -38,16 +35,15 @@ def recursive_walk(path, basename=False):
 
     for root, _, files in os.walk(path):
         for file in files:
-            if file.endswith('.zip') and len(set(os.listdir(root)).intersection(set(SES_FILES))) == 0:
+            if file.endswith('.zip') and len(set(os.listdir(root)).intersection(set(TO_EXTRACT))) == 0:
                 content += z.extract_zip(os.path.join(root, file))
                 continue
 
             file = rename_tract_lengths(file)
-            if file not in EXCLUDE:
-                if basename:
-                    content.append(file)
-                else:
-                    content.append(os.path.join(root, file))
+            if basename:
+                content.append(file)
+            else:
+                content.append(os.path.join(root, file))
 
     return content
 
@@ -81,11 +77,7 @@ def get_content(path, files, basename=False):
         if ext in ACCEPTED_EXT:
             # Step 5.3: rename `tract_lengths` to `distances`
             file = rename_tract_lengths(file)
-
-            # Step 5.4: check if the file ends with txt, and it's not among the files that cannot be used
-            if (ext == 'txt' and file not in EXCLUDE) or ext != 'txt':
-                # Step 5.5: append file
-                contents.append(file)
+            contents.append(file)
 
     # Step 6: return contents
     return contents
