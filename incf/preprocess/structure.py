@@ -49,7 +49,7 @@ class FolderStructure:
             if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
                 self.save_wd(v, sid)
             elif k in ['centers.txt']:
-                self.save_centres(v, sid)
+                self.save_centres(v)
             elif k.endswith('.mat'):
                 self.save_mat(v, sid)
             elif k.endswith('.h5'):
@@ -115,7 +115,6 @@ class FolderStructure:
                 self.iterate(k, v)
             else:
                 for k2, v2 in v.items():
-
                     if k not in self.components['subjects'].keys() and k2 in ['ses-preop', 'ses-postop']:
                         self.components['subjects'][k] = OrderedDict(
                             {'ses-preop': {'net': [], 'ts': [], 'spatial': [], 'coord': []},
@@ -138,8 +137,8 @@ class FolderStructure:
 
     def join(self, files, form='files'):
         subfile = '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;|___{}<br>'
-        file = '&emsp;&emsp;&emsp;&emsp;|___{}<br>'
         sub2file = '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;|___{}<br>'
+        file = '&emsp;&emsp;&emsp;&emsp;|___{}<br>'
         joiner = lambda x: ''.join(x)
 
         if form == 'files':
@@ -183,18 +182,17 @@ class FolderStructure:
                 self.layout += [fold.format(k), self.join(v)]
             elif isinstance(v, dict):
                 for k2, v2 in v.items():
-                    layout = []
-                    self.layout += [fold.format(f'sub-{k2}')]
-                    for k3 in v2.keys():
-                        if len(v2[k3]) == 0:
-                            continue
 
-                        layout += [subfold.format(k3),
-                                   '&emsp;&emsp;' + subfold.format('net'), self.join(v2[k3]['net'], 'sub'),
-                                   '&emsp;&emsp;' + subfold.format('ts'), self.join(v2[k3]['ts'], 'sub'),
-                                   '&emsp;&emsp;' + subfold.format('spatial'), self.join(v2[k3]['spatial'], 'sub'),
-                                   '&emsp;&emsp;' + subfold.format('coord'), self.join(v2[k3]['coord'], 'sub')]
-                        self.layout += layout
+                    self.layout += [fold.format(f'sub-{k2}')]
+
+                    for k3 in v2.keys():
+                        if len(v2[k3]['net']) == 0:
+                            continue
+                        self.layout += [subfold.format(k3),
+                                        '&emsp;&emsp;' + subfold.format('net'), self.join(v2[k3]['net'], 'sub'),
+                                        '&emsp;&emsp;' + subfold.format('ts'), self.join(v2[k3]['ts'], 'sub'),
+                                        '&emsp;&emsp;' + subfold.format('spatial'), self.join(v2[k3]['spatial'], 'sub'),
+                                        '&emsp;&emsp;' + subfold.format('coord'), self.join(v2[k3]['coord'], 'sub')]
 
         self.layout += [main_files.format(x) for x in self.components['files']]
         self.layout = ''.join(self.layout)
