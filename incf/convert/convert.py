@@ -49,7 +49,6 @@ def recursive_walk(path, basename=False):
 
 
 def get_content(path, files, basename=False):
-
     # if provided path contains only one sub-folder, and it's needed to traverse that, return the whole content
     # of the specified location.
     if isinstance(files, str):
@@ -123,18 +122,18 @@ def save_output(subs, output):
     # verify there are no conflicting folders
     conflict = len(os.listdir(output)) > 0
 
-    def save(sub):
+    def save(sub, ses=None):
         for k, v in sub.items():
             if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
-                wdc.save(sub[k], output)
+                wdc.save(sub[k], output, ses=None)
             elif k in ['centres.txt']:
-                wdc.save(sub[k], output, center=True)
+                wdc.save(sub[k], output, center=True, ses=None)
             # elif k in TO_EXTRACT[3:]:
 
             elif k.endswith('.mat'):
-                mat.save(sub[k], output)
+                mat.save(sub[k], output, ses=None)
             elif k.endswith('.h5'):
-                h5.save(sub[k], output)
+                h5.save(sub[k], output, ses=None)
 
     # overwrite existing content
     if conflict:
@@ -146,22 +145,43 @@ def save_output(subs, output):
     struct.check_folders(output)
 
     # save output files
-    for _, val in subs.items():
-        save(val)
+    for k, val in subs.items():
+        if 'ses-preop' in val.keys():
+            for k2, v in val:
+                save(val, ses=k2)
+        else:
+            save(val)
 
 
-def create_sub_struct(path, subs):
-    sub = os.path.join(path, f"sub-{subs['sid']}")
-    net = os.path.join(sub, 'net')
-    spatial = os.path.join(sub, 'spatial')
-    ts = os.path.join(sub, 'ts')
+def create_sub_struct(path, subs, ses=False):
+    if ses is None:
+        sub = os.path.join(path, f"sub-{subs['sid']}")
+        net = os.path.join(sub, 'net')
+        spatial = os.path.join(sub, 'spatial')
+        ts = os.path.join(sub, 'ts')
+        folders = [sub, net, spatial, ts]
+    else:
+        sub = os.path.join(path, f"sub-{subs['sid']}")
+        preop = os.path.join(sub, 'ses-preop')
+        postop = os.path.join(sub, 'ses-postop')
+        net_preop = os.path.join(preop, 'net')
+        spatial_preop = os.path.join(preop, 'spatial')
+        coord_preop = os.path.join(preop, 'coord')
+        ts_preop = os.path.join(preop, 'ts')
+        net_postop = os.path.join(postop, 'net')
+        spatial_postop = os.path.join(postop, 'spatial')
+        coord_postop = os.path.join(postop, 'coord')
+        ts_postop = os.path.join(postop, 'ts')
 
-    for folder in [sub, net, spatial, ts]:
+        folders = [sub, preop, postop, net_preop, spatial_preop, coord_preop,
+                   ts_preop, net_postop, spatial_postop, coord_postop, ts_postop]
+
+    for folder in folders:
         if not os.path.exists(folder):
             print(f'Creating folder `{folder}`')
             os.mkdir(folder)
 
-    return sub, net, spatial, ts
+    return folders
 
 
 def get_shape(file, sep):
