@@ -70,7 +70,7 @@ class FolderStructure:
             self.components['subjects'][sid][ses]['coord'] += coord_structure(v)
 
     def save_sub_coord(self, v, sid, ses):
-        self.components['subjects'][sid][ses]['coord'] += coord_structure(v, v['name'])
+        self.components['subjects'][sid][ses]['coord'] += common_structure(v, v['name'])
 
     def save_mat(self, v, sid, ses=None):
         if ses is None:
@@ -79,8 +79,9 @@ class FolderStructure:
                                                           coord_format.format(v['desc'], 'times', 'json')]
         else:
             self.components['subjects'][sid][ses]['ts'] += common_structure(v)
-            self.components['subjects'][sid][ses]['coord'] += [coord_format.format(v['desc'], 'times', 'tsv'),
-                                                               coord_format.format(v['desc'], 'times', 'json')]
+            self.components['subjects'][sid][ses]['coord'] += [
+                coord_format.replace('desc-', '').format(f'sub-{sid}_desc-{v["desc"]}', f'times-{v["name"]}', 'tsv'),
+                coord_format.replace('desc-', '').format(f'sub-{sid}_desc-{v["desc"]}', f'times-{v["name"]}', 'json')]
 
     def save_h5(self, v, ses=None):
         file = h.File(v['path'])
@@ -190,7 +191,6 @@ class FolderStructure:
 
         self.layout += [main_files.format(x) for x in self.components['files']]
         self.layout = ''.join(self.layout)
-        print(self.layout)
 
 
 def common_structure(v, name=None):
@@ -201,13 +201,10 @@ def common_structure(v, name=None):
 
 
 def coord_structure(v, name=None):
-    if name is None:
-        return [coord_format.format(v['desc'], 'nodes', 'tsv'),
-                coord_format.format(v['desc'], 'nodes', 'json'),
-                coord_format.format(v['desc'], 'labels', 'tsv'),
-                coord_format.format(v['desc'], 'labels', 'json')]
-    return [coord_format.format(f"sub-{v['sid']}_desc-{v['desc']}", name, 'tsv'),
-            coord_format.format(f"sub-{v['sid']}_desc-{v['desc']}", name, 'json')]
+    return [coord_format.format(v['desc'], 'nodes', 'tsv'),
+            coord_format.format(v['desc'], 'nodes', 'json'),
+            coord_format.format(v['desc'], 'labels', 'tsv'),
+            coord_format.format(v['desc'], 'labels', 'json')]
 
 
 def create_layout(subs=None, output='../output'):
@@ -220,17 +217,6 @@ def create_layout(subs=None, output='../output'):
 
     output = output.replace('.', '').replace('/', '')
     return FolderStructure(output, subs).layout
-
-
-def create_sub_folders(path):
-    sub = os.path.join(path, f'sub-{convert.SID}')
-    net = os.path.join(sub, 'net')
-    ts = os.path.join(sub, 'ts')
-    spatial = os.path.join(sub, 'spatial')
-
-    for file in [sub, net, ts, spatial]:
-        if not os.path.exists(file):
-            os.mkdir(file)
 
 
 def check_folders(path):

@@ -5,34 +5,46 @@ import pandas as pd
 from incf.convert import convert
 
 
-def save(subs: dict, output: str, center: bool = False):
+def save(subs: dict, output: str, center: bool = False, ses=None):
     if center:
-        save_centers(subs, output)
+        save_centers(subs, output, ses=ses)
     else:
-        save_wd(subs, output)
+        save_wd(subs, output, ses=ses)
 
 
-def save_wd(subs, output):
-    DEFAULT_TMPL = 'sub-{}_desc-{}_{}.{}'
+def save_wd(subs, output, ses=None):
     # check and create folders & return paths to them
-    sub, net, spatial, ts = convert.create_sub_struct(output, subs)
+    if ses is None:
+        if convert.CENTERS:
+            coords = [f'../coord/desc-{subs["desc"]}_labels.json', f'../coord/desc-{subs["desc"]}_nodes.json']
+            save_files(convert.create_sub_struct(output, subs), subs, coords)
+    else:
+        save_files(convert.create_sub_struct(output, subs, ses=True), subs)
+
+
+def save_files(folders, subs, coords=None):
+    DEFAULT_TMPL = 'sub-{}_desc-{}_{}.{}'
     name = DEFAULT_TMPL.format(subs['sid'], subs['desc'], subs['name'], 'tsv')
     file = read_csv(subs['path'], subs['sep'])
 
-    # add coordinates if exists
-    coords = None
+    if len(folders) == 4:
+        net = folders[1]
+        save_txt(net, file, name, coords)
+    else:
+        save_txt(folders[3], file, name, coords)
+        save_txt(folders[7], file, name, coords)
 
-    if convert.CENTERS:
-        coords = [f'../coord/desc-{subs["desc"]}_labels.json', f'../coord/desc-{subs["desc"]}_nodes.json']
 
-    if isinstance(file, str):
-        Path(os.path.join(net, name)).touch()
-        Path(os.path.join(net, name.replace('tsv', 'json'))).touch()
+def save_txt(path, f, name, coords=None):
+    if isinstance(f, str):
+        Path(os.path.join(path, name)).touch()
+        Path(os.path.join(path, name.replace('tsv', 'json'))).touch()
 
     else:
         # save to tsv
-        convert.to_tsv(os.path.join(net, name), file[:])
-        convert.to_json(os.path.join(net, name.replace('tsv', 'json')), file.shape, desc='', ftype='wd', coords=coords)
+        convert.to_tsv(os.path.join(path, name), f[:])
+        convert.to_json(os.path.join(path, name.replace('tsv', 'json')), f.shape,
+                        desc='', ftype='wd', coords=coords)
 
 
 def save_centers(subs, output):
