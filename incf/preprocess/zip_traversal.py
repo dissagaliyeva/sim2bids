@@ -58,4 +58,4 @@ def extract_zip(path):
                     # append newly added files
                     added.append(new_filename)
 
-    return added
+        return added

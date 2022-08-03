@@ -175,11 +175,18 @@ def find_separator(path):
     if path.split('.')[-1] not in ['txt', 'csv']:
         return
 
+    print(path)
+
     try:
-        f = pd.read_csv(path)
+        file = pd.read_csv(path)
     except pd.errors.EmptyDataError:
         pn.state.notifications.error(f'File {os.path.basename(path)} is empty! Creating an empty file...')
         return ''
+
+    # if cortical.txt, hemisphere.txt, or areas.txt are present, return '\n' delimiter
+    if path.endswith('hemisphere.txt') or path.endswith('cortical.txt') or path.endswith('areas.txt'):
+        file.to_csv(path, sep='\n', header=None, index=None)
+        return '\n'
 
     sniffer = csv.Sniffer()
 
@@ -188,8 +195,11 @@ def find_separator(path):
             delimiter = sniffer.sniff(fp.read(5000)).delimiter
         except Exception:
             delimiter = sniffer.sniff(fp.read(100)).delimiter
-        except Exception:
-            delimiter = sniffer.sniff(fp.read(500)).delimiter
+        # except Exception:
+        #     delimiter = sniffer.sniff(fp.read(500)).delimiter
+        # except Exception:
+        #     pn.state.notifications.error(f'Could not find the delimiter for {path}...')
+        #     return ''
 
     delimiter = '\s' if delimiter == ' ' else delimiter
     return delimiter
