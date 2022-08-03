@@ -35,7 +35,7 @@ def recursive_walk(path, basename=False):
 
     for root, _, files in os.walk(path):
         for file in files:
-            if file.endswith('.zip') and len(set(os.listdir(root)).intersection(set(TO_EXTRACT))) == 0:
+            if file.endswith('.zip') and len(set(os.listdir(root)).intersection(set(TO_EXTRACT))) < 7:
                 content += z.extract_zip(os.path.join(root, file))
                 continue
 
