@@ -175,8 +175,6 @@ def find_separator(path):
     if path.split('.')[-1] not in ['txt', 'csv']:
         return
 
-    print(path)
-
     try:
         file = pd.read_csv(path)
     except pd.errors.EmptyDataError:
@@ -195,11 +193,6 @@ def find_separator(path):
             delimiter = sniffer.sniff(fp.read(5000)).delimiter
         except Exception:
             delimiter = sniffer.sniff(fp.read(100)).delimiter
-        # except Exception:
-        #     delimiter = sniffer.sniff(fp.read(500)).delimiter
-        # except Exception:
-        #     pn.state.notifications.error(f'Could not find the delimiter for {path}...')
-        #     return ''
 
     delimiter = '\s' if delimiter == ' ' else delimiter
     return delimiter
