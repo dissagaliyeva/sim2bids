@@ -206,8 +206,8 @@ def coord_structure(v, name=None):
                 coord_format.format(v['desc'], 'nodes', 'json'),
                 coord_format.format(v['desc'], 'labels', 'tsv'),
                 coord_format.format(v['desc'], 'labels', 'json')]
-    return [coord_format.format(v['desc'], name, 'tsv'),
-            coord_format.format(v['desc'], name, 'json')]
+    return [coord_format.format(f"sub-{v['sid']}_desc-{v['desc']}", name, 'tsv'),
+            coord_format.format(f"sub-{v['sid']}_desc-{v['desc']}", name, 'json')]
 
 
 def create_layout(subs=None, output='../output'):
