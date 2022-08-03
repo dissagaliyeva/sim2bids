@@ -48,8 +48,8 @@ class FolderStructure:
         if ses is None:
             if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
                 self.save_wd(v, sid)
-            elif k in ['centers.txt']:
-                self.save_centres(v)
+            elif k == 'centres.txt':
+                self.save_centres(v, sid)
             elif k.endswith('.mat'):
                 self.save_mat(v, sid)
             elif k.endswith('.h5'):
@@ -171,6 +171,7 @@ class FolderStructure:
         self.layout = ''.join(self.layout)
 
     def create_ses_layout(self):
+        print('I am triggered')
         fold = '&emsp;&emsp;|___{}/<br>'
         subfold = '&emsp;&emsp;&emsp;&emsp;|___{}/<br>'
         main_files = '|___{}<br>'
@@ -196,6 +197,7 @@ class FolderStructure:
 
         self.layout += [main_files.format(x) for x in self.components['files']]
         self.layout = ''.join(self.layout)
+        print(self.layout)
 
 
 def common_structure(v, name=None):
