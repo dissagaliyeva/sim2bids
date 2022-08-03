@@ -16,7 +16,6 @@ def save_wd(subs, output):
     DEFAULT_TMPL = 'sub-{}_desc-{}_{}.{}'
     # check and create folders & return paths to them
     sub, net, spatial, ts = convert.create_sub_struct(output, subs)
-
     name = DEFAULT_TMPL.format(subs['sid'], subs['desc'], subs['name'], 'tsv')
     file = read_csv(subs['path'], subs['sep'])
 
