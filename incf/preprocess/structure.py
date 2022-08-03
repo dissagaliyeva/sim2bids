@@ -27,17 +27,6 @@ class FolderStructure:
         self.coord_format = 'desc-{}_{}.{}'
         self.populate()
 
-    def common_structure(self, v, name=None):
-        name = v['name'] if name is None else name
-        return [self.default_format.format(v['sid'], v['desc'], name, 'tsv'),
-                self.default_format.format(v['sid'], v['desc'], name, 'json')]
-
-    def coord_structure(self, v):
-        return [self.coord_format.format(v['desc'], 'nodes', 'tsv'),
-                self.coord_format.format(v['desc'], 'nodes', 'json'),
-                self.coord_format.format(v['desc'], 'labels', 'tsv'),
-                self.coord_format.format(v['desc'], 'labels', 'json')]
-
     def iterate(self, k, v, ses=None, sid=None):
         sid = v['sid'] if sid is None else sid
 
@@ -53,42 +42,47 @@ class FolderStructure:
             elif k.endswith('.mat'):
                 self.save_mat(v, sid)
             elif k.endswith('.h5'):
-                self.save_h5(v, sid)
+                self.save_h5(v)
         else:
             for k2, v2 in v.items():
-                if k2 in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
+                if k2 in ['weights.txt', 'distances.txt']:
                     self.save_wd(v2, sid, ses=ses)
                 elif k2 in ['centers.txt']:
                     self.save_centres(v2, sid, ses=ses)
+                elif k2 in convert.TO_EXTRACT[3:]:
+                    self.save_sub_coord(v2, sid, ses=ses)
                 elif k2.endswith('.mat'):
                     self.save_mat(v2, sid, ses=ses)
                 elif k2.endswith('.h5'):
-                    self.save_h5(v2, sid, ses=ses)
+                    self.save_h5(v2, ses=ses)
 
     def save_wd(self, v, sid, ses=None):
         if ses is None:
-            self.components['subjects'][sid]['net'] += self.common_structure(v)
+            self.components['subjects'][sid]['net'] += common_structure(v)
         else:
-            self.components['subjects'][sid][ses]['net'] += self.common_structure(v)
+            self.components['subjects'][sid][ses]['net'] += common_structure(v)
 
     def save_centres(self, v, sid, ses=None):
         if ses is None:
-            self.components['coord'] += self.coord_structure(v)
+            self.components['coord'] += coord_structure(v)
         else:
             del self.components['coord']
-            self.components['subjects'][sid][ses]['coord'] += self.coord_structure(v)
+            self.components['subjects'][sid][ses]['coord'] += coord_structure(v)
+
+    def save_sub_coord(self, v, sid, ses):
+        self.components['subjects'][sid][ses]['coord'] += coord_structure(v, v['name'])
 
     def save_mat(self, v, sid, ses=None):
         if ses is None:
-            self.components['subjects'][sid]['ts'] += self.common_structure(v)
-            self.components['subjects'][sid]['coord'] += [self.coord_format.format(v['desc'], 'times', 'tsv'),
-                                                          self.coord_format.format(v['desc'], 'times', 'json')]
+            self.components['subjects'][sid]['ts'] += common_structure(v)
+            self.components['subjects'][sid]['coord'] += [coord_format.format(v['desc'], 'times', 'tsv'),
+                                                          coord_format.format(v['desc'], 'times', 'json')]
         else:
-            self.components['subjects'][sid][ses]['ts'] += self.common_structure(v)
-            self.components['subjects'][sid][ses]['coord'] += [self.coord_format.format(v['desc'], 'times', 'tsv'),
-                                                               self.coord_format.format(v['desc'], 'times', 'json')]
+            self.components['subjects'][sid][ses]['ts'] += common_structure(v)
+            self.components['subjects'][sid][ses]['coord'] += [coord_format.format(v['desc'], 'times', 'tsv'),
+                                                               coord_format.format(v['desc'], 'times', 'json')]
 
-    def save_h5(self, v, sid, ses=None):
+    def save_h5(self, v, ses=None):
         file = h.File(v['path'])
         keys = file.keys()
         name = v['fname'].split('_')[0].lower()
@@ -99,13 +93,13 @@ class FolderStructure:
                 self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
 
             if sim.check_params(file):
-                self.components['subjects'][sid]['net'] += self.common_structure(v, 'weights')
-                self.components['subjects'][sid]['net'] += self.common_structure(v, 'distances')
-                self.components['coord'] += self.coord_structure(v)
+                self.components['subjects'][sid]['net'] += common_structure(v, 'weights')
+                self.components['subjects'][sid]['net'] += common_structure(v, 'distances')
+                self.components['coord'] += coord_structure(v)
             else:
                 if len(list(keys)) > 0:
-                    self.components['param'] += [self.coord_format.format(v['desc'], name, 'xml'),
-                                                 self.coord_format.format(v['desc'], name, 'json')]
+                    self.components['param'] += [coord_format.format(v['desc'], name, 'xml'),
+                                                 coord_format.format(v['desc'], name, 'json')]
 
     def populate(self):
         ses_exists = False
@@ -171,7 +165,6 @@ class FolderStructure:
         self.layout = ''.join(self.layout)
 
     def create_ses_layout(self):
-        print('I am triggered')
         fold = '&emsp;&emsp;|___{}/<br>'
         subfold = '&emsp;&emsp;&emsp;&emsp;|___{}/<br>'
         main_files = '|___{}<br>'
@@ -202,15 +195,19 @@ class FolderStructure:
 
 def common_structure(v, name=None):
     name = v['name'] if name is None else name
+
     return [default_format.format(v['sid'], v['desc'], name, 'tsv'),
             default_format.format(v['sid'], v['desc'], name, 'json')]
 
 
-def coord_structure(v):
-    return [coord_format.format(v['desc'], 'nodes', 'tsv'),
-            coord_format.format(v['desc'], 'nodes', 'json'),
-            coord_format.format(v['desc'], 'labels', 'tsv'),
-            coord_format.format(v['desc'], 'labels', 'json')]
+def coord_structure(v, name=None):
+    if name is None:
+        return [coord_format.format(v['desc'], 'nodes', 'tsv'),
+                coord_format.format(v['desc'], 'nodes', 'json'),
+                coord_format.format(v['desc'], 'labels', 'tsv'),
+                coord_format.format(v['desc'], 'labels', 'json')]
+    return [coord_format.format(v['desc'], name, 'tsv'),
+            coord_format.format(v['desc'], name, 'json')]
 
 
 def create_layout(subs=None, output='../output'):
