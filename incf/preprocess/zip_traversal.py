@@ -21,9 +21,6 @@ def extract_zip(path):
     if to_extract in contents:
         return
 
-    print('to_extract:', to_extract)
-    print('contents:', contents)
-
     if len(set(to_extract).intersection(set(contents))) != 7:
         # open zip file
         archive = zipfile.ZipFile(path)
