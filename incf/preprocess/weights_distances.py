@@ -57,6 +57,8 @@ def save_centers(subs, output, ses=None):
     lname = COORD_TMPL.format(desc, 'labels', 'tsv')
     nname = COORD_TMPL.format(desc, 'nodes', 'tsv')
 
+    print('save_centers output:', output)
+
     if ses is None:
         # save to tsv
         convert.to_tsv(os.path.join(output, 'coord', lname), labels)

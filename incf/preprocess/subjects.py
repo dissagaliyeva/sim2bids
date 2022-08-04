@@ -176,7 +176,7 @@ def find_separator(path):
         return
 
     try:
-        file = pd.read_csv(path)
+        file = pd.read_csv(path, index_col=None, header=None)
     except pd.errors.EmptyDataError:
         pn.state.notifications.error(f'File {os.path.basename(path)} is empty! Creating an empty file...')
         return ''

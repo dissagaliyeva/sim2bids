@@ -16,6 +16,7 @@ import incf.preprocess.subjects as subj
 import incf.preprocess.weights_distances as wdc
 import incf.preprocess.zip_traversal as z
 import incf.templates.templates as temp
+import incf.preprocess.coords as coords
 import incf.utils as utils
 
 SID = None
@@ -124,13 +125,12 @@ def save_output(subs, output):
 
     def save(sub, ses=None):
         for k, v in sub.items():
-            print(k, v, end='\n\n')
             if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
                 wdc.save(sub[k], output, ses=ses)
             elif k in ['centres.txt']:
                 wdc.save(sub[k], output, center=True, ses=ses)
-            # elif k in TO_EXTRACT[3:]:
-
+            elif k in TO_EXTRACT[3:]:
+                coords.save_coords(sub[k], output, ses=ses)
             elif k.endswith('.mat'):
                 mat.save(sub[k], output, ses=None)
             elif k.endswith('.h5'):
@@ -157,13 +157,13 @@ def save_output(subs, output):
 
 def create_sub_struct(path, subs, ses=None):
     if ses is None:
-        sub = os.path.join(path, f"sub-{subs['sid']}")
+        sub = os.path.join(path, subs['sid'])
         net = os.path.join(sub, 'net')
         spatial = os.path.join(sub, 'spatial')
         ts = os.path.join(sub, 'ts')
         folders = [sub, net, spatial, ts]
     else:
-        sub = os.path.join(path, f"sub-{subs['sid']}")
+        sub = os.path.join(path, subs['sid'])
         preop = os.path.join(sub, 'ses-preop')
         postop = os.path.join(sub, 'ses-postop')
         net_preop = os.path.join(preop, 'net')
@@ -195,7 +195,12 @@ def to_tsv(path, file=None):
         Path(path).touch()
     else:
         params = {'sep': '\t', 'header': None, 'index': None}
-        pd.DataFrame(file).to_csv(path, **params)
+        try:
+            pd.DataFrame(file).to_csv(path, **params)
+        except ValueError:
+            with open(file) as f:
+                with open(path, 'w') as f2:
+                    f2.write(f.read())
 
 
 def to_json(path, shape, desc, ftype, coords=None):

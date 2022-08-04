@@ -40,18 +40,10 @@ def extract_zip(path):
 
                     # rename tract_lengths.txt to distances.txt
                     if ext.startswith('tract_lengths'):
-                        print('exists!')
                         new_filename = new_filename.replace('tract_lengths', 'distances')
 
                         # rename the new file
                         os.replace(os.path.join(parent, ext), new_filename)
-
-                    # # get the tract_length path
-                    # tract_path = os.path.join(parent, f'tract_lengths.txt')
-                    #
-                    # # double-check the removal of tract_lengths
-                    # if os.path.exists(tract_path):
-                    #     os.remove(tract_path)
 
                     # append newly added files
                     added.append(new_filename)
