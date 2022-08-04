@@ -155,8 +155,8 @@ def save_output(subs, output):
             save(val)
 
 
-def create_sub_struct(path, subs, ses=None):
-    if ses is None:
+def create_sub_struct(path, subs, ses=False):
+    if not ses:
         sub = os.path.join(path, subs['sid'])
         net = os.path.join(sub, 'net')
         spatial = os.path.join(sub, 'spatial')
