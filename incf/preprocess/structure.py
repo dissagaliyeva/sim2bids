@@ -5,7 +5,7 @@ from incf.convert import convert
 from collections import OrderedDict
 from incf.preprocess import simulations_h5 as sim
 
-default_format, coord_format = 'sub-{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
+default_format, coord_format = '{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
 
 
 class FolderStructure:
@@ -23,7 +23,7 @@ class FolderStructure:
         })
 
         self.layout = []
-        self.default_format = 'sub-{}_desc-{}_{}.{}'
+        self.default_format = '{}_desc-{}_{}.{}'
         self.coord_format = 'desc-{}_{}.{}'
         self.populate()
 
@@ -80,8 +80,8 @@ class FolderStructure:
         else:
             self.components['subjects'][sid][ses]['ts'] += common_structure(v)
             self.components['subjects'][sid][ses]['coord'] += [
-                coord_format.replace('desc-', '').format(f'sub-{sid}_desc-{v["desc"]}', f'times-{v["name"]}', 'tsv'),
-                coord_format.replace('desc-', '').format(f'sub-{sid}_desc-{v["desc"]}', f'times-{v["name"]}', 'json')]
+                coord_format.replace('desc-', '').format(f'{sid}_desc-{v["desc"]}', f'times-{v["name"]}', 'tsv'),
+                coord_format.replace('desc-', '').format(f'{sid}_desc-{v["desc"]}', f'times-{v["name"]}', 'json')]
 
     def save_h5(self, v, ses=None):
         file = h.File(v['path'])
@@ -157,7 +157,7 @@ class FolderStructure:
                     self.layout += [fold.format(k), self.join(v)]
                 elif isinstance(v, dict):
                     for k2, v2 in v.items():
-                        self.layout += [fold.format(f'sub-{k2}'), subfold.format('net'),
+                        self.layout += [fold.format(f'{k2}'), subfold.format('net'),
                                         self.join(v2['net'], 'subfile'), subfold.format('ts'),
                                         self.join(v2['ts'], 'subfile'), subfold.format('spatial'),
                                         self.join(v2['spatial'], 'subfile')]
@@ -178,7 +178,7 @@ class FolderStructure:
             elif isinstance(v, dict):
                 for k2, v2 in v.items():
 
-                    self.layout += [fold.format(f'sub-{k2}')]
+                    self.layout += [fold.format(k2)]
 
                     for k3 in v2.keys():
                         if len(v2[k3]['net']) == 0:
@@ -200,7 +200,7 @@ def common_structure(v, name=None):
             default_format.format(v['sid'], v['desc'], name, 'json')]
 
 
-def coord_structure(v, name=None):
+def coord_structure(v):
     return [coord_format.format(v['desc'], 'nodes', 'tsv'),
             coord_format.format(v['desc'], 'nodes', 'json'),
             coord_format.format(v['desc'], 'labels', 'tsv'),

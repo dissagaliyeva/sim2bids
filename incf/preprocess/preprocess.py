@@ -11,7 +11,7 @@ def create_uuid():
     if start in IDS:
         start += 1
 
-    new = f'0{start}' if start < 10 else start
+    new = f'sub-0{start}' if start < 10 else f'sub-{start}'
 
     IDS.append(start)
     return new
