@@ -124,10 +124,11 @@ def save_output(subs, output):
 
     def save(sub, ses=None):
         for k, v in sub.items():
+            print(k, v, end='\n\n')
             if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
-                wdc.save(sub[k], output, ses=None)
+                wdc.save(sub[k], output, ses=ses)
             elif k in ['centres.txt']:
-                wdc.save(sub[k], output, center=True, ses=None)
+                wdc.save(sub[k], output, center=True, ses=ses)
             # elif k in TO_EXTRACT[3:]:
 
             elif k.endswith('.mat'):
@@ -147,13 +148,14 @@ def save_output(subs, output):
     # save output files
     for k, val in subs.items():
         if 'ses-preop' in val.keys():
-            for k2, v in val:
-                save(val, ses=k2)
+            # create_sub_struct(output, subs, ses=True)
+            for k2, v in val.items():
+                save(v, ses=k2)
         else:
             save(val)
 
 
-def create_sub_struct(path, subs, ses=False):
+def create_sub_struct(path, subs, ses=None):
     if ses is None:
         sub = os.path.join(path, f"sub-{subs['sid']}")
         net = os.path.join(sub, 'net')

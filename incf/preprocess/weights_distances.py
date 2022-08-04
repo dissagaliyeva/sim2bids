@@ -6,6 +6,7 @@ from incf.convert import convert
 
 
 def save(subs: dict, output: str, center: bool = False, ses=None):
+    convert.create_sub_struct(output, subs, ses=ses)
     if center:
         save_centers(subs, output, ses=ses)
     else:
@@ -47,7 +48,7 @@ def save_txt(path, f, name, coords=None):
                         desc='', ftype='wd', coords=coords)
 
 
-def save_centers(subs, output):
+def save_centers(subs, output, ses=None):
     COORD_TMPL = 'desc-{}_{}.{}'
     file = read_csv(subs['path'], subs['sep'])
     labels, nodes = file[0], file[[1, 2, 3]]
@@ -56,15 +57,30 @@ def save_centers(subs, output):
     lname = COORD_TMPL.format(desc, 'labels', 'tsv')
     nname = COORD_TMPL.format(desc, 'nodes', 'tsv')
 
-    # save to tsv
-    convert.to_tsv(os.path.join(output, 'coord', lname), labels)
-    convert.to_tsv(os.path.join(output, 'coord', nname), nodes)
+    if ses is None:
+        # save to tsv
+        convert.to_tsv(os.path.join(output, 'coord', lname), labels)
+        convert.to_tsv(os.path.join(output, 'coord', nname), nodes)
 
-    # save to json
-    for content in ['labels', 'nodes']:
-        cols = 1 if content == 'labels' else 3
-        convert.to_json(os.path.join(output, 'coord', COORD_TMPL.format(desc, content, 'json')),
-                        [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
+        # save to json
+        for content in ['labels', 'nodes']:
+            cols = 1 if content == 'labels' else 3
+            convert.to_json(os.path.join(output, 'coord', COORD_TMPL.format(desc, content, 'json')),
+                            [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
+    else:
+        convert.to_tsv(os.path.join(output, f'sub-{subs["sid"]}', ses, 'coord', lname), labels)
+        convert.to_tsv(os.path.join(output, f'sub-{subs["sid"]}', ses, 'coord', nname), nodes)
+
+        # save to json
+        for content in ['labels', 'nodes']:
+            cols = 1 if content == 'labels' else 3
+            convert.to_json(os.path.join(output, f'sub-{subs["sid"]}', ses, 'coord',
+                                         COORD_TMPL.format(desc, content, 'json')),
+                            [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
+
+
+
+
 
 
 def read_csv(path, sep):
