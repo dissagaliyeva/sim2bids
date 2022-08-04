@@ -24,7 +24,7 @@ def save_wd(subs, output, ses=None):
 
 
 def save_files(folders, subs, coords=None):
-    DEFAULT_TMPL = 'sub-{}_desc-{}_{}.{}'
+    DEFAULT_TMPL = '{}_desc-{}_{}.{}'
     name = DEFAULT_TMPL.format(subs['sid'], subs['desc'], subs['name'], 'tsv')
     file = read_csv(subs['path'], subs['sep'])
 
@@ -70,13 +70,13 @@ def save_centers(subs, output, ses=None):
             convert.to_json(os.path.join(output, 'coord', COORD_TMPL.format(desc, content, 'json')),
                             [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
     else:
-        convert.to_tsv(os.path.join(output, f'sub-{subs["sid"]}', ses, 'coord', lname), labels)
-        convert.to_tsv(os.path.join(output, f'sub-{subs["sid"]}', ses, 'coord', nname), nodes)
+        convert.to_tsv(os.path.join(output, f'{subs["sid"]}', ses, 'coord', lname), labels)
+        convert.to_tsv(os.path.join(output, f'{subs["sid"]}', ses, 'coord', nname), nodes)
 
         # save to json
         for content in ['labels', 'nodes']:
             cols = 1 if content == 'labels' else 3
-            convert.to_json(os.path.join(output, f'sub-{subs["sid"]}', ses, 'coord',
+            convert.to_json(os.path.join(output, f'{subs["sid"]}', ses, 'coord',
                                          COORD_TMPL.format(desc, content, 'json')),
                             [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
 
