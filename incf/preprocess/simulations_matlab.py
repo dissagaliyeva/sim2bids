@@ -37,15 +37,14 @@ def convert_mat(mat, subs, path, folders, ses=None):
         pn.state.notifications.error(f'File `{fname}` does not have any data input!', duration=duration)
     elif len(data) == 1:
         data = mat[data[0]]
+        ts_path = folders[-1]
 
         if ses is None:
-            ts_path = folders[-1]
-            coord_json = os.path.join(path, 'coord', f'desc-{desc}_times.json')
-            coord_tsv = os.path.join(path, 'coord', f'desc-{desc}_times.tsv')
+            coord_json = os.path.join(ts_path, f'desc-{desc}_times.json')
+            coord_tsv = os.path.join(ts_path, f'desc-{desc}_times.tsv')
         else:
-            ts_path = folders[-1]
-            coord_json = os.path.join(path, sid, ses, 'coord', f'desc-{desc}_times.json')
-            coord_tsv = os.path.join(path, sid, ses, 'coord', f'desc-{desc}_times.tsv')
+            coord_json = os.path.join(ts_path, f'desc-{desc}_times.json')
+            coord_tsv = os.path.join(ts_path, f'desc-{desc}_times.tsv')
 
         convert.to_tsv(os.path.join(ts_path, temp.format(sid, desc, name, 'tsv')), data)
         convert.to_json(os.path.join(ts_path, temp.format(sid, desc, name, 'json')), data.shape, '', 'simulations')

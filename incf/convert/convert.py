@@ -152,6 +152,10 @@ def save_output(subs, output):
         if 'ses-preop' in val.keys() or 'ses-postop' in val.keys():
             for k2, v in val.items():
                 save(v, ses=k2)
+
+            if os.path.exists(os.path.join(output, 'coord')):
+                os.rmdir(os.path.join(output, 'coord'))
+
         else:
             save(val)
 

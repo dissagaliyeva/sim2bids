@@ -80,10 +80,6 @@ def save_centers(subs, output, folders, ses=None):
                             [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
 
 
-
-
-
-
 def read_csv(path, sep):
     try:
         f = pd.read_csv(path, sep=sep, header=None, index_col=False)
