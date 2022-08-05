@@ -4,16 +4,12 @@ import pandas as pd
 from incf.convert import convert as conv
 
 
-def save_coords(subs: dict, output: str, ses=None):
-    print(subs, end='\n\n')
-    conv.create_sub_struct(output, subs, ses)
-
+def save_coords(subs: dict, output: str, folders, ses=None):
     template = '{}_desc-{}_{}.{}'
     sid, desc, name = subs['sid'], subs['desc'], subs['name']
 
     # get path
-    path = os.path.join(output, sid, ses, 'coord')
-    path = os.path.join(path, template.format(sid, desc, name, 'tsv'))
+    path = os.path.join(folders[4], template.format(sid, desc, name, 'tsv'))
 
     # to tsv
     conv.to_tsv(path, subs['path'])
