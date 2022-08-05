@@ -125,16 +125,18 @@ def save_output(subs, output):
 
     def save(sub, ses=None):
         for k, v in sub.items():
-            if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
-                wdc.save(sub[k], output, ses=ses)
+            folders = create_sub_struct(output, v, ses=True, ses_name=ses)
+
+            if k in ['weights.txt', 'distances.txt']:
+                wdc.save(sub[k], output, folders, ses=ses)
             elif k in ['centres.txt']:
-                wdc.save(sub[k], output, center=True, ses=ses)
+                wdc.save(sub[k], output, folders, center=True, ses=ses)
             elif k in TO_EXTRACT[3:]:
-                coords.save_coords(sub[k], output, ses=ses)
+                coords.save_coords(sub[k], output, folders, ses=ses)
             elif k.endswith('.mat'):
-                mat.save(sub[k], output, ses=None)
+                mat.save(sub[k], output, folders, ses=None)
             elif k.endswith('.h5'):
-                h5.save(sub[k], output, ses=None)
+                h5.save(sub[k], output, folders, ses=None)
 
     # overwrite existing content
     if conflict:
@@ -147,15 +149,14 @@ def save_output(subs, output):
 
     # save output files
     for k, val in subs.items():
-        if 'ses-preop' in val.keys():
-            # create_sub_struct(output, subs, ses=True)
+        if 'ses-preop' in val.keys() or 'ses-postop' in val.keys():
             for k2, v in val.items():
                 save(v, ses=k2)
         else:
             save(val)
 
 
-def create_sub_struct(path, subs, ses=False):
+def create_sub_struct(path, subs, ses=False, ses_name=None):
     if not ses:
         sub = os.path.join(path, subs['sid'])
         net = os.path.join(sub, 'net')
@@ -164,19 +165,12 @@ def create_sub_struct(path, subs, ses=False):
         folders = [sub, net, spatial, ts]
     else:
         sub = os.path.join(path, subs['sid'])
-        preop = os.path.join(sub, 'ses-preop')
-        postop = os.path.join(sub, 'ses-postop')
-        net_preop = os.path.join(preop, 'net')
-        spatial_preop = os.path.join(preop, 'spatial')
-        coord_preop = os.path.join(preop, 'coord')
-        ts_preop = os.path.join(preop, 'ts')
-        net_postop = os.path.join(postop, 'net')
-        spatial_postop = os.path.join(postop, 'spatial')
-        coord_postop = os.path.join(postop, 'coord')
-        ts_postop = os.path.join(postop, 'ts')
-
-        folders = [sub, preop, postop, net_preop, spatial_preop, coord_preop,
-                   ts_preop, net_postop, spatial_postop, coord_postop, ts_postop]
+        ses = os.path.join(sub, ses_name)
+        net_ses = os.path.join(ses, 'net')
+        spatial_ses = os.path.join(ses, 'spatial')
+        coord_ses = os.path.join(ses, 'coord')
+        ts_ses = os.path.join(ses, 'ts')
+        folders = [sub, ses, net_ses, spatial_ses, coord_ses, ts_ses]
 
     for folder in folders:
         if not os.path.exists(folder):
