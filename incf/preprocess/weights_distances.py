@@ -31,6 +31,9 @@ def save_files(folders, subs, coords=None):
         net = folders[1]
         save_txt(net, file, name, coords)
     else:
+        coords_loc = folders[-2]
+        coords = []
+
         save_txt(folders[2], file, name, coords)
 
 
@@ -42,8 +45,7 @@ def save_txt(path, f, name, coords=None):
     else:
         # save to tsv
         convert.to_tsv(os.path.join(path, name), f[:])
-        convert.to_json(os.path.join(path, name.replace('tsv', 'json')), f.shape,
-                        desc='', ftype='wd', coords=coords)
+        convert.to_json(os.path.join(path, name.replace('tsv', 'json')), f.shape, desc='', key='wd', coords=coords)
 
 
 def save_centers(subs, output, folders, ses=None):
@@ -66,7 +68,8 @@ def save_centers(subs, output, folders, ses=None):
         for content in ['labels', 'nodes']:
             cols = 1 if content == 'labels' else 3
             convert.to_json(os.path.join(output, 'coord', COORD_TMPL.format(desc, content, 'json')),
-                            [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
+                            shape=[labels.shape[0], cols], desc='Time steps of the simulated time series.',
+                            key='coord')
     else:
         convert.to_tsv(os.path.join(output, subs['sid'] + '_' + lname), labels)
         convert.to_tsv(os.path.join(output, subs['sid'] + '_' + nname), nodes)
@@ -75,7 +78,8 @@ def save_centers(subs, output, folders, ses=None):
         for content in ['labels', 'nodes']:
             cols = 1 if content == 'labels' else 3
             convert.to_json(os.path.join(output, subs['sid'] + '_' + COORD_TMPL.format(desc, content, 'json')),
-                            [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
+                            shape=[labels.shape[0], cols], desc='Time steps of the simulated time series.',
+                            key='coord')
 
 
 def read_csv(path, sep):

@@ -17,7 +17,7 @@ def save_coords(subs: dict, folders):
     # to json
     file = pd.DataFrame(open(subs['path'])).apply(lambda x: x.str.strip('\n'))
 
-    conv.to_json(path=path.replace('tsv', 'json'), shape=file.shape, desc=desc, ftype='centers')
+    conv.to_json(path=path.replace('tsv', 'json'), shape=file.shape, desc=desc, ftype='centers', key='coord')
 
 
 

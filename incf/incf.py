@@ -10,7 +10,7 @@ import incf.preprocess.preprocess as prep
 from incf.convert import convert
 
 
-JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam','SourceCode',
+JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
 UNITS = ['s', 'm', 'ms', 'degrees', 'radians']
 
