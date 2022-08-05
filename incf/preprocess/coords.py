@@ -4,7 +4,7 @@ import pandas as pd
 from incf.convert import convert as conv
 
 
-def save_coords(subs: dict, output: str, folders, ses=None):
+def save_coords(subs: dict, folders):
     template = '{}_desc-{}_{}.{}'
     sid, desc, name = subs['sid'], subs['desc'], subs['name']
 

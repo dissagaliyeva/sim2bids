@@ -9,17 +9,17 @@ from scipy.io import loadmat
 from incf.convert import convert
 
 
-def save(subs, path, folders, ses=None):
+def save(subs, folders, ses=None):
     duration, fname = convert.DURATION, subs['fname']
     try:
         mat = loadmat(subs['path'], squeeze_me=True)
     except NotImplementedError:
         pn.state.notifications.info(f'File `{fname}` uses MATLAB version 7.3.', duration=duration)
-        save_mat73(subs, path, folders, ses=ses)
+        save_mat73(subs, folders, ses=ses)
     except scipy.io.matlab._miobase.MatReadError:
         pn.state.notifications.error(f'File `{fname}` is empty! Aborting...', duration=duration)
     else:
-        convert_mat(mat, subs, path, folders, ses=ses)
+        convert_mat(mat, subs, folders, ses=ses)
 
 
 def save_mat73(subs, path, folders, ses=None):
@@ -27,7 +27,7 @@ def save_mat73(subs, path, folders, ses=None):
     convert_mat(mat, subs, path, folders, ses=ses)
 
 
-def convert_mat(mat, subs, path, folders, ses=None):
+def convert_mat(mat, subs, folders, ses=None):
     name, duration, fname = subs['name'], convert.DURATION, subs['fname']
     sid, desc = subs['sid'], subs['desc']
     temp = '{}_desc-{}-{}.{}'

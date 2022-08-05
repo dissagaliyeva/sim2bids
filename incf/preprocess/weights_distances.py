@@ -7,10 +7,8 @@ from incf.convert import convert
 
 def save(subs: dict, output: str, folders: list, center: bool = False, ses=None):
     if center:
-        # convert.create_sub_struct(output, subs, ses=False)
         save_centers(subs, output, folders, ses=ses)
     else:
-        # convert.create_sub_struct(output, subs, ses=True, ses_name=ses)
         save_wd(subs, folders, ses=ses)
 
 
@@ -70,13 +68,13 @@ def save_centers(subs, output, folders, ses=None):
             convert.to_json(os.path.join(output, 'coord', COORD_TMPL.format(desc, content, 'json')),
                             [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
     else:
-        convert.to_tsv(os.path.join(output, lname), labels)
-        convert.to_tsv(os.path.join(output, nname), nodes)
+        convert.to_tsv(os.path.join(output, subs['sid'] + '_' + lname), labels)
+        convert.to_tsv(os.path.join(output, subs['sid'] + '_' + nname), nodes)
 
         # save to json
         for content in ['labels', 'nodes']:
             cols = 1 if content == 'labels' else 3
-            convert.to_json(os.path.join(output, COORD_TMPL.format(desc, content, 'json')),
+            convert.to_json(os.path.join(output, subs['sid'] + '_' + COORD_TMPL.format(desc, content, 'json')),
                             [labels.shape[0], cols], 'Time steps of the simulated time series.', 'centers')
 
 

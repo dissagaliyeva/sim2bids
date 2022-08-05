@@ -132,9 +132,9 @@ def save_output(subs, output):
             elif k in ['centres.txt']:
                 wdc.save(sub[k], output, folders, center=True, ses=ses)
             elif k in TO_EXTRACT[3:]:
-                coords.save_coords(sub[k], output, folders, ses=ses)
+                coords.save_coords(sub[k], folders)
             elif k.endswith('.mat'):
-                mat.save(sub[k], output, folders, ses=None)
+                mat.save(sub[k], folders, ses=None)
             elif k.endswith('.h5'):
                 h5.save(sub[k], output, folders, ses=None)
 
@@ -178,7 +178,6 @@ def create_sub_struct(path, subs, ses=False, ses_name=None):
 
     for folder in folders:
         if not os.path.exists(folder):
-            print(f'Creating folder `{folder}`')
             os.mkdir(folder)
 
     return folders
