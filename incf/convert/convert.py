@@ -152,6 +152,10 @@ def save_output(subs, output):
         if 'ses-preop' in val.keys() or 'ses-postop' in val.keys():
             for k2, v in val.items():
                 save(v, ses=k2)
+
+            if os.path.exists(os.path.join(output, 'coord')):
+                os.rmdir(os.path.join(output, 'coord'))
+
         else:
             save(val)
 
@@ -184,17 +188,22 @@ def get_shape(file, sep):
     return pd.read_csv(file, sep=sep, index_col=None, header=None).shape
 
 
-def to_tsv(path, file=None):
+def to_tsv(path, file=None, sep=None):
     if file is None:
         Path(path).touch()
     else:
         params = {'sep': '\t', 'header': None, 'index': None}
-        try:
-            pd.DataFrame(file).to_csv(path, **params)
-        except ValueError:
-            with open(file) as f:
-                with open(path, 'w') as f2:
-                    f2.write(f.read())
+        sep = sep if sep != '\n' else '\0'
+
+        if isinstance(file, str) and sep is not None:
+            pd.read_csv(file, index_col=None, header=None, sep=sep).to_csv(path, **params)
+        else:
+            try:
+                pd.DataFrame(file).to_csv(path, **params)
+            except ValueError:
+                with open(file) as f:
+                    with open(path, 'w') as f2:
+                        f2.write(f.read())
 
 
 def to_json(path, shape, desc, ftype, coords=None):
