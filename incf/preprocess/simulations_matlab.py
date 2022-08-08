@@ -38,21 +38,37 @@ def convert_mat(mat, subs, folders, ses=None):
     elif len(data) == 1:
         data = mat[data[0]]
         ts_path = folders[-1]
-
-        if ses is None:
-            coord_json = os.path.join(ts_path, f'desc-{desc}_times.json')
-            coord_tsv = os.path.join(ts_path, f'desc-{desc}_times.tsv')
+        spatial_path = folders[2] if ses is None else folders[3]
+        print(name)
+        if 'fc' in name.lower():
+            coord_json = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.json')
+            coord_tsv = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.tsv')
         else:
-            coord_json = os.path.join(ts_path, f'desc-{desc}_times.json')
-            coord_tsv = os.path.join(ts_path, f'desc-{desc}_times.tsv')
+            if ses is None:
+                coord_json = os.path.join(ts_path, f'desc-{desc}_{name}.json')
+                coord_tsv = os.path.join(ts_path, f'desc-{desc}_{name}.tsv')
+            else:
+                coord_json = os.path.join(ts_path, f'{sid}_desc-{desc}_{name}.json')
+                coord_tsv = os.path.join(ts_path, f'{sid}_desc-{desc}_{name}.tsv')
 
-        convert.to_tsv(os.path.join(ts_path, temp.format(sid, desc, name, 'tsv')), data)
-        convert.to_json(os.path.join(ts_path, temp.format(sid, desc, name, 'json')), data.shape, '', 'ts')
-        convert.to_json(coord_json, data.shape, 'Time steps of the simulated time series.', 'ts')
-        convert.to_tsv(coord_tsv)
+        save_tsv_json(coord_tsv, data)
+        save_tsv_json(coord_json, data, tsv=False)
+        # convert.to_tsv(os.path.join(ts_path, temp.format(sid, desc, name, 'tsv')), data)
+        # convert.to_json(os.path.join(ts_path, temp.format(sid, desc, name, 'json')), data.shape, '', 'ts')
+        # convert.to_json(coord_json, data.shape, 'Time steps of the simulated time series.', 'ts')
+        # convert.to_tsv(coord_tsv)
 
     else:
         print('MATLAB weird files, `simulations_matlab.py` @51:', data)
+
+
+def save_tsv_json(path, data, tsv=True, desc=None):
+    desc = '' if desc is None else desc
+
+    if tsv:
+        convert.to_tsv(path, data)
+    else:
+        convert.to_json(path, data.shape, desc, 'ts')
 
 
 def find_mat_array(mat):

@@ -216,15 +216,3 @@ def to_json(path, shape, desc, key, coords=None, **kwargs):
 
     with open(path, 'w') as file:
         json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coords, **kwargs), file)
-
-
-    # if ftype == 'simulations':
-    #     json_file = temp.merge_dicts(temp.JSON_template, temp.JSON_simulations)
-    # elif ftype == 'centers':
-    #     json_file = temp.JSON_centers
-    # elif ftype == 'wd':
-    #     json_file = temp.JSON_template
-
-    # if json_file is not None:
-    #     with open(path, 'w') as f:
-    #         json.dump(temp.populate_dict(json_file, shape=shape, desc=desc, coords=coords), f)
