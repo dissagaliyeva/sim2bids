@@ -4,7 +4,7 @@ import pandas as pd
 from incf.convert import convert as conv
 
 
-def save_coords(subs: dict, output: str, folders, ses=None):
+def save_coords(subs: dict, folders):
     template = '{}_desc-{}_{}.{}'
     sid, desc, name = subs['sid'], subs['desc'], subs['name']
 
@@ -17,7 +17,7 @@ def save_coords(subs: dict, output: str, folders, ses=None):
     # to json
     file = pd.DataFrame(open(subs['path'])).apply(lambda x: x.str.strip('\n'))
 
-    conv.to_json(path=path.replace('tsv', 'json'), shape=file.shape, desc=desc, ftype='centers')
+    conv.to_json(path=path.replace('tsv', 'json'), shape=file.shape, desc=desc, key='coord')
 
 
 

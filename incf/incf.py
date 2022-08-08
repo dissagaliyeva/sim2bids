@@ -7,10 +7,11 @@ import panel as pn
 import param
 
 import incf.preprocess.preprocess as prep
+import incf.templates.templates as temp
 from incf.convert import convert
 
 
-JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam','SourceCode',
+JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
 UNITS = ['s', 'm', 'ms', 'degrees', 'radians']
 
@@ -169,7 +170,7 @@ class ViewResults(param.Parameterized):
                     self.je_widget = pn.WidgetBox()
 
                 je = pn.widgets.JSONEditor(value=file, height=350, mode='view')
-                je_widget = get_settings(OrderedDict(je.value))
+                je_widget = get_settings(OrderedDict(je.value), self.select_options.value)
                 self.je_widget.append(pn.Row(je, pn.Column(je_widget,
                                                            pn.Param(self, parameters=['je_btn'], show_name=False,
                                                                     widgets={'je_btn': {'button_type': 'primary'}}))))
@@ -202,11 +203,19 @@ class ViewResults(param.Parameterized):
         return pn.Column(self.file_selection, self.widget)
 
 
-def get_settings(json_editor):
+def get_settings(json_editor, selected):
     widget = pn.WidgetBox()
 
     for k, v in json_editor.items():
-        name = f'Specify {k}:'
+        specs = temp.struct
+        reqs = temp.required
+        root = os.path.basename(os.path.dirname(selected))
+        req = k in specs[root]['required']
+
+        if k in reqs or req:
+            name = f'Specify {k} (REQUIRED):'
+        else:
+            name = f'Specify {k} (RECOMMENDED):'
 
         if k == 'Units':
             widget.append(pn.widgets.Select(name=name, options=UNITS, value=''))

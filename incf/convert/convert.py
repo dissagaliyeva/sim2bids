@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import zipfile
+from collections import OrderedDict
 from pathlib import Path
 
 import pandas as pd
@@ -93,7 +94,6 @@ def check_file(path, files, subs=None, save=False):
     if subs is None:
         subs = subj.Files(path, files).subs
 
-    print(subs)
     if save:
         save_output(subs, OUTPUT)
 
@@ -132,9 +132,9 @@ def save_output(subs, output):
             elif k in ['centres.txt']:
                 wdc.save(sub[k], output, folders, center=True, ses=ses)
             elif k in TO_EXTRACT[3:]:
-                coords.save_coords(sub[k], output, folders, ses=ses)
+                coords.save_coords(sub[k], folders)
             elif k.endswith('.mat'):
-                mat.save(sub[k], output, folders, ses=None)
+                mat.save(sub[k], folders, ses=None)
             elif k.endswith('.h5'):
                 h5.save(sub[k], output, folders, ses=None)
 
@@ -178,7 +178,6 @@ def create_sub_struct(path, subs, ses=False, ses_name=None):
 
     for folder in folders:
         if not os.path.exists(folder):
-            print(f'Creating folder `{folder}`')
             os.mkdir(folder)
 
     return folders
@@ -206,16 +205,14 @@ def to_tsv(path, file=None, sep=None):
                         f2.write(f.read())
 
 
-def to_json(path, shape, desc, ftype, coords=None):
-    json_file = None
+def to_json(path, shape, desc, key, coords=None, **kwargs):
+    inp = temp.required
+    out = OrderedDict({x: '' for x in inp})
 
-    if ftype == 'simulations':
-        json_file = temp.merge_dicts(temp.JSON_template, temp.JSON_simulations)
-    elif ftype == 'centers':
-        json_file = temp.JSON_centers
-    elif ftype == 'wd':
-        json_file = temp.JSON_template
+    if key != 'wd':
+        struct = temp.struct[key]
+        out.update({x: '' for x in struct['required']})
+        out.update({x: '' for x in struct['recommend']})
 
-    if json_file is not None:
-        with open(path, 'w') as f:
-            json.dump(temp.populate_dict(json_file, shape=shape, desc=desc, coords=coords), f)
+    with open(path, 'w') as file:
+        json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coords, **kwargs), file)

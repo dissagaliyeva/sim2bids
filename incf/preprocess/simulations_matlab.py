@@ -9,17 +9,17 @@ from scipy.io import loadmat
 from incf.convert import convert
 
 
-def save(subs, path, folders, ses=None):
+def save(subs, folders, ses=None):
     duration, fname = convert.DURATION, subs['fname']
     try:
         mat = loadmat(subs['path'], squeeze_me=True)
     except NotImplementedError:
         pn.state.notifications.info(f'File `{fname}` uses MATLAB version 7.3.', duration=duration)
-        save_mat73(subs, path, folders, ses=ses)
+        save_mat73(subs, folders, ses=ses)
     except scipy.io.matlab._miobase.MatReadError:
         pn.state.notifications.error(f'File `{fname}` is empty! Aborting...', duration=duration)
     else:
-        convert_mat(mat, subs, path, folders, ses=ses)
+        convert_mat(mat, subs, folders, ses=ses)
 
 
 def save_mat73(subs, path, folders, ses=None):
@@ -27,7 +27,7 @@ def save_mat73(subs, path, folders, ses=None):
     convert_mat(mat, subs, path, folders, ses=ses)
 
 
-def convert_mat(mat, subs, path, folders, ses=None):
+def convert_mat(mat, subs, folders, ses=None):
     name, duration, fname = subs['name'], convert.DURATION, subs['fname']
     sid, desc = subs['sid'], subs['desc']
     temp = '{}_desc-{}-{}.{}'
@@ -38,21 +38,32 @@ def convert_mat(mat, subs, path, folders, ses=None):
     elif len(data) == 1:
         data = mat[data[0]]
         ts_path = folders[-1]
+        spatial_path = folders[2] if ses is None else folders[3]
 
-        if ses is None:
-            coord_json = os.path.join(ts_path, f'desc-{desc}_times.json')
-            coord_tsv = os.path.join(ts_path, f'desc-{desc}_times.tsv')
+        if 'fc' in name.lower():
+            coord_json = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.json')
+            coord_tsv = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.tsv')
         else:
-            coord_json = os.path.join(ts_path, f'desc-{desc}_times.json')
-            coord_tsv = os.path.join(ts_path, f'desc-{desc}_times.tsv')
+            if ses is None:
+                coord_json = os.path.join(ts_path, f'desc-{desc}_{name}.json')
+                coord_tsv = os.path.join(ts_path, f'desc-{desc}_{name}.tsv')
+            else:
+                coord_json = os.path.join(ts_path, f'{sid}_desc-{desc}_{name}.json')
+                coord_tsv = os.path.join(ts_path, f'{sid}_desc-{desc}_{name}.tsv')
 
-        convert.to_tsv(os.path.join(ts_path, temp.format(sid, desc, name, 'tsv')), data)
-        convert.to_json(os.path.join(ts_path, temp.format(sid, desc, name, 'json')), data.shape, '', 'simulations')
-        convert.to_json(coord_json, data.shape, 'Time steps of the simulated time series.', 'wd')
-        convert.to_tsv(coord_tsv)
-
+        save_tsv_json(coord_tsv, data)
+        save_tsv_json(coord_json, data, tsv=False)
     else:
         print('MATLAB weird files, `simulations_matlab.py` @51:', data)
+
+
+def save_tsv_json(path, data, tsv=True, desc=None):
+    desc = '' if desc is None else desc
+
+    if tsv:
+        convert.to_tsv(path, data)
+    else:
+        convert.to_json(path, data.shape, desc, 'ts')
 
 
 def find_mat_array(mat):

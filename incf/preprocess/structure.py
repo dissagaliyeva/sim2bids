@@ -52,7 +52,10 @@ class FolderStructure:
                 elif k2 in convert.TO_EXTRACT[3:]:
                     self.save_sub_coord(v2, sid, ses=ses)
                 elif k2.endswith('.mat'):
-                    self.save_mat(v2, sid, ses=ses)
+                    if 'fc' in k2.lower():
+                        self.save_mat(v2, sid, ses=ses, fc=True)
+                    else:
+                        self.save_mat(v2, sid, ses=ses)
                 elif k2.endswith('.h5'):
                     self.save_h5(v2, ses=ses)
 
@@ -70,18 +73,29 @@ class FolderStructure:
             self.components['subjects'][sid][ses]['coord'] += coord_structure(v)
 
     def save_sub_coord(self, v, sid, ses):
-        self.components['subjects'][sid][ses]['coord'] += common_structure(v, v['name'])
+        self.components['subjects'][sid][ses]['coord'] += common_structure(v, v['name'].lower())
 
-    def save_mat(self, v, sid, ses=None):
+    def save_mat(self, v, sid, ses=None, fc=False):
+        name, desc = v["name"].lower(), v["desc"]
+
         if ses is None:
-            self.components['subjects'][sid]['ts'] += common_structure(v)
-            self.components['subjects'][sid]['coord'] += [coord_format.format(v['desc'], 'times', 'tsv'),
-                                                          coord_format.format(v['desc'], 'times', 'json')]
+            if fc:
+                self.components['subjects'][sid]['spatial'] += [coord_format.format(desc, 'times', 'tsv'),
+                                                                coord_format.format(desc, 'times', 'json')]
+            else:
+                self.components['subjects'][sid]['ts'] += common_structure(v)
+                self.components['subjects'][sid]['coord'] += [coord_format.format(desc, 'times', 'tsv'),
+                                                              coord_format.format(desc, 'times', 'json')]
         else:
-            self.components['subjects'][sid][ses]['ts'] += common_structure(v)
-            self.components['subjects'][sid][ses]['coord'] += [
-                coord_format.replace('desc-', '').format(f'{sid}_desc-{v["desc"]}', f'times-{v["name"]}', 'tsv'),
-                coord_format.replace('desc-', '').format(f'{sid}_desc-{v["desc"]}', f'times-{v["name"]}', 'json')]
+            if fc:
+                self.components['subjects'][sid][ses]['spatial'] += [
+                    coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'tsv'),
+                    coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'json')]
+            else:
+                self.components['subjects'][sid][ses]['ts'] += common_structure(v)
+                self.components['subjects'][sid][ses]['coord'] += [
+                    coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'tsv'),
+                    coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'json')]
 
     def save_h5(self, v, ses=None):
         file = h.File(v['path'])
