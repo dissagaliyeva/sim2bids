@@ -9,6 +9,7 @@ import param
 import incf.preprocess.preprocess as prep
 import incf.templates.templates as temp
 import incf.preprocess.subjects as subj
+import incf.validate.validate as validate
 from incf.convert import convert
 
 
@@ -33,7 +34,9 @@ def get_selector(name):
         'Coordinates (coord)': ['times', 'centres', 'orientations', 'areas', 'hemisphere'],
         'Timeseries (ts)': ['ts'],
         'Spatial (spatial)': ['fc'],
-        'Code (code)': ['code']})
+        'Code (code)': ['code'],
+        'Skip file type': ['skip']
+    })
 
 
 def append_widgets(files):
@@ -130,7 +133,7 @@ class MainArea(param.Parameterized):
                 convert.OUTPUT = output
 
     def _rename(self, event=None):
-        print(self.rename_files)
+        validate.validate(self.rename_files, convert.ALL_FILES)
 
     @pn.depends('desc.value', watch=True)
     def _change_desc(self):

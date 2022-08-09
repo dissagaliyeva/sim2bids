@@ -27,6 +27,7 @@ class Files:
 
         # set multi-subject input to true
         conv.MULTI_INPUT = False if self.single else True
+        conv.ALL_FILES = self.content
 
         # traverse files and create subjects
         self.traverse_files()
@@ -62,6 +63,7 @@ class Files:
 
                 # Step 5: get all content
                 all_files = os.listdir(path)
+                conv.ALL_FILES = all_files
 
                 # Step 6: traverse ses-preop if present
                 if 'ses-preop' in all_files:

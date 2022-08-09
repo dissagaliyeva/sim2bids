@@ -30,6 +30,7 @@ TRAVERSE_FOLDERS = True
 TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt', 'average_orientations.txt',
               'areas.txt', 'cortical.txt', 'hemisphere.txt']
 ACCEPTED_EXT = ['txt', 'csv', 'mat', 'h5']
+ALL_FILES = None
 
 
 def recursive_walk(path, basename=False):
