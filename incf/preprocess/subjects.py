@@ -32,6 +32,7 @@ class Files:
     def traverse_files(self):
         # traverse multi-folder input
         if conv.MULTI_INPUT:
+
             files = self.selected_files
             changed_path = False
 
@@ -74,13 +75,30 @@ class Files:
 
                 # Step 8: if there are no `ses-preop` and `ses-postop`, traverse the folders as usual
                 if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
+
                     if changed_path:
                         path = path.replace(file, '')
 
-                    if not os.path.exists(os.path.join(path, file)):
-                        self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
-                    else:
-                        self.subs[sid] = prepare_subs(conv.get_content(path.replace(file, ''), file), sid)
+                    # Step 1: check if the structure contains multi-subject
+                    match = find_matches(self.basename)
+
+                    if len(match) > 0:
+                        for k, v in get_unique_subs(match, self.content).items():
+                            sid = prep.create_uuid()
+
+                            if sid not in self.subs.keys():
+                                self.subs[sid] = {}
+
+                            if len(self.selected_files) == 1:
+                                self.subs[sid].update(
+                                    prepare_subs([os.path.join(self.path, self.selected_files[0], x) for x in v], sid))
+                            else:
+                                self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
+
+        #                     if not os.path.exists(os.path.join(path, file)):
+        #                         self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
+        #                     else:
+        #                         self.subs[sid] = prepare_subs(conv.get_content(path.replace(file, ''), file), sid)
 
         # traverse over single-subject and multi-subject in one folder structure
         else:
@@ -154,6 +172,7 @@ def prepare_subs(file_paths, sid):
 
         if subs[name]['name'] in ['centres', 'centers', 'centres_preop', 'centres_postop']:
             conv.CENTERS = True
+    print(subs)
     return subs
 
 

@@ -31,7 +31,7 @@ class FolderStructure:
         sid = v['sid'] if sid is None else sid
 
         if sid not in self.components['subjects'] and ses is None:
-            self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
+            self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': [], 'coord': []}
 
         # save weights, distances, and centres
         if ses is None:
@@ -85,7 +85,7 @@ class FolderStructure:
             else:
                 self.components['subjects'][sid]['ts'] += common_structure(v)
                 self.components['subjects'][sid]['coord'] += [coord_format.format(desc, 'times', 'tsv'),
-                                                              coord_format.format(desc, 'times', 'json')]
+                                                         coord_format.format(desc, 'times', 'json')]
         else:
             if fc:
                 self.components['subjects'][sid][ses]['spatial'] += [
