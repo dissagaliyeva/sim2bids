@@ -11,6 +11,8 @@ from collections import OrderedDict
 import incf.preprocess.preprocess as prep
 import incf.convert.convert as conv
 
+TO_RENAME = None
+
 
 class Files:
     def __init__(self, path, files):
@@ -30,6 +32,8 @@ class Files:
         self.traverse_files()
 
     def traverse_files(self):
+        global TO_RENAME
+
         # traverse multi-folder input
         if conv.MULTI_INPUT:
 
@@ -75,12 +79,11 @@ class Files:
 
                 # Step 8: if there are no `ses-preop` and `ses-postop`, traverse the folders as usual
                 if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
-
-                    if changed_path:
-                        path = path.replace(file, '')
-
                     # Step 1: check if the structure contains multi-subject
                     match = find_matches(self.basename)
+
+                    # get files to rename
+                    TO_RENAME = get_extensions(self.basename, match)g
 
                     if len(match) > 0:
                         for k, v in get_unique_subs(match, self.content).items():
@@ -95,17 +98,15 @@ class Files:
                             else:
                                 self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
 
-        #                     if not os.path.exists(os.path.join(path, file)):
-        #                         self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
-        #                     else:
-        #                         self.subs[sid] = prepare_subs(conv.get_content(path.replace(file, ''), file), sid)
-
         # traverse over single-subject and multi-subject in one folder structure
         else:
             # Step 1: check if the structure contains multi-subject
             match = find_matches(self.basename)
 
             if len(match) > 0:
+                # get files to rename
+                TO_RENAME = get_extensions(self.basename, match)
+
                 for k, v in get_unique_subs(match, self.content).items():
                     sid = prep.create_uuid()
 
@@ -145,6 +146,17 @@ def get_unique_subs(match, contents):
         subs[match[idx]] = [x for x in contents if match[idx] in x]
 
     return subs
+
+
+def get_extensions(files, ids=None):
+    if ids is not None:
+        return [x for x in list(set([remove_id(x, ids) for x in files])) if x is not None]
+
+
+def remove_id(file, ids):
+    for id_ in ids:
+        if file.startswith(id_):
+            return file.replace(id_, '').strip(',.\\/_;!?-')
 
 
 def prepare_subs(file_paths, sid):

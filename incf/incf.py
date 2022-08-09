@@ -8,6 +8,7 @@ import param
 
 import incf.preprocess.preprocess as prep
 import incf.templates.templates as temp
+import incf.preprocess.subjects as subj
 from incf.convert import convert
 
 
@@ -26,6 +27,24 @@ def get_files(path='../output', ftype='.json'):
     return f
 
 
+def get_selector(name):
+    return pn.widgets.Select(name=f'Specify {name}', groups={
+        'Network (net)': ['weights', 'distances', 'delays', 'speed'],
+        'Coordinates (coord)': ['times', 'centres', 'orientations', 'areas', 'hemisphere'],
+        'Timeseries (ts)': ['ts'],
+        'Spatial (spatial)': ['fc'],
+        'Code (code)': ['code']})
+
+
+def append_widgets(files):
+    widgets = []
+
+    for file in files:
+        widgets.append(get_selector(file))
+
+    return widgets
+
+
 class MainArea(param.Parameterized):
     # generate files button
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
@@ -41,6 +60,7 @@ class MainArea(param.Parameterized):
     checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders'],
                                               options=checkbox_options,
                                               margin=(-20, 10, 0, 10))
+    rename_files = pn.WidgetBox()
 
     def __init__(self, **params):
         super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
@@ -57,6 +77,7 @@ class MainArea(param.Parameterized):
             self.cross_select.value = []
             self.structure.value = ''
             prep.reset_index()
+            subj.TO_RENAME = None
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
@@ -74,11 +95,17 @@ class MainArea(param.Parameterized):
             self.subjects, self.structure.value = convert.check_file(path=self.text_input.value,
                                                                      files=self.cross_select.value,
                                                                      save=False)
+            print(subj.TO_RENAME)
+
+            if subj.TO_RENAME is not None:
+                self.rename_files += ['### Preprocessing step: rename files', *append_widgets(subj.TO_RENAME)]
+
             self.length = len(self.cross_select.value)
 
     def _generate_files(self, event=None):
         _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value,
                                subs=self.subjects, save=True)
+        subj.TO_RENAME = None
 
     @pn.depends('checkbox_group.value', watch=True)
     def _change_checkbox(self):
@@ -113,8 +140,10 @@ class MainArea(param.Parameterized):
                                        self.structure,
                                        pn.Param(self, parameters=['gen_btn'],
                                                 show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}))),
+            ('Preprocess Data', self.rename_files),
             ('View Results', ViewResults().view()),
             ('User Guide', UserGuide().view()),
+
         )
 
         sidebar = pn.Column(
@@ -226,6 +255,10 @@ def get_settings(json_editor, selected):
 
     # append button
     return widget
+
+
+class DefineFiles(param.Parameterized):
+    pass
 
 
 class UserGuide(param.Parameterized):
