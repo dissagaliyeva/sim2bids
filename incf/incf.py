@@ -37,7 +37,7 @@ def get_selector(name):
 
 
 def append_widgets(files):
-    widgets = []
+    widgets = ['### Preprocessing step: rename files']
 
     for file in files:
         widgets.append(get_selector(file))
@@ -48,6 +48,9 @@ def append_widgets(files):
 class MainArea(param.Parameterized):
     # generate files button
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
+
+    # rename files button
+    rename_btn = param.Action(lambda self: self._rename(), label='Rename Files')
 
     # sidebar components
     output_path = pn.widgets.TextInput(value='../output', margin=(-20, 10, 0, 10))
@@ -69,6 +72,7 @@ class MainArea(param.Parameterized):
         self.structure = pn.widgets.StaticText(margin=(50, 0, 50, 20))
         self.subjects = None
         self.length = 0
+        subj.TO_RENAME = None
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
@@ -95,10 +99,11 @@ class MainArea(param.Parameterized):
             self.subjects, self.structure.value = convert.check_file(path=self.text_input.value,
                                                                      files=self.cross_select.value,
                                                                      save=False)
-            print(subj.TO_RENAME)
-
             if subj.TO_RENAME is not None:
-                self.rename_files += ['### Preprocessing step: rename files', *append_widgets(subj.TO_RENAME)]
+                if len(subj.TO_RENAME) > len(self.rename_files):
+                    self.rename_files += [*append_widgets(subj.TO_RENAME)]
+                    self.rename_files.append(pn.Param(self, parameters=['rename_btn'],
+                                             show_name=False, widgets={'rename_btn': {'button_type': 'primary'}}))
 
             self.length = len(self.cross_select.value)
 
@@ -123,6 +128,9 @@ class MainArea(param.Parameterized):
                 pn.state.notifications.success(f'Folder `{output}` is selected as output folder',
                                                duration=convert.DURATION)
                 convert.OUTPUT = output
+
+    def _rename(self, event=None):
+        print(self.rename_files)
 
     @pn.depends('desc.value', watch=True)
     def _change_desc(self):

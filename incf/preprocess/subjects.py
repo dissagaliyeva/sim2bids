@@ -83,7 +83,7 @@ class Files:
                     match = find_matches(self.basename)
 
                     # get files to rename
-                    TO_RENAME = get_extensions(self.basename, match)g
+                    TO_RENAME = get_extensions(self.basename, match)
 
                     if len(match) > 0:
                         for k, v in get_unique_subs(match, self.content).items():
