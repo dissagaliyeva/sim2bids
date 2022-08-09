@@ -22,15 +22,14 @@ def save(subs, folders, ses=None):
         convert_mat(mat, subs, folders, ses=ses)
 
 
-def save_mat73(subs, path, folders, ses=None):
+def save_mat73(subs, folders, ses):
     mat = mat73.loadmat(subs['path'])
-    convert_mat(mat, subs, path, folders, ses=ses)
+    convert_mat(mat, subs, folders, ses=ses)
 
 
 def convert_mat(mat, subs, folders, ses=None):
     name, duration, fname = subs['name'], convert.DURATION, subs['fname']
     sid, desc = subs['sid'], subs['desc']
-    temp = '{}_desc-{}-{}.{}'
     data = find_mat_array(mat)
 
     if len(data) == 0:
