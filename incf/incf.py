@@ -85,6 +85,7 @@ class MainArea(param.Parameterized):
             self.structure.value = ''
             prep.reset_index()
             subj.TO_RENAME = None
+            convert.ALL_FILES = None
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
@@ -92,9 +93,18 @@ class MainArea(param.Parameterized):
 
         if len(self.cross_select.value) == 0:
             prep.reset_index()
+            subj.TO_RENAME = None
+            convert.ALL_FILES = None
+            for _ in self.rename_files:
+                self.rename_files.pop(-1)
 
         if self.length != len(self.cross_select.value):
             prep.reset_index()
+            subj.TO_RENAME = None
+            convert.ALL_FILES = None
+            for _ in self.rename_files:
+                    self.rename_files.pop(-1)
+
 
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
@@ -107,6 +117,9 @@ class MainArea(param.Parameterized):
                     self.rename_files += [*append_widgets(subj.TO_RENAME)]
                     self.rename_files.append(pn.Param(self, parameters=['rename_btn'],
                                              show_name=False, widgets={'rename_btn': {'button_type': 'primary'}}))
+            else:
+                for _ in self.rename_files:
+                    self.rename_files.pop(-1)
 
             self.length = len(self.cross_select.value)
 
@@ -114,6 +127,7 @@ class MainArea(param.Parameterized):
         _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value,
                                subs=self.subjects, save=True)
         subj.TO_RENAME = None
+        convert.ALL_FILES = None
 
     @pn.depends('checkbox_group.value', watch=True)
     def _change_checkbox(self):
