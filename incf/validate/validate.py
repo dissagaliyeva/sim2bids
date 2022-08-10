@@ -64,7 +64,7 @@ def extract_files(ext, mat, cols, paths):
             if os.path.basename(path).startswith(match) and path.endswith(ext):
                 mat[cols[0]].tofile(os.path.join(og_path, f'{match}_weights.txt'), sep=' ')
                 pd.DataFrame(get_nodes(mat[cols[-1]])).to_csv(os.path.join(og_path, f'{match}_nodes.txt'),
-                                                                header=None, index=None)
+                                                              header=None, index=None)
                 # delete file
                 os.remove(path)
 
