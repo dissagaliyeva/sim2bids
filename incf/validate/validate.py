@@ -59,16 +59,12 @@ def extract_files(ext, mat, cols, paths):
     base = os.path.basename(paths[0])
     og_path = paths[0].replace(base, '')
 
-    print(og_path)
-
     for match in matches:
         for path in paths:
-            print(path)
             if os.path.basename(path).startswith(match) and path.endswith(ext):
                 mat[cols[0]].tofile(os.path.join(og_path, f'{match}_weights.txt'), sep=' ')
-
-                pd.DataFrame(get_nodes(mat[cols[1]])).to_csv(os.path.join(og_path, f'{match}_nodes.txt'),
-                                                             header=None, index=None)
+                pd.DataFrame(get_nodes(mat[cols[-1]])).to_csv(os.path.join(og_path, f'{match}_nodes.txt'),
+                                                                header=None, index=None)
 
     # with open()
 
@@ -77,7 +73,7 @@ def get_nodes(arr: list) -> list:
     all_nodes = []
 
     for node in arr:
-        split = [x for x in node[0][0].split(' ') if x.startswith('ctx')]
+        split = [x for x in node[0].split(' ') if x.startswith('ctx')]
         if len(split) > 0:
             all_nodes.append(split[0].replace('ctx', '').replace('-', '_').strip('-_/?.!,'))
 
