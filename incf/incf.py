@@ -30,7 +30,7 @@ def get_files(path='../output', ftype='.json'):
 
 def get_selector(name):
     return pn.widgets.Select(name=f'Specify {name}', groups={
-        'Network (net)': ['weights', 'distances', 'delays', 'speed'],
+        'Network (net)': ['weights', 'distances', 'delays', 'speed', 'weights & nodes'],
         'Coordinates (coord)': ['times', 'centres', 'orientations', 'areas', 'hemisphere'],
         'Timeseries (ts)': ['ts'],
         'Spatial (spatial)': ['fc'],

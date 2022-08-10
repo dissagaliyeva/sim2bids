@@ -186,7 +186,6 @@ def prepare_subs(file_paths, sid):
 
         if subs[name]['name'] in ['centres', 'centers', 'centres_preop', 'centres_postop']:
             conv.CENTERS = True
-    print(subs)
     return subs
 
 
