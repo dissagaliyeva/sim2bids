@@ -4,6 +4,8 @@ from pathlib import Path
 import pandas as pd
 from incf.convert import convert
 
+DEFAULT_TMPL = '{}_desc-{}_{}.{}'
+
 
 def save(subs: dict, output: str, folders: list, center: bool = False, ses=None):
     if center:
@@ -41,14 +43,11 @@ def save_areas(subs, output, ses=None):
         # create the "map" folder if it doesn't exist
         os.mkdir(path)
 
-        print(read_csv(sub_path, sep))
-
         # save content
-        save_txt(path, read_csv(sub_path, sep), name)
+        save_txt(path, read_csv(sub_path, sep), DEFAULT_TMPL.format(subs['sid'], subs['desc'], subs['name'], 'tsv'))
 
 
 def save_files(folders, subs, coords=None):
-    DEFAULT_TMPL = '{}_desc-{}_{}.{}'
     name = DEFAULT_TMPL.format(subs['sid'], subs['desc'], subs['name'], 'tsv')
     file = read_csv(subs['path'], subs['sep'])
 
