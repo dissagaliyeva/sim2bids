@@ -31,7 +31,9 @@ class FolderStructure:
         sid = v['sid'] if sid is None else sid
 
         if sid not in self.components['subjects'] and ses is None:
-            self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': [], 'coord': []}
+            self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []}
+        elif sid not in self.components['subjects'] and ses is not None:
+            self.components['subjects'][sid][ses] = {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []}
 
         # save weights, distances, and centres
         if ses is None:
@@ -47,9 +49,12 @@ class FolderStructure:
             for k2, v2 in v.items():
                 if k2 in ['weights.txt', 'distances.txt']:
                     self.save_wd(v2, sid, ses=ses)
-                elif k2 in ['centers.txt']:
+                elif k2 == 'centers.txt':
                     self.save_centres(v2, sid, ses=ses)
-                elif k2 in convert.TO_EXTRACT[3:]:
+                elif k2 == 'areas.txt':
+                    print('areas triggered @structure.py line 55')
+                    self.save_areas(v2, sid, ses=ses)
+                elif k2 in convert.TO_EXTRACT[4:]:
                     self.save_sub_coord(v2, sid, ses=ses)
                 elif k2.endswith('.mat'):
                     if 'fc' in k2.lower():
@@ -64,6 +69,12 @@ class FolderStructure:
             self.components['subjects'][sid]['net'] += common_structure(v)
         else:
             self.components['subjects'][sid][ses]['net'] += common_structure(v)
+
+    def save_areas(self, v, sid, ses=None):
+        if ses is None:
+            self.components['subjects'][sid]['map'] += common_structure(v)
+        else:
+            self.components['subjects'][sid][ses]['map'] += common_structure(v)
 
     def save_centres(self, v, sid, ses=None):
         if ses is None:
@@ -105,7 +116,7 @@ class FolderStructure:
         if ses is None:
             sid = v['sid']
             if sid not in self.components['subjects']:
-                self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': []}
+                self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': [], 'map': []}
 
             if sim.check_params(file):
                 self.components['subjects'][sid]['net'] += common_structure(v, 'weights')
@@ -126,8 +137,8 @@ class FolderStructure:
                 for k2, v2 in v.items():
                     if k not in self.components['subjects'].keys() and k2 in ['ses-preop', 'ses-postop']:
                         self.components['subjects'][k] = OrderedDict(
-                            {'ses-preop': {'net': [], 'ts': [], 'spatial': [], 'coord': []},
-                             'ses-postop': {'net': [], 'ts': [], 'spatial': [], 'coord': []}})
+                            {'ses-preop': {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []},
+                             'ses-postop': {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []}})
 
                     if k2 == 'ses-preop':
                         ses_exists = True
@@ -171,10 +182,11 @@ class FolderStructure:
                     self.layout += [fold.format(k), self.join(v)]
                 elif isinstance(v, dict):
                     for k2, v2 in v.items():
-                        self.layout += [fold.format(f'{k2}'), subfold.format('net'),
-                                        self.join(v2['net'], 'subfile'), subfold.format('ts'),
-                                        self.join(v2['ts'], 'subfile'), subfold.format('spatial'),
-                                        self.join(v2['spatial'], 'subfile')]
+                        self.layout += [fold.format(f'{k2}'),
+                                        subfold.format('net'), self.join(v2['net'], 'subfile'),
+                                        subfold.format('ts'), self.join(v2['ts'], 'subfile'),
+                                        subfold.format('spatial'), self.join(v2['spatial'], 'subfile'),
+                                        subfold.format('map'), self.join(v2['map'], 'subfile')]
 
         self.layout += [main_files.format(x) for x in self.components['files']]
         self.layout = ''.join(self.layout)
@@ -201,7 +213,8 @@ class FolderStructure:
                                         '&emsp;&emsp;' + subfold.format('net'), self.join(v2[k3]['net'], 'sub'),
                                         '&emsp;&emsp;' + subfold.format('ts'), self.join(v2[k3]['ts'], 'sub'),
                                         '&emsp;&emsp;' + subfold.format('spatial'), self.join(v2[k3]['spatial'], 'sub'),
-                                        '&emsp;&emsp;' + subfold.format('coord'), self.join(v2[k3]['coord'], 'sub')]
+                                        '&emsp;&emsp;' + subfold.format('coord'), self.join(v2[k3]['coord'], 'sub'),
+                                        '&emsp;&emsp;' + subfold.format('map'), self.join(v2[k3]['map'], 'sub')]
 
         self.layout += [main_files.format(x) for x in self.components['files']]
         self.layout = ''.join(self.layout)

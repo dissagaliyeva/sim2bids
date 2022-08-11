@@ -27,8 +27,10 @@ DURATION = 3000
 CENTERS = False
 MULTI_INPUT = False
 TRAVERSE_FOLDERS = True
-TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt', 'average_orientations.txt',
-              'areas.txt', 'cortical.txt', 'hemisphere.txt']
+TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                               # folder "net"
+              'areas.txt',                                                                 # folder "map"
+              'average_orientations.txt', 'cortical.txt', 'hemisphere.txt', 'normals.txt'  # folder "coord"
+              ]
 ACCEPTED_EXT = ['txt', 'csv', 'mat', 'h5']
 ALL_FILES = None
 
@@ -95,26 +97,11 @@ def check_file(path, files, subs=None, save=False):
     if subs is None:
         subs = subj.Files(path, files).subs
 
-    print(subs)
-
     if save:
         save_output(subs, OUTPUT)
 
-        # remove zip folder contents
-        # if isinstance(ZIP_CONTENT, list):
-        #     print('zipfiles:', ZIP_CONTENT)
-        #     print('contents:', get_content(path, files))
-        #
-        #     for content in get_content(path, files):
-        #         print('content:', content)
-        #         file = content.split('\\')[-1].split('.')[0]
-        #         file = file.replace('_preop', '') if 'preop' in file else file.replace('_postop', '') if 'postop' in file else file
-        #         print('file:', file)
-        #
-        #         if file in ZIP_CONTENT:
-        #             os.remove(content)
-        #
-        #         ZIP_CONTENT = None
+        # remove all empty folders
+        remove_empty_folders(path)
 
     return subs, struct.create_layout(subs, OUTPUT)
 
@@ -134,7 +121,9 @@ def save_output(subs, output):
                 wdc.save(sub[k], output, folders, ses=ses)
             elif k in ['centres.txt']:
                 wdc.save(sub[k], output, folders, center=True, ses=ses)
-            elif k in TO_EXTRACT[3:]:
+            elif k in ['areas.txt']:
+                wdc.save_areas(sub[k], output, ses=ses)
+            elif k in TO_EXTRACT[4:]:
                 coords.save_coords(sub[k], folders)
             elif k.endswith('.mat'):
                 mat.save(sub[k], folders, ses=None)
@@ -219,3 +208,7 @@ def to_json(path, shape, desc, key, coords=None, **kwargs):
 
     with open(path, 'w') as file:
         json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coords, **kwargs), file)
+
+
+def remove_empty_folders(path):
+    pass
