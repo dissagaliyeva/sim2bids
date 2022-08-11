@@ -154,6 +154,23 @@ def prepare_subs(file_paths, sid):
         name = get_filename(file_path)
         desc = convert.DESC
 
+        # rename tract_lengths to distances
+        if name == 'tract_lengths.txt':
+            name = 'distances.txt'
+
+        # rename tract_lengths to distances in the physical folder location
+        if 'tract_lengths' in file_path and not os.path.exists(file_path.replace('tract_lengths', 'distances')):
+            new_path = file_path.replace('tract_lengths', 'distances')
+            os.replace(file_path, new_path)
+            file_path = new_path
+
+        # rename average_orientations to normals in both subject- and physical levels
+        if name == 'average_orientations.txt':
+            name = 'normals.txt'
+            new_path = file_path.replace('average_orientations', 'normals')
+            os.replace(file_path, new_path)
+            file_path = new_path
+
         subs[name] = {
             'name': name.split('.')[0],
             'fname': name,
@@ -164,14 +181,10 @@ def prepare_subs(file_paths, sid):
             'ext': get_file_ext(file_path),
         }
 
-        if subs[name]['name'] in ['tract_lengths', 'tract_lengths_preop', 'tract_lengths_postop']:
-            subs[name]['name'] = 'distances'
-
-        if 'tract_lengths' in file_path and not os.path.exists(file_path.replace('tract_lengths', 'distances')):
-            os.replace(file_path, file_path.replace('tract_lengths', 'distances'))
-
-        if subs[name]['name'] in ['centres', 'centers', 'centres_preop', 'centres_postop']:
+        if subs[name]['name'] in ['centres', 'centers']:
             conv.CENTERS = True
+
+    print(subs)
     return subs
 
 
