@@ -41,8 +41,6 @@ def save_areas(subs, output, ses=None):
         # create the "map" folder if it doesn't exist
         os.mkdir(path)
 
-        print(read_csv(sub_path, sep))
-
         # save content
         save_txt(path, read_csv(sub_path, sep), name)
 

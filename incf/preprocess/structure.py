@@ -52,7 +52,6 @@ class FolderStructure:
                 elif k2 == 'centers.txt':
                     self.save_centres(v2, sid, ses=ses)
                 elif k2 == 'areas.txt':
-                    print('areas triggered @structure.py line 55')
                     self.save_areas(v2, sid, ses=ses)
                 elif k2 in convert.TO_EXTRACT[4:]:
                     self.save_sub_coord(v2, sid, ses=ses)
@@ -96,7 +95,7 @@ class FolderStructure:
             else:
                 self.components['subjects'][sid]['ts'] += common_structure(v)
                 self.components['subjects'][sid]['coord'] += [coord_format.format(desc, 'times', 'tsv'),
-                                                         coord_format.format(desc, 'times', 'json')]
+                                                              coord_format.format(desc, 'times', 'json')]
         else:
             if fc:
                 self.components['subjects'][sid][ses]['spatial'] += [
@@ -104,9 +103,9 @@ class FolderStructure:
                     coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'json')]
             else:
                 self.components['subjects'][sid][ses]['ts'] += common_structure(v)
-                self.components['subjects'][sid][ses]['coord'] += [
-                    coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'tsv'),
-                    coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'json')]
+                # self.components['subjects'][sid][ses]['coord'] += [
+                #     coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'tsv'),
+                #     coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'json')]
 
     def save_h5(self, v, ses=None):
         file = h.File(v['path'])
