@@ -141,7 +141,7 @@ def save_output(subs, output):
             elif k.endswith('.h5'):
                 h5.save(sub[k], output, folders, ses=None)
 
-    # overwrite existing content
+    # remove existing content & prepare for new data
     if conflict:
         pn.state.notifications.info('Output folder contains files. Removing them...', duration=DURATION)
         utils.rm_tree(output)
@@ -163,8 +163,8 @@ def save_output(subs, output):
             save(val)
 
 
-def create_sub_struct(path, subs, ses=False, ses_name=None):
-    if ses or ses_name in ['ses-preop', 'ses-postop']:
+def create_sub_struct(path, subs, ses_name=None):
+    if ses_name in ['ses-preop', 'ses-postop']:
         sub = os.path.join(path, subs['sid'])
         ses = os.path.join(sub, ses_name)
         net_ses = os.path.join(ses, 'net')

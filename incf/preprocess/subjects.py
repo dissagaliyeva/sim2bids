@@ -152,7 +152,7 @@ def prepare_subs(file_paths, sid):
 
     for file_path in file_paths:
         name = get_filename(file_path)
-        desc = convert.DESC + 'h5' if file_path.endswith('h5') else convert.DESC
+        desc = convert.DESC
 
         subs[name] = {
             'name': name.split('.')[0],
