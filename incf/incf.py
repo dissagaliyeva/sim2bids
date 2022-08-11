@@ -105,7 +105,6 @@ class MainArea(param.Parameterized):
             for _ in self.rename_files:
                     self.rename_files.pop(-1)
 
-
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
             # convert.check_input(path=self.text_input.value, files=self.cross_select.value)
