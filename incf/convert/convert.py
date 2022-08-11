@@ -128,7 +128,7 @@ def save_output(subs, output):
 
     def save(sub, ses=None):
         for k, v in sub.items():
-            folders = create_sub_struct(output, v, ses=True, ses_name=ses)
+            folders = create_sub_struct(output, v, ses_name=ses)
 
             if k in ['weights.txt', 'distances.txt']:
                 wdc.save(sub[k], output, folders, ses=ses)
@@ -164,13 +164,7 @@ def save_output(subs, output):
 
 
 def create_sub_struct(path, subs, ses=False, ses_name=None):
-    if not ses:
-        sub = os.path.join(path, subs['sid'])
-        net = os.path.join(sub, 'net')
-        spatial = os.path.join(sub, 'spatial')
-        ts = os.path.join(sub, 'ts')
-        folders = [sub, net, spatial, ts]
-    else:
+    if ses or ses_name in ['ses-preop', 'ses-postop']:
         sub = os.path.join(path, subs['sid'])
         ses = os.path.join(sub, ses_name)
         net_ses = os.path.join(ses, 'net')
@@ -178,6 +172,12 @@ def create_sub_struct(path, subs, ses=False, ses_name=None):
         coord_ses = os.path.join(ses, 'coord')
         ts_ses = os.path.join(ses, 'ts')
         folders = [sub, ses, net_ses, spatial_ses, coord_ses, ts_ses]
+    else:
+        sub = os.path.join(path, subs['sid'])
+        net = os.path.join(sub, 'net')
+        spatial = os.path.join(sub, 'spatial')
+        ts = os.path.join(sub, 'ts')
+        folders = [sub, net, spatial, ts]
 
     for folder in folders:
         if not os.path.exists(folder):
