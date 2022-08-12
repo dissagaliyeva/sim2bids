@@ -35,16 +35,13 @@ class FolderStructure:
             self.iterate_dict(k2, v2, sid, ses=ses)
 
     def iterate_dict(self, k, v, sid, ses=None):
-        print(k, v)
         if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
             self.save_wd(v, sid, ses=ses)
         elif k == 'centres.txt':
             self.save_centres(v, sid, ses=ses)
         elif k == 'areas.txt':
-            print('im triggered: areas.txt')
             self.save_areas(v, sid, ses=ses)
         elif k == convert.TO_EXTRACT[4:]:
-            print(f'im triggered: {v["name"]}')
             self.save_sub_coord(v, sid, ses=ses)
         elif k.endswith('.mat'):
             if 'fc' in k.lower():
