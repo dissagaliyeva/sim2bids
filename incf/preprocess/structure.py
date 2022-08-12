@@ -30,38 +30,29 @@ class FolderStructure:
     def iterate(self, k, v, ses=None, sid=None):
         sid = v['sid'] if sid is None else sid
 
-        if sid not in self.components['subjects'] and ses is None:
-            self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []}
-        elif sid not in self.components['subjects'] and ses is not None:
-            self.components['subjects'][sid][ses] = {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []}
-
         # save weights, distances, and centres
-        if ses is None:
-            if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
-                self.save_wd(v, sid)
-            elif k == 'centres.txt':
-                self.save_centres(v, sid)
-            elif k.endswith('.mat'):
-                self.save_mat(v, sid)
-            elif k.endswith('.h5'):
-                self.save_h5(v)
-        else:
-            for k2, v2 in v.items():
-                if k2 in ['weights.txt', 'distances.txt']:
-                    self.save_wd(v2, sid, ses=ses)
-                elif k2 == 'centers.txt':
-                    self.save_centres(v2, sid, ses=ses)
-                elif k2 == 'areas.txt':
-                    self.save_areas(v2, sid, ses=ses)
-                elif k2 in convert.TO_EXTRACT[4:]:
-                    self.save_sub_coord(v2, sid, ses=ses)
-                elif k2.endswith('.mat'):
-                    if 'fc' in k2.lower():
-                        self.save_mat(v2, sid, ses=ses, fc=True)
-                    else:
-                        self.save_mat(v2, sid, ses=ses)
-                elif k2.endswith('.h5'):
-                    self.save_h5(v2, ses=ses)
+        for k2, v2 in v.items():
+            self.iterate_dict(k2, v2, sid, ses=ses)
+
+    def iterate_dict(self, k, v, sid, ses=None):
+        print(k, v)
+        if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
+            self.save_wd(v, sid, ses=ses)
+        elif k == 'centres.txt':
+            self.save_centres(v, sid, ses=ses)
+        elif k == 'areas.txt':
+            print('im triggered: areas.txt')
+            self.save_areas(v, sid, ses=ses)
+        elif k == convert.TO_EXTRACT[4:]:
+            print(f'im triggered: {v["name"]}')
+            self.save_sub_coord(v, sid, ses=ses)
+        elif k.endswith('.mat'):
+            if 'fc' in k.lower():
+                self.save_mat(v, sid, ses=ses, fc=True)
+            else:
+                self.save_mat(v, sid, ses=ses)
+        elif k.endswith('.h5'):
+            self.save_h5(v, ses=ses)
 
     def save_wd(self, v, sid, ses=None):
         if ses is None:
@@ -77,12 +68,19 @@ class FolderStructure:
 
     def save_centres(self, v, sid, ses=None):
         if ses is None:
-            self.components['coord'] += coord_structure(v)
+            if convert.MULTI_INPUT:
+                self.components['subjects'][sid]['coord'] += coord_structure(v)
+            else:
+                self.components['coord'] += coord_structure(v)
         else:
-            del self.components['coord']
             self.components['subjects'][sid][ses]['coord'] += coord_structure(v)
 
-    def save_sub_coord(self, v, sid, ses):
+    def save_sub_coord(self, v, sid, ses=None):
+        if ses is None:
+            if convert.MULTI_INPUT:
+                self.components['subjects'][sid]['coord'] += coord_structure(v)
+            else:
+                self.components['coord'] += coord_structure(v)
         self.components['subjects'][sid][ses]['coord'] += common_structure(v, v['name'].lower())
 
     def save_mat(self, v, sid, ses=None, fc=False):
@@ -129,9 +127,12 @@ class FolderStructure:
     def populate(self):
         ses_exists = False
         for k, v in self.subs.items():
-            if 'sid' in v:
-                # traverse single-instance files
-                self.iterate(k, v)
+            if 'sid' in v or not convert.MULTI_INPUT:
+                if k not in self.components['subjects'].keys():
+                    self.components['subjects'][k] = OrderedDict({'net': [], 'ts': [], 'spatial': [],
+                                                                  'coord': [], 'map': []})
+                    # traverse single-instance files
+                    self.iterate(k, v, sid=k)
             else:
                 for k2, v2 in v.items():
                     if k not in self.components['subjects'].keys() and k2 in ['ses-preop', 'ses-postop']:

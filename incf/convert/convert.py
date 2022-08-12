@@ -97,6 +97,8 @@ def check_file(path, files, subs=None, save=False):
     if subs is None:
         subs = subj.Files(path, files).subs
 
+    print(subs)
+
     if save:
         save_output(subs, OUTPUT)
 
