@@ -93,6 +93,7 @@ class Files:
             match = find_matches(self.basename)
             # traverse multi-subject in one folder
             if len(match) > 0:
+                convert.MULTI_INPUT = True
                 # get unique IDs for matches
                 TO_RENAME = get_extensions(self.basename, match)
                 for k, v in get_unique_subs(match, self.content).items():
@@ -149,6 +150,7 @@ def prepare_subs(file_paths, sid):
 
     for file_path in file_paths:
         name = get_filename(file_path)
+        name = name.split('_')[-1] if '_' in name else name
         desc = convert.DESC
 
         # rename tract_lengths to distances
