@@ -29,19 +29,23 @@ class FolderStructure:
 
     def iterate(self, k, v, ses=None, sid=None):
         sid = v['sid'] if sid is None else sid
-
+        print(k, v)
         # save weights, distances, and centres
         for k2, v2 in v.items():
             self.iterate_dict(k2, v2, sid, ses=ses)
 
     def iterate_dict(self, k, v, sid, ses=None):
-        if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
+        k = k.split('_')[-1] if '_' in k else k
+
+        if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt',
+                 'weights.csv', 'distances.csv', 'tract_lengths.csv']:
             self.save_wd(v, sid, ses=ses)
         elif k == 'centres.txt':
             self.save_centres(v, sid, ses=ses)
-        elif k == 'areas.txt':
-            self.save_areas(v, sid, ses=ses)
-        elif k == convert.TO_EXTRACT[4:]:
+        # add traversal for nodes and labels separately
+        elif k in ['nodes.txt', 'nodes.csv', 'labels.txt', 'labels.csv']:
+
+        elif k == convert.TO_EXTRACT[3:]:
             self.save_sub_coord(v, sid, ses=ses)
         elif k.endswith('.mat'):
             if 'fc' in k.lower():
@@ -56,12 +60,6 @@ class FolderStructure:
             self.components['subjects'][sid]['net'] += common_structure(v)
         else:
             self.components['subjects'][sid][ses]['net'] += common_structure(v)
-
-    def save_areas(self, v, sid, ses=None):
-        if ses is None:
-            self.components['subjects'][sid]['map'] += common_structure(v)
-        else:
-            self.components['subjects'][sid][ses]['map'] += common_structure(v)
 
     def save_centres(self, v, sid, ses=None):
         if ses is None:
@@ -78,7 +76,8 @@ class FolderStructure:
                 self.components['subjects'][sid]['coord'] += coord_structure(v)
             else:
                 self.components['coord'] += coord_structure(v)
-        self.components['subjects'][sid][ses]['coord'] += common_structure(v, v['name'].lower())
+        else:
+            self.components['subjects'][sid][ses]['coord'] += common_structure(v, v['name'].lower())
 
     def save_mat(self, v, sid, ses=None, fc=False):
         name, desc = v["name"].lower(), v["desc"]
@@ -98,9 +97,6 @@ class FolderStructure:
                     coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'json')]
             else:
                 self.components['subjects'][sid][ses]['ts'] += common_structure(v)
-                # self.components['subjects'][sid][ses]['coord'] += [
-                #     coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'tsv'),
-                #     coord_format.replace('desc-', '').format(f'{sid}_desc-{desc}', name, 'json')]
 
     def save_h5(self, v, ses=None):
         file = h.File(v['path'])
@@ -123,19 +119,20 @@ class FolderStructure:
 
     def populate(self):
         ses_exists = False
+
         for k, v in self.subs.items():
             if 'sid' in v or not convert.MULTI_INPUT:
                 if k not in self.components['subjects'].keys():
-                    self.components['subjects'][k] = OrderedDict({'net': [], 'ts': [], 'spatial': [],
-                                                                  'coord': [], 'map': []})
+                    self.components['subjects'][k] = {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []}
                     # traverse single-instance files
                     self.iterate(k, v, sid=k)
             else:
                 for k2, v2 in v.items():
                     if k not in self.components['subjects'].keys() and k2 in ['ses-preop', 'ses-postop']:
-                        self.components['subjects'][k] = OrderedDict(
-                            {'ses-preop': {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []},
-                             'ses-postop': {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []}})
+                        self.components['subjects'][k] = {
+                            'ses-preop': {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []},
+                            'ses-postop': {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []}
+                        }
 
                     if k2 == 'ses-preop':
                         ses_exists = True
@@ -146,7 +143,6 @@ class FolderStructure:
                     if k2 not in ['ses-preop', 'ses-postop']:
                         self.iterate(k2, v2)
                         self.components['coord'] = list(set(self.components['coord']))
-
         if ses_exists:
             self.create_ses_layout()
         else:
