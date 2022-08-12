@@ -79,41 +79,38 @@ class Files:
 
                     self.subs[sid]['ses-postop'].update(prepare_subs(conv.get_content(path, 'ses-postop'), sid))
 
-                # Step 8: if there are no `ses-preop` and `ses-postop`, traverse the folders as usual
                 if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
-                    # Step 1: check if the structure contains multi-subject
-                    match = find_matches(self.basename)
-
-                    # traverse multi-subject in one folder
-                    if len(match) > 0:
-                        # get unique IDs for matches
-                        TO_RENAME = get_extensions(self.basename, match)
-
-                        for k, v in get_unique_subs(match, self.content).items():
-                            sid = prep.create_uuid()
-
-                            if sid not in self.subs.keys():
-                                self.subs[sid] = {}
-
-                            if len(self.selected_files) == 1:
-                                self.subs[sid].update(
-                                    prepare_subs([os.path.join(self.path, self.selected_files[0], x) for x in v], sid))
-                            else:
-                                self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
-
-                    # traverse mutli-subject multi-folder without sessions
-                    else:
-                        self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
+                    pass
+                    # # traverse mutli-subject multi-folder without sessions
+                    # else:
+                    #     self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
 
         # traverse over single-subject and multi-subject in one folder structure
         else:
             sid = prep.create_uuid()
 
-            if len(self.selected_files) == 1 and os.path.isdir(os.path.join(self.path, self.selected_files[0])):
-                self.subs[sid] = prepare_subs(conv.get_content(self.path, self.selected_files), sid)
+            # Step 1: check if the structure contains multi-subject
+            match = find_matches(self.basename)
+            # traverse multi-subject in one folder
+            if len(match) > 0:
+                # get unique IDs for matches
+                TO_RENAME = get_extensions(self.basename, match)
+                for k, v in get_unique_subs(match, self.content).items():
+                    sid = prep.create_uuid()
+                    if sid not in self.subs.keys():
+                        self.subs[sid] = {}
+                    if len(self.selected_files) == 1:
+                        self.subs[sid].update(
+                            prepare_subs([os.path.join(self.path, self.selected_files[0], x) for x in v], sid))
+                    else:
+                        self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
+
             else:
-                paths = [os.path.join(self.path, file) for file in self.selected_files]
-                self.subs[sid] = prepare_subs(paths, sid)
+                if len(self.selected_files) == 1 and os.path.isdir(os.path.join(self.path, self.selected_files[0])):
+                    self.subs[sid] = prepare_subs(conv.get_content(self.path, self.selected_files), sid)
+                else:
+                    paths = [os.path.join(self.path, file) for file in self.selected_files]
+                    self.subs[sid] = prepare_subs(paths, sid)
 
 
 def find_matches(paths):

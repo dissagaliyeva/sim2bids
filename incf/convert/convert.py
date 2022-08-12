@@ -27,9 +27,8 @@ DURATION = 3000
 CENTERS = False
 MULTI_INPUT = False
 TRAVERSE_FOLDERS = True
-TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                               # folder "net"
-              'areas.txt',                                                                 # folder "map"
-              'average_orientations.txt', 'cortical.txt', 'hemisphere.txt', 'normals.txt'  # folder "coord"
+TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                                            # folder "net"
+              'areas.txt', 'average_orientations.txt', 'cortical.txt', 'hemisphere.txt', 'normals.txt'  # folder "coord"
               ]
 ACCEPTED_EXT = ['txt', 'csv', 'mat', 'h5']
 ALL_FILES = None
@@ -97,8 +96,6 @@ def check_file(path, files, subs=None, save=False):
     if subs is None:
         subs = subj.Files(path, files).subs
 
-    print(subs)
-
     if save:
         save_output(subs, OUTPUT)
 
@@ -123,9 +120,9 @@ def save_output(subs, output):
                 wdc.save(sub[k], output, folders, ses=ses)
             elif k in ['centres.txt']:
                 wdc.save(sub[k], output, folders, center=True, ses=ses)
-            elif k in ['areas.txt']:
-                wdc.save_areas(sub[k], output, ses=ses)
-            elif k in TO_EXTRACT[4:]:
+            # elif k in ['areas.txt']:
+            #     wdc.save_areas(sub[k], output, ses=ses)
+            elif k in TO_EXTRACT[3:]:
                 coords.save_coords(sub[k], folders)
             elif k.endswith('.mat'):
                 mat.save(sub[k], folders, ses=None)
