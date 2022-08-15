@@ -1,6 +1,10 @@
 import os
 import shutil
 
+import panel as pn
+import incf.templates.templates as temp
+import incf.incf as app
+
 
 def rm_tree(path: str = '../output'):
     assert os.path.exists(path), f'Path `{path}` does not exist'
@@ -13,4 +17,59 @@ def rm_tree(path: str = '../output'):
     print('Removed all test files...')
 
 
-# def
+def get_selector(name):
+    return pn.widgets.Select(name=f'Specify {name}', groups={
+        'Network (net)': ['weights', 'distances', 'delays', 'speed', 'weights & nodes'],
+        'Coordinates (coord)': ['times', 'centres', 'orientations', 'areas', 'hemisphere'],
+        'Timeseries (ts)': ['ts'],
+        'Spatial (spatial)': ['fc'],
+        'Code (code)': ['code'],
+        'Skip file type': ['skip']
+    })
+
+
+def append_widgets(files):
+    widgets = ['### Preprocessing step: rename files']
+
+    for file in files:
+        widgets.append(get_selector(file))
+
+    return widgets
+
+
+def get_settings(json_editor, selected):
+    global REQUIRED
+
+    REQUIRED = []
+
+    widget = pn.WidgetBox()
+
+    for k, v in json_editor.items():
+        specs = temp.struct
+        reqs = temp.required
+        root = os.path.basename(os.path.dirname(selected))
+        req = k in specs[root]['required']
+
+        if k in reqs or req:
+            REQUIRED.append(k)
+            name = f'Specify {k} (REQUIRED):'
+        else:
+            name = f'Specify {k} (RECOMMENDED):'
+
+        if k == 'Units':
+            widget.append(pn.widgets.Select(name=name, options=app.UNITS, value=''))
+        elif k not in ['NumberOfColumns', 'NumberOfRows', 'Units']:
+            if len(v) > 0 and k in ['CoordsColumns', 'CoordsRows']:
+                continue
+            widget.append(pn.widgets.TextInput(name=name))
+
+    # append button
+    return widget
+
+
+def verify_complete(widgets):
+    for widget in widgets:
+        name = widget.name.split(' ')[-2]
+        if name in REQUIRED and widget.value == '':
+            return False
+    return True

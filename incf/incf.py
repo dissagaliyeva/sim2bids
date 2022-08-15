@@ -7,45 +7,17 @@ import panel as pn
 import param
 
 import incf.preprocess.preprocess as prep
-import incf.templates.templates as temp
 import incf.preprocess.subjects as subj
 import incf.validate.validate as validate
 from incf.convert import convert
+from incf import utils
 
 
 JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
 UNITS = ['s', 'm', 'ms', 'degrees', 'radians']
 
-
-def get_files(path='../output', ftype='.json'):
-    f = []
-
-    for root, dirs, files in os.walk(path, topdown=False):
-        for name in files:
-            if ftype in name:
-                f.append(os.path.join(root, name))
-    return f
-
-
-def get_selector(name):
-    return pn.widgets.Select(name=f'Specify {name}', groups={
-        'Network (net)': ['weights', 'distances', 'delays', 'speed', 'weights & nodes'],
-        'Coordinates (coord)': ['times', 'centres', 'orientations', 'areas', 'hemisphere'],
-        'Timeseries (ts)': ['ts'],
-        'Spatial (spatial)': ['fc'],
-        'Code (code)': ['code'],
-        'Skip file type': ['skip']
-    })
-
-
-def append_widgets(files):
-    widgets = ['### Preprocessing step: rename files']
-
-    for file in files:
-        widgets.append(get_selector(file))
-
-    return widgets
+REQUIRED = None
 
 
 class MainArea(param.Parameterized):
@@ -103,7 +75,7 @@ class MainArea(param.Parameterized):
             subj.TO_RENAME = None
             convert.ALL_FILES = None
             for _ in self.rename_files:
-                    self.rename_files.pop(-1)
+                self.rename_files.pop(-1)
 
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
@@ -113,7 +85,7 @@ class MainArea(param.Parameterized):
                                                                      save=False)
             if subj.TO_RENAME is not None:
                 if len(subj.TO_RENAME) > len(self.rename_files):
-                    self.rename_files += [*append_widgets(subj.TO_RENAME)]
+                    self.rename_files += [*utils.append_widgets(subj.TO_RENAME)]
                     self.rename_files.append(pn.Param(self, parameters=['rename_btn'],
                                              show_name=False, widgets={'rename_btn': {'button_type': 'primary'}}))
             else:
@@ -223,7 +195,7 @@ class ViewResults(param.Parameterized):
                     self.je_widget = pn.WidgetBox()
 
                 je = pn.widgets.JSONEditor(value=file, height=350, mode='view')
-                je_widget = get_settings(OrderedDict(je.value), self.select_options.value)
+                je_widget = utils.get_settings(OrderedDict(je.value), self.select_options.value)
                 self.je_widget.append(pn.Row(je, pn.Column(je_widget,
                                                            pn.Param(self, parameters=['je_btn'], show_name=False,
                                                                     widgets={'je_btn': {'button_type': 'primary'}}))))
@@ -239,55 +211,26 @@ class ViewResults(param.Parameterized):
 
     def _update_je(self, event=None):
         txt_inputs = self.je_widget[0][1][0]
-        json_editor = self.je_widget[0][0]
 
         for idx, inputs in enumerate(txt_inputs):
             value = inputs.value
-            name = inputs.name.split(' ')[-1].replace(':', '')
+            name = inputs.name.split(' ')[-2]
             self.je_widget[0][0].value[name] = value
             self.widget.pop(-1)
             self.widget.append(self.je_widget)
 
+        if utils.verify_complete(txt_inputs):
             # save output
             with open(self.select_options.value, 'w') as f:
                 json.dump(OrderedDict(self.je_widget[0][0].value), f)
+        else:
+            pn.state.notifications.error('Please fill in ALL required fields.')
 
     def view(self):
         return pn.Column(self.file_selection, self.widget)
 
 
-def get_settings(json_editor, selected):
-    widget = pn.WidgetBox()
-
-    for k, v in json_editor.items():
-        specs = temp.struct
-        reqs = temp.required
-        root = os.path.basename(os.path.dirname(selected))
-        req = k in specs[root]['required']
-
-        if k in reqs or req:
-            name = f'Specify {k} (REQUIRED):'
-        else:
-            name = f'Specify {k} (RECOMMENDED):'
-
-        if k == 'Units':
-            widget.append(pn.widgets.Select(name=name, options=UNITS, value=''))
-        elif k not in ['NumberOfColumns', 'NumberOfRows', 'Units']:
-            if len(v) > 0 and k in ['CoordsColumns', 'CoordsRows']:
-                continue
-            widget.append(pn.widgets.TextInput(name=name))
-
-    # append button
-    return widget
-
-
-class DefineFiles(param.Parameterized):
-    pass
-
-
 class UserGuide(param.Parameterized):
-    # TODO: Try out 'Select' option from HoloViz
-
     # content buttons
     intro = pn.widgets.Button(name='Introduction', button_type='light', value=True, width=100)
     sup_files = pn.widgets.Button(name='Supported Files', button_type='light', width=100)
@@ -303,6 +246,16 @@ class UserGuide(param.Parameterized):
             ('How to Use the App', INTRO),
             ('BEP034', INTRO)
         )
+
+
+def get_files(path='../output', ftype='.json'):
+    f = []
+
+    for root, dirs, files in os.walk(path, topdown=False):
+        for name in files:
+            if ftype in name:
+                f.append(os.path.join(root, name))
+    return f
 
 
 SELECT_FILES = """
