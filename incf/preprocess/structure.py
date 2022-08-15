@@ -63,11 +63,9 @@ class FolderStructure:
                 self.components['subjects'][sid][ses]['net'] += structure
 
     def save_centres(self, v, sid, ses=None, name=None):
-        structure = coord_structure(v) if name is None else common_structure(v, name)
+        structure = coord_structure(v, ses) if name is None else common_structure(v, name)
         if ses is None:
             if convert.MULTI_INPUT:
-                print(structure)
-
                 if len(set(structure).intersection(set(self.components['subjects'][sid]['coord']))) == 0:
                     self.components['subjects'][sid]['coord'] += structure
             else:
@@ -231,11 +229,18 @@ def common_structure(v, name=None):
             default_format.format(v['sid'], v['desc'], name, 'json')]
 
 
-def coord_structure(v, name=None):
-    return [coord_format.format(v['desc'], 'nodes', 'tsv'),
-            coord_format.format(v['desc'], 'nodes', 'json'),
-            coord_format.format(v['desc'], 'labels', 'tsv'),
-            coord_format.format(v['desc'], 'labels', 'json')]
+def coord_structure(v, ses=None):
+    sid, desc = v['sid'], v['desc']
+
+    if ses is None:
+        return [coord_format.format(desc, 'nodes', 'tsv'),
+                coord_format.format(desc, 'nodes', 'json'),
+                coord_format.format(desc, 'labels', 'tsv'),
+                coord_format.format(desc, 'labels', 'json')]
+    return [default_format.format(sid, desc, 'nodes', 'tsv'),
+            default_format.format(sid, desc, 'nodes', 'json'),
+            default_format.format(sid, desc, 'labels', 'tsv'),
+            default_format.format(sid, desc, 'labels', 'json')]
 
 
 def create_layout(subs=None, output='../output'):
