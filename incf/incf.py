@@ -19,7 +19,7 @@ UNITS = ['s', 'm', 'ms', 'degrees', 'radians']
 
 REQUIRED = None
 
-AUTOFILL = False
+AUTOFILL = True
 
 
 class MainArea(param.Parameterized):
@@ -220,28 +220,46 @@ class ViewResults(param.Parameterized):
     def _update_je(self, event=None):
         txt_inputs = self.je_widget[0][1][0]
         contents = {}
+        to_remove = []
 
         for idx, inputs in enumerate(txt_inputs):
             value = inputs.value
             name = inputs.name.split(' ')[-2]
             self.je_widget[0][0].value[name] = value
+
+            if self.je_widget[0][0].value[name] == '':
+                to_remove.append(name)
+
             contents[name] = value
 
         if utils.verify_complete(txt_inputs):
+            content = {}
+
             self.widget.pop(-1)
             self.widget.append(self.je_widget)
+
+            # remove empty columns
+            for k, v in contents.items():
+                if v == '' or k in to_remove:
+                    del self.je_widget[0][0].value[k]
+                else:
+                    content[k] = v
 
             # autocomplete the files with the same ending
             if AUTOFILL:
                 for path in self.select_options.options:
                     if self.file.split('.')[-2].split('_')[-1] in path:
-                        print(True, path)
+                        file = json.load(open(path))
+                        temp = {}
 
+                        for k, v in file.items():
+                            if k in content.keys():
+                                temp[k] = content[k]
+                        temp['NumberOfColumns'] = file['NumberOfColumns']
+                        temp['NumberOfRows'] = file['NumberOfRows']
 
-                    file = json.load(open(path))
-
-
-                    for k, v in contents.items()
+                        with open(path, 'w') as f:
+                            json.dump(OrderedDict(temp), f)
 
             # save output
             with open(self.select_options.value, 'w') as f:
