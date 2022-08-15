@@ -8,7 +8,7 @@ import param
 
 import incf.preprocess.preprocess as prep
 import incf.preprocess.subjects as subj
-import incf.validate.validate as validate
+from incf.validate import validate
 from incf.convert import convert
 from incf import utils
 from incf.templates import user_guide as guide

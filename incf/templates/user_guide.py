@@ -13,14 +13,14 @@ input folder to verify files exist.
 
 - Select files you want to convert. You have three options:
 
-&emsp; - Go back one level and select the whole folder containing the files <br>
-![Folder]("../../static/user_guide/folder.gif")
+Go back one level and select the whole folder containing the files <br>
+<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/folder.gif" width="75%"/>
 
-&emsp; - Select all files one-by-one <br>
-![Folder]("../../static/user_guide/one-by-one.gif")
+Select all files one-by-one <br>
+<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/one-by-one.gif" width="75%"/>
 
-&emsp; - Select-scroll the files <br>
-![Folder]("../../static/user_guide/select-scroll.gif")
+Select-scroll the files <br>
+<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/select-scroll.gif" width="75%"/>
 
 - Check out the automatically generated folder structure. Don’t worry, no files are generated at this stage.
 The structure just shows the possible output. You might see some empty folders there, they will be removed when
