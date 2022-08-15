@@ -11,6 +11,7 @@ import incf.preprocess.subjects as subj
 import incf.validate.validate as validate
 from incf.convert import convert
 from incf import utils
+from incf.templates import user_guide as guide
 
 
 JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
@@ -281,10 +282,9 @@ class UserGuide(param.Parameterized):
 
     def view(self):
         return pn.Tabs(
-            ('Introduction', INTRO),
+            ('How to Use the App', guide.how_to_use),
             ('Supported Files', INTRO),
             ('Transforming Data', INTRO),
-            ('How to Use the App', INTRO),
             ('BEP034', INTRO)
         )
 
