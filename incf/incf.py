@@ -19,6 +19,8 @@ UNITS = ['s', 'm', 'ms', 'degrees', 'radians']
 
 REQUIRED = None
 
+AUTOFILL = False
+
 
 class MainArea(param.Parameterized):
     # generate files button
@@ -102,8 +104,13 @@ class MainArea(param.Parameterized):
 
     @pn.depends('checkbox_group.value', watch=True)
     def _change_checkbox(self):
+        global AUTOFILL
+
         # set whether to traverse sub-folders
         convert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
+
+        # whether to autofill all files
+        AUTOFILL = True if self.checkbox_options[1] in self.checkbox_group.value else False
 
     @pn.depends('output_path.value', watch=True)
     def _store_output(self):
@@ -188,6 +195,7 @@ class ViewResults(param.Parameterized):
         if self.file_selection.value == 'JSON files':
             try:
                 file = json.load(open(self.select_options.value))
+                self.file = self.select_options.value
             except Exception:
                 pn.state.notifications.error(f'File `{self.select_options.value}` is empty!')
             else:
@@ -211,15 +219,29 @@ class ViewResults(param.Parameterized):
 
     def _update_je(self, event=None):
         txt_inputs = self.je_widget[0][1][0]
+        contents = {}
 
         for idx, inputs in enumerate(txt_inputs):
             value = inputs.value
             name = inputs.name.split(' ')[-2]
             self.je_widget[0][0].value[name] = value
+            contents[name] = value
 
         if utils.verify_complete(txt_inputs):
             self.widget.pop(-1)
             self.widget.append(self.je_widget)
+
+            # autocomplete the files with the same ending
+            if AUTOFILL:
+                for path in self.select_options.options:
+                    if self.file.split('.')[-2].split('_')[-1] in path:
+                        print(True, path)
+
+
+                    file = json.load(open(path))
+
+
+                    for k, v in contents.items()
 
             # save output
             with open(self.select_options.value, 'w') as f:
