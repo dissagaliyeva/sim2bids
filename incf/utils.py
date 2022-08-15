@@ -38,9 +38,7 @@ def append_widgets(files):
 
 
 def get_settings(json_editor, selected):
-    global REQUIRED
-
-    REQUIRED = []
+    app.REQUIRED = []
 
     widget = pn.WidgetBox()
 
@@ -51,17 +49,18 @@ def get_settings(json_editor, selected):
         req = k in specs[root]['required']
 
         if k in reqs or req:
-            REQUIRED.append(k)
+            app.REQUIRED.append(k)
             name = f'Specify {k} (REQUIRED):'
         else:
             name = f'Specify {k} (RECOMMENDED):'
 
-        if k == 'Units':
+        if k == 'Units' and v == '' and name is not None:
             widget.append(pn.widgets.Select(name=name, options=app.UNITS, value=''))
         elif k not in ['NumberOfColumns', 'NumberOfRows', 'Units']:
             if len(v) > 0 and k in ['CoordsColumns', 'CoordsRows']:
                 continue
-            widget.append(pn.widgets.TextInput(name=name))
+            if v == '' and name is not None:
+                widget.append(pn.widgets.TextInput(name=name))
 
     # append button
     return widget
@@ -70,6 +69,6 @@ def get_settings(json_editor, selected):
 def verify_complete(widgets):
     for widget in widgets:
         name = widget.name.split(' ')[-2]
-        if name in REQUIRED and widget.value == '':
+        if name in app.REQUIRED and widget.value == '':
             return False
     return True
