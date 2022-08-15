@@ -165,7 +165,12 @@ def create_sub_struct(path, subs, ses_name=None):
         net = os.path.join(sub, 'net')
         spatial = os.path.join(sub, 'spatial')
         ts = os.path.join(sub, 'ts')
-        folders = [sub, net, spatial, ts]
+
+        if MULTI_INPUT:
+            coord = os.path.join(sub, 'coord')
+            folders = [sub, net, spatial, coord, ts]
+        else:
+            folders = [sub, net, spatial, ts]
 
     for folder in folders:
         if not os.path.exists(folder):
