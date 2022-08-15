@@ -40,8 +40,10 @@ def convert_mat(mat, subs, folders, ses=None):
         spatial_path = folders[2] if ses is None else folders[3]
 
         if 'fc' in name.lower():
+            print('fc found:')
             coord_json = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.json')
             coord_tsv = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.tsv')
+            print(coord_tsv, coord_json, end='\n\n')
         else:
             if ses is None:
                 coord_json = os.path.join(ts_path, f'desc-{desc}_{name}.json')
