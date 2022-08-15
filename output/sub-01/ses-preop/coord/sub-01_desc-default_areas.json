@@ -1,1 +1,1 @@
-{"NumberOfRows": 33, "NumberOfColumns": 1, "CoordsRows": "", "CoordsColumns": "", "Description": "", "Units": "s", "AnatomicalLandmarkCoordinates": "", "AnatomicalLandmarkCoordinateSystem": "", "AnatomicalLandmarkCoordinateUnits": "", "AnatomicalLandmarkCoordinateSystemDescription": ""}
+{"NumberOfRows": 33, "NumberOfColumns": 1, "CoordsRows": "'../output'", "CoordsColumns": "'../output'", "Description": "areas", "Units": "s"}
