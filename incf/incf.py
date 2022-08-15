@@ -216,15 +216,16 @@ class ViewResults(param.Parameterized):
             value = inputs.value
             name = inputs.name.split(' ')[-2]
             self.je_widget[0][0].value[name] = value
+
+        if utils.verify_complete(txt_inputs):
             self.widget.pop(-1)
             self.widget.append(self.je_widget)
 
-        if utils.verify_complete(txt_inputs):
             # save output
             with open(self.select_options.value, 'w') as f:
                 json.dump(OrderedDict(self.je_widget[0][0].value), f)
         else:
-            pn.state.notifications.error('Please fill in ALL required fields.')
+            pn.state.notifications.error('Please fill in ALL required fields.', duration=5000)
 
     def view(self):
         return pn.Column(self.file_selection, self.widget)
