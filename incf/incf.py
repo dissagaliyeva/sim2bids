@@ -62,8 +62,8 @@ class MainArea(param.Parameterized):
     desc = pn.widgets.TextInput(value='default', max_length=30, margin=(-20, 10, 0, 10))
     convert.DESC = desc.value
 
-    checkbox_options = ['Traverse subfolders', 'Option 2', 'Option 3']
-    checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders'],
+    checkbox_options = ['Traverse subfolders', 'Autocomplete columns', 'Option 3']
+    checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders', 'Autocomplete columns'],
                                               options=checkbox_options,
                                               margin=(-20, 10, 0, 10))
     rename_files = pn.WidgetBox()

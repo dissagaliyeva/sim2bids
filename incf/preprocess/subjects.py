@@ -80,10 +80,7 @@ class Files:
                     self.subs[sid]['ses-postop'].update(prepare_subs(conv.get_content(path, 'ses-postop'), sid))
 
                 if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
-                    pass
-                    # # traverse mutli-subject multi-folder without sessions
-                    # else:
-                    #     self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
+                    self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
 
         # traverse over single-subject and multi-subject in one folder structure
         else:
