@@ -1,30 +1,12 @@
 ====
-incf
+Computational data conversion
 ====
 
+.. note::
 
-.. image:: https://img.shields.io/pypi/v/incf.svg
-        :target: https://pypi.python.org/pypi/incf
+   This project is under active development.
 
-.. image:: https://img.shields.io/travis/dissagaliyeva/incf.svg
-        :target: https://travis-ci.com/dissagaliyeva/incf
-
-.. image:: https://readthedocs.org/projects/incf/badge/?version=latest
-        :target: https://incf.readthedocs.io/en/latest/?version=latest
-        :alt: Documentation Status
-
-
-.. image:: https://pyup.io/repos/github/dissagaliyeva/incf/shield.svg
-     :target: https://pyup.io/repos/github/dissagaliyeva/incf/
-     :alt: Updates
-
-.. image:: https://www.codefactor.io/repository/github/dissagaliyeva/incf/badge
-   :target: https://www.codefactor.io/repository/github/dissagaliyeva/incf
-   :alt: CodeFactor
-
-
-Holoviz app to load, transform, store, and download neuroscience data"
-
+App to preprocess, convert, and visualize computational data.
 
 * Free software: MIT license
 * Documentation: https://incf.readthedocs.io.
@@ -33,7 +15,20 @@ Holoviz app to load, transform, store, and download neuroscience data"
 Features
 --------
 
-* TODO
+* Preprocess simulated data
+Standardize and rename files mapping them to the accepted files. [Add link to the accepted files]
+
+* Convert data according to `BEP034 <https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit?usp=sharing/>`_
+
+* Add user-input to JSON files
+Take care of the file contents effortlessly. Simply provide own interpretation of data in one file type and let the app automatically fill in the others!
+
+TO-DO
+-------
+
+* Add visualizations
+* Create BIDS-validator for computational data
+
 
 Credits
 -------
