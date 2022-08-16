@@ -308,7 +308,7 @@ class UserGuide(param.Parameterized):
         self.text.value = self.map[self.user_guide.value]
 
     def view(self):
-        return pn.Column(self.user_guide, self.text, scroll=True, height=1000)
+        return pn.Column(self.user_guide, self.text, scroll=True, height=600)
 
 
 def get_files(path='../output', ftype='.json'):
