@@ -297,8 +297,8 @@ class UserGuide(param.Parameterized):
     def __init__(self, **params):
         super().__init__(**params)
         self.map = {'App 101': ug.how_to_use,
-                    'Preprocess data': ug.preprocess,
-                    'Supported files': ug.supported,
+                    'Preprocess Data': ug.preprocess,
+                    'Format & Files': ug.supported,
                     'Functionality': ug.functionality,
                     'BEP034': ug.bep034}
         self.text = pn.widgets.StaticText(value=self.map['App 101'])
