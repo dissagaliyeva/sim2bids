@@ -1,15 +1,15 @@
 alt = """<br>
 Using the app was created to ease your computational simulation conversion! Before passing your files to the
 conversion tool, make sure to <strong>run the preprocessing pipeline beforehand</strong>. We know that manually
-renaming your files is too time-consuming and, let’s be honest, annoying! Please run the cell under "Preprocess files"
+renaming your files is too time-consuming and, let’s be honest, annoying! Please run the cell under "Preprocess data"
 and follow the instructions there.
 
 From now on we assume the files are preprocessed and ready to be used. There are several steps you need to take:
 
 <h3>Step 1: Insert path</h3>
-Go to the "Select Files" tab, provide a path to your files under "Insert Path", and make sure to **press "Enter"**
-or click on any space **outside** of the input box where you provided your path. If you provided the path and pressed
-“Enter”, but no files are shown below on the left-hand side, make sure to do it once again and/or check your
+Go to the "Select files" tab, provide a path to your files under "Insert Path", and make sure to <strong>press "Enter"</strong>
+or click on any space <strong>outside</strong> of the input box where you provided your path. If you provided the path and pressed
+"Enter", but no files are shown below on the left-hand side, make sure to do it once again and/or check your
 input folder to verify files exist.
 
 <h3>Step 2: Select files</h3>
@@ -61,10 +61,14 @@ There are several settings on the left-hand side that you might consider crucial
         If you specify the REQUIRED or RECOMMENDED fields, say, for "weights", then all the other "weights"
         files will inherit the same information. Columns "NumberOfRows" and "NumberOfColumns" won't be affected.
     </ul>
-
-
 </ul>
 
+<h3>Step 5: Generate the files! </h3>
+If you’re happy with the possible structure and sure about the settings, click "Generate Files" button.
+
+<h3>Step 6 (OPTIONAL): Check out the JSON/TSV conversions in the "View Results" tab </h3>
+
+<h3>Step 7 (OPTIONAL): Check out visualizations! (TO BE IMPLEMENTED...) </h3>
 
 """
 
