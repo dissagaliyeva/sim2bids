@@ -11,8 +11,7 @@ import incf.preprocess.subjects as subj
 from incf.validate import validate
 from incf.convert import convert
 from incf import utils
-from incf.templates import user_guide as guide
-
+from incf.templates import user_guide as ug
 
 JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
@@ -90,7 +89,8 @@ class MainArea(param.Parameterized):
                 if len(subj.TO_RENAME) > len(self.rename_files):
                     self.rename_files += [*utils.append_widgets(subj.TO_RENAME)]
                     self.rename_files.append(pn.Param(self, parameters=['rename_btn'],
-                                             show_name=False, widgets={'rename_btn': {'button_type': 'primary'}}))
+                                                      show_name=False,
+                                                      widgets={'rename_btn': {'button_type': 'primary'}}))
             else:
                 for _ in self.rename_files:
                     self.rename_files.pop(-1)
@@ -147,7 +147,7 @@ class MainArea(param.Parameterized):
             ('Preprocess Data', self.rename_files),
             ('View Results', ViewResults().view()),
             ('User Guide', UserGuide().view()),
-
+            dynamic=True, active=0
         )
 
         sidebar = pn.Column(
@@ -164,7 +164,8 @@ class MainArea(param.Parameterized):
             title='Visualize | Transform | Download',
             sidebar=sidebar,
             site='INCF',
-            main=main
+            main=main,
+            sizing_mode="stretch_both"
         )
 
 
@@ -272,21 +273,42 @@ class ViewResults(param.Parameterized):
         return pn.Column(self.file_selection, self.widget)
 
 
+# class UserGuide(param.Parameterized):
+#     # content buttons
+#     intro = pn.widgets.Button(name='Introduction', button_type='light', value=True, width=100)
+#     sup_files = pn.widgets.Button(name='Supported Files', button_type='light', width=100)
+#     transform = pn.widgets.Button(name='Transforming Data', button_type='light', width=100)
+#     how_to = pn.widgets.Button(name='How to use the app', button_type='light', width=100)
+#     bep034 = pn.widgets.Button(name='BIDS Computational Data Standard', button_type='light', width=100)
+#
+#     def view(self):
+#         return pn.Tabs(
+#             ('How to Use the App', guide.how_to_use),
+#             ('Supported Files', guide.how_to_use),
+#             ('Transforming Data', guide.how_to_use),
+#             ('BEP034', guide.how_to_use)
+#         )
+
 class UserGuide(param.Parameterized):
-    # content buttons
-    intro = pn.widgets.Button(name='Introduction', button_type='light', value=True, width=100)
-    sup_files = pn.widgets.Button(name='Supported Files', button_type='light', width=100)
-    transform = pn.widgets.Button(name='Transforming Data', button_type='light', width=100)
-    how_to = pn.widgets.Button(name='How to use the app', button_type='light', width=100)
-    bep034 = pn.widgets.Button(name='BIDS Computational Data Standard', button_type='light', width=100)
+    user_guide = pn.widgets.ToggleGroup(name='User Guide', value='App 101', behavior='radio',
+                                        options=['App 101', 'Preprocess data', 'Supported files',
+                                                 'Functionality', 'BEP034'])
+
+    def __init__(self, **params):
+        super().__init__(**params)
+        self.map = {'App 101': ug.how_to_use,
+                    'Preprocess data': ug.preprocess,
+                    'Supported files': ug.supported,
+                    'Functionality': ug.functionality,
+                    'BEP034': ug.bep034}
+        self.text = pn.widgets.StaticText(value=self.map['App 101'])
+
+    @pn.depends('user_guide.value', watch=True)
+    def _change_sel(self):
+        self.text.value = self.map[self.user_guide.value]
 
     def view(self):
-        return pn.Tabs(
-            ('How to Use the App', guide.how_to_use),
-            ('Supported Files', INTRO),
-            ('Transforming Data', INTRO),
-            ('BEP034', INTRO)
-        )
+        return pn.Column(self.user_guide, self.text, scroll=True, height=1000)
 
 
 def get_files(path='../output', ftype='.json'):
@@ -322,6 +344,14 @@ Below you will see the generated folder with content as specified at [BIDS Compu
 
 INTRO = """
 #### Introduction <a name="intro"></a>
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Et ultrices neque ornare aenean euismod elementum nisi. Tincidunt ornare massa eget egestas purus viverra. Quis blandit turpis cursus in hac. Dictum varius duis at consectetur lorem donec. Phasellus faucibus scelerisque eleifend donec pretium vulputate sapien nec. Ipsum nunc aliquet bibendum enim facilisis gravida neque. Odio aenean sed adipiscing diam donec. Massa tincidunt nunc pulvinar sapien et. Nibh nisl condimentum id venenatis a condimentum. Congue quisque egestas diam in arcu cursus. Aenean vel elit scelerisque mauris. Sit amet justo donec enim. Habitant morbi tristique senectus et.
+
+
+Praesent elementum facilisis leo vel fringilla est ullamcorper. Urna molestie at elementum eu facilisis sed. Maecenas pharetra convallis posuere morbi leo urna molestie. Ultricies lacus sed turpis tincidunt id aliquet risus feugiat in. Facilisi cras fermentum odio eu feugiat pretium nibh ipsum. Sem integer vitae justo eget magna fermentum iaculis. Sollicitudin tempor id eu nisl nunc mi ipsum faucibus vitae. Mauris augue neque gravida in fermentum. Scelerisque eu ultrices vitae auctor eu augue. Sed cras ornare arcu dui.
+
+
+In mollis nunc sed id semper risus. Velit ut tortor pretium viverra suspendisse. Viverra adipiscing at in tellus integer. Ultricies lacus sed turpis tincidunt. Vitae purus faucibus ornare suspendisse. Arcu cursus vitae congue mauris rhoncus aenean vel elit. Vestibulum lorem sed risus ultricies tristique. A erat nam at lectus urna duis convallis. Etiam erat velit scelerisque in dictum non. Sit amet facilisis magna etiam tempor. Purus gravida quis blandit turpis cursus in hac. Ultricies tristique nulla aliquet enim tortor at auctor.
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Et ultrices neque ornare aenean euismod elementum nisi. Tincidunt ornare massa eget egestas purus viverra. Quis blandit turpis cursus in hac. Dictum varius duis at consectetur lorem donec. Phasellus faucibus scelerisque eleifend donec pretium vulputate sapien nec. Ipsum nunc aliquet bibendum enim facilisis gravida neque. Odio aenean sed adipiscing diam donec. Massa tincidunt nunc pulvinar sapien et. Nibh nisl condimentum id venenatis a condimentum. Congue quisque egestas diam in arcu cursus. Aenean vel elit scelerisque mauris. Sit amet justo donec enim. Habitant morbi tristique senectus et.
 
