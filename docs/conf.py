@@ -19,9 +19,12 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
-
+import sphinx_theme_pd
 import incf
+
+sys.path.insert(0, os.path.abspath('..'))
+html_theme = 'sphinx_theme_pd'
+html_theme_path = [sphinx_theme_pd.get_html_theme_path()]
 
 # -- General configuration ---------------------------------------------
 
