@@ -1,172 +1,79 @@
-how_to_use = """
-Using the app was created to ease your computational simulations’ conversion! Before passing your files to the
-conversion tool, make sure to **run the preprocessing pipeline beforehand**. We know that manually renaming your files
-is too time-consuming and, let’s be honest, annoying! Please run the cell under “Preprocess files” and follow the
-instructions there.
+alt = """<br>
+Using the app was created to ease your computational simulation conversion! Before passing your files to the
+conversion tool, make sure to <strong>run the preprocessing pipeline beforehand</strong>. We know that manually
+renaming your files is too time-consuming and, let’s be honest, annoying! Please run the cell under "Preprocess files"
+and follow the instructions there.
 
 From now on we assume the files are preprocessed and ready to be used. There are several steps you need to take:
 
-<ul>
-<li>Go to the “Select Files” tab, provide a path to your files under “Insert Path”, and make sure to **press “Enter”**
+<h3>Step 1: Insert path</h3>
+Go to the "Select Files" tab, provide a path to your files under "Insert Path", and make sure to **press "Enter"**
 or click on any space **outside** of the input box where you provided your path. If you provided the path and pressed
 “Enter”, but no files are shown below on the left-hand side, make sure to do it once again and/or check your
-input folder to verify files exist.</li>
+input folder to verify files exist.
 
-<li>Select files you want to convert. You have three options:
-<ul>
-<li>Go back one level and select the whole folder containing the files <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/folder.gif" width="75%"/>
+<h3>Step 2: Select files</h3>
+Select files you want to convert. You have three options:
 
-<li>Select all files one-by-one <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/one-by-one.gif" width="75%"/>
+<center><h4>Go back one level and select the whole folder containing the files</h4></center>
+<center><img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/folder.gif" width="70%"/><br></center>
 
-<li>Select-scroll the files <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/select-scroll.gif" width="75%"/>
-</ul>
+<center><h4>Select all files one-by-one</h4></center>
+<center><img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/one-by-one.gif" width="70%"/><br></center>
 
-<li>Check out the automatically generated folder structure. Don’t worry, no files are generated at this stage.
+<center><h4>Select-scroll the files</h4></center>
+<center><img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/select-scroll.gif" width="70%"/><br></center>
+
+<h3>Step 3: Check out preliminary results</h3>
+Check out the automatically generated folder structure. Don't worry, no files are generated at this stage.
 The structure just shows the possible output. You might see some empty folders there, they will be removed when
 the structure gets generated. This conversion follows the BEP034 specification, therefore, we need to keep the
-structure as minimal as possible.</li>
+structure as minimal as possible. For more information, check out "BEP034" above.
+
+<h3>Step 4: Verify settings parameters </h3>
+There are several settings on the left-hand side that you might consider crucial. Here's the explanation of each:
+
+<ul>
+    <li><strong>Provide output path</strong></li>
+    By default, the app stores all conversion output in the local folder (on the same level as "requirements.txt"). In case
+    you want to change the destination, simply provide a new path. If the folder doesn't exist, the app creates it ;)
+
+    <li><strong>Provide a short description (max 30 chars)</strong></li>
+    Here you can give the description to your files that will distinguish each simulation; it will be used in all of
+    the files! For example, if you leave the description as "default", the files are going to look like this:
+    <pre><code>
+    |__ sub-01/
+        |__ coord/
+            |__ sub-01_desc-default_areas.json
+            |__ sub-01_desc-default_areas.tsv
+            .
+            .
+            .
+    </code></pre>
+
+    <li><strong>Select additional settings</strong></li>
+    <ul>
+        <li><strong>Traverse folders</strong></li>
+        By default, all folders get traversed. For example, if you pass in a folder that has sub-folders, the app
+        traverses the sub-folders as well. If you don't want that behavior, simply click on the checkbox.
+        <li><strong>Autocomplete columns</strong></li>
+        After file conversion, you will be able to see the generated JSON and TSV files in the "View Results" tab.
+        If you specify the REQUIRED or RECOMMENDED fields, say, for "weights", then all the other "weights"
+        files will inherit the same information. Columns "NumberOfRows" and "NumberOfColumns" won't be affected.
+    </ul>
+
+
 </ul>
+
 
 """
 
-preprocess = """
-Using the app was created to ease your computational simulations’ conversion! Before passing your files to the
-conversion tool, make sure to **run the preprocessing pipeline beforehand**. We know that manually renaming your files
-is too time-consuming and, let’s be honest, annoying! Please run the cell under “Preprocess files” and follow the
-instructions there.
+how_to_use = alt
 
-From now on we assume the files are preprocessed and ready to be used. There are several steps you need to take:
+preprocess = alt
 
-<ul>
-<li>Go to the “Select Files” tab, provide a path to your files under “Insert Path”, and make sure to **press “Enter”**
-or click on any space **outside** of the input box where you provided your path. If you provided the path and pressed
-“Enter”, but no files are shown below on the left-hand side, make sure to do it once again and/or check your
-input folder to verify files exist.</li>
+supported = alt
 
-<li>Select files you want to convert. You have three options:
-<ul>
-<li>Go back one level and select the whole folder containing the files <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/folder.gif" width="75%"/>
+functionality = alt
 
-<li>Select all files one-by-one <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/one-by-one.gif" width="75%"/>
-
-<li>Select-scroll the files <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/select-scroll.gif" width="75%"/>
-</ul>
-
-<li>Check out the automatically generated folder structure. Don’t worry, no files are generated at this stage.
-The structure just shows the possible output. You might see some empty folders there, they will be removed when
-the structure gets generated. This conversion follows the BEP034 specification, therefore, we need to keep the
-structure as minimal as possible.</li>
-</ul>
-
-"""
-
-supported = """
-Using the app was created to ease your computational simulations’ conversion! Before passing your files to the
-conversion tool, make sure to **run the preprocessing pipeline beforehand**. We know that manually renaming your files
-is too time-consuming and, let’s be honest, annoying! Please run the cell under “Preprocess files” and follow the
-instructions there.
-
-From now on we assume the files are preprocessed and ready to be used. There are several steps you need to take:
-
-<ul>
-<li>Go to the “Select Files” tab, provide a path to your files under “Insert Path”, and make sure to **press “Enter”**
-or click on any space **outside** of the input box where you provided your path. If you provided the path and pressed
-“Enter”, but no files are shown below on the left-hand side, make sure to do it once again and/or check your
-input folder to verify files exist.</li>
-
-<li>Select files you want to convert. You have three options:
-<ul>
-<li>Go back one level and select the whole folder containing the files <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/folder.gif" width="75%"/>
-
-<li>Select all files one-by-one <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/one-by-one.gif" width="75%"/>
-
-<li>Select-scroll the files <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/select-scroll.gif" width="75%"/>
-</ul>
-
-<li>Check out the automatically generated folder structure. Don’t worry, no files are generated at this stage.
-The structure just shows the possible output. You might see some empty folders there, they will be removed when
-the structure gets generated. This conversion follows the BEP034 specification, therefore, we need to keep the
-structure as minimal as possible.</li>
-</ul>
-
-"""
-
-
-functionality = """
-Using the app was created to ease your computational simulations’ conversion! Before passing your files to the
-conversion tool, make sure to **run the preprocessing pipeline beforehand**. We know that manually renaming your files
-is too time-consuming and, let’s be honest, annoying! Please run the cell under “Preprocess files” and follow the
-instructions there.
-
-From now on we assume the files are preprocessed and ready to be used. There are several steps you need to take:
-
-<ul>
-<li>Go to the “Select Files” tab, provide a path to your files under “Insert Path”, and make sure to **press “Enter”**
-or click on any space **outside** of the input box where you provided your path. If you provided the path and pressed
-“Enter”, but no files are shown below on the left-hand side, make sure to do it once again and/or check your
-input folder to verify files exist.</li>
-
-<li>Select files you want to convert. You have three options:
-<ul>
-<li>Go back one level and select the whole folder containing the files <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/folder.gif" width="75%"/>
-
-<li>Select all files one-by-one <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/one-by-one.gif" width="75%"/>
-
-<li>Select-scroll the files <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/select-scroll.gif" width="75%"/>
-</ul>
-
-<li>Check out the automatically generated folder structure. Don’t worry, no files are generated at this stage.
-The structure just shows the possible output. You might see some empty folders there, they will be removed when
-the structure gets generated. This conversion follows the BEP034 specification, therefore, we need to keep the
-structure as minimal as possible.</li>
-</ul>
-
-"""
-
-
-bep034 = """
-Using the app was created to ease your computational simulations’ conversion! Before passing your files to the
-conversion tool, make sure to **run the preprocessing pipeline beforehand**. We know that manually renaming your files
-is too time-consuming and, let’s be honest, annoying! Please run the cell under “Preprocess files” and follow the
-instructions there.
-
-From now on we assume the files are preprocessed and ready to be used. There are several steps you need to take:
-
-<ul>
-<li>Go to the “Select Files” tab, provide a path to your files under “Insert Path”, and make sure to **press “Enter”**
-or click on any space **outside** of the input box where you provided your path. If you provided the path and pressed
-“Enter”, but no files are shown below on the left-hand side, make sure to do it once again and/or check your
-input folder to verify files exist.</li>
-
-<li>Select files you want to convert. You have three options:
-<ul>
-<li>Go back one level and select the whole folder containing the files <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/folder.gif" width="75%"/>
-
-<li>Select all files one-by-one <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/one-by-one.gif" width="75%"/>
-
-<li>Select-scroll the files <br></li>
-<img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/select-scroll.gif" width="75%"/>
-</ul>
-
-<li>Check out the automatically generated folder structure. Don’t worry, no files are generated at this stage.
-The structure just shows the possible output. You might see some empty folders there, they will be removed when
-the structure gets generated. This conversion follows the BEP034 specification, therefore, we need to keep the
-structure as minimal as possible.</li>
-</ul>
-
-"""
-
+bep034 = alt
