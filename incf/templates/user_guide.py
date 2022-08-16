@@ -2,7 +2,7 @@ alt = """<br>
 Using the app was created to ease your computational simulation conversion! Before passing your files to the
 conversion tool, make sure to <strong>run the preprocessing pipeline beforehand</strong>. We know that manually
 renaming your files is too time-consuming and, let’s be honest, annoying! Please run the cell under "Preprocess data"
-and follow the instructions there.
+and follow the instructions there. <br><br>
 
 From now on we assume the files are preprocessed and ready to be used. There are several steps you need to take:
 
