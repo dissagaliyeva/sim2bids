@@ -1,8 +1,5 @@
-import glob
 import json
 import os
-import sys
-import zipfile
 from collections import OrderedDict
 from pathlib import Path
 
@@ -23,13 +20,15 @@ import incf.utils as utils
 SID = None
 OUTPUT = '../output'
 DESC = 'default'
-DURATION = 3000
 CENTERS = False
 MULTI_INPUT = False
 TRAVERSE_FOLDERS = True
 TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                                            # folder "net"
               'areas.txt', 'average_orientations.txt', 'cortical.txt', 'hemisphere.txt', 'normals.txt'  # folder "coord"
               ]
+ACCEPTED = ['weights', 'tract_lengths',                                                                 # network (net)
+            'centres', 'nodes', 'labels', 'areas', 'cortical', 'hemisphere', 'normals', 'orientations'  # coord
+            'fc', ]
 ACCEPTED_EXT = ['txt', 'csv', 'mat', 'h5']
 ALL_FILES = None
 
@@ -125,13 +124,13 @@ def save_output(subs, output):
             elif k in TO_EXTRACT[3:]:
                 coords.save_coords(sub[k], folders)
             elif k.endswith('.mat'):
-                mat.save(sub[k], folders, ses=None)
+                mat.save(sub[k], folders, ses=ses)
             elif k.endswith('.h5'):
-                h5.save(sub[k], output, folders, ses=None)
+                h5.save(sub[k], output, folders, ses=ses)
 
     # remove existing content & prepare for new data
     if conflict:
-        pn.state.notifications.info('Output folder contains files. Removing them...', duration=DURATION)
+        pn.state.notifications.info('Output folder contains files. Removing them...')
         utils.rm_tree(output)
         prep.reset_index()
 

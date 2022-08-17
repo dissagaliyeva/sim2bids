@@ -10,14 +10,14 @@ from incf.convert import convert
 
 
 def save(subs, folders, ses=None):
-    duration, fname = convert.DURATION, subs['fname']
+    fname = subs['fname']
     try:
         mat = loadmat(subs['path'], squeeze_me=True)
     except NotImplementedError:
-        pn.state.notifications.info(f'File `{fname}` uses MATLAB version 7.3.', duration=duration)
+        pn.state.notifications.info(f'File `{fname}` uses MATLAB version 7.3.')
         save_mat73(subs, folders, ses=ses)
     except scipy.io.matlab._miobase.MatReadError:
-        pn.state.notifications.error(f'File `{fname}` is empty! Aborting...', duration=duration)
+        pn.state.notifications.error(f'File `{fname}` is empty! Aborting...')
     else:
         convert_mat(mat, subs, folders, ses=ses)
 
@@ -28,27 +28,29 @@ def save_mat73(subs, folders, ses):
 
 
 def convert_mat(mat, subs, folders, ses=None):
-    name, duration, fname = subs['name'], convert.DURATION, subs['fname']
+    name, fname = subs['name'], subs['fname']
     sid, desc = subs['sid'], subs['desc']
     data = find_mat_array(mat)
 
     if len(data) == 0:
-        pn.state.notifications.error(f'File `{fname}` does not have any data input!', duration=duration)
+        pn.state.notifications.error(f'File `{fname}` does not have any data input!')
     elif len(data) == 1:
         data = mat[data[0]]
         ts_path = folders[-1]
         spatial_path = folders[2] if ses is None else folders[3]
 
         if 'fc' in name.lower():
-            print('fc found:')
+            print('im triggered simulations_matlab.py @43')
             coord_json = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.json')
             coord_tsv = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.tsv')
             print(coord_tsv, coord_json, end='\n\n')
         else:
             if ses is None:
+                print('im triggered simulations_matlab.py @49')
                 coord_json = os.path.join(ts_path, f'desc-{desc}_{name}.json')
                 coord_tsv = os.path.join(ts_path, f'desc-{desc}_{name}.tsv')
             else:
+                print('im triggered simulations_matlab.py @53')
                 coord_json = os.path.join(ts_path, f'{sid}_desc-{desc}_{name}.json')
                 coord_tsv = os.path.join(ts_path, f'{sid}_desc-{desc}_{name}.tsv')
 
