@@ -82,7 +82,7 @@ def save_txt(path, f, name, coords=None):
 def save_centers(subs, output, folders, ses=None):
     COORD_TMPL = 'desc-{}_{}.{}'
     file = read_csv(subs['path'], subs['sep'])
-    labels, nodes = file[0], file[[1, 2, 3]]
+    labels, nodes = file[0], file.iloc[:, 1:]
     desc = subs['desc']
 
     lname = COORD_TMPL.format(desc, 'labels', 'tsv')
