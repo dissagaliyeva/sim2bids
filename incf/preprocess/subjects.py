@@ -43,8 +43,10 @@ class Files:
 
             # Step 1: change directory to the folders if only one folder is listed
             if len(self.selected_files) == 1:
-                changed_path = True
-                files = os.listdir(os.path.join(self.path, self.selected_files[0]))
+                if len(set(os.listdir(os.path.join(self.path, self.selected_files[0]))).intersection(
+                        {'ses-preop', 'ses-postop'})) == 0:
+                    changed_path = True
+                    files = os.listdir(os.path.join(self.path, self.selected_files[0]))
 
             # Step 1: traverse over the provided input
             for file in files:
@@ -104,11 +106,41 @@ class Files:
                         self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
 
             else:
+                sessions, path = [], None
+
+                # check if a folder with folders is passed
+                if len(self.selected_files) == 1:
+                    path = os.path.join(self.path, self.selected_files[0])
+                    contents = os.listdir(path)
+
+                    # check if session-specific folders are passed
+                    if 'ses-preop' in contents:
+                        sessions.append('ses-preop')
+                    elif 'ses-postop' in contents:
+                        sessions.append('ses-postop')
+
                 if len(self.selected_files) == 1 and os.path.isdir(os.path.join(self.path, self.selected_files[0])):
-                    self.subs[sid] = prepare_subs(conv.get_content(self.path, self.selected_files), sid)
+                    if len(sessions) == 0:
+                        self.subs[sid] = traverse_single(self.path, self.selected_files[0], sid)
+                    else:
+                        if sid not in self.subs.keys():
+                            self.subs[sid] = {'ses-preop': {}, 'ses-postop': {}}
+
+                        for session in sessions:
+                            if path is None:
+                                self.subs[sid][session] = traverse_single(self.path, self.selected_files, sid,
+                                                                          ses=session)
+                            else:
+                                self.subs[sid][session] = traverse_single(path, self.selected_files, sid, ses=session)
                 else:
-                    paths = [os.path.join(self.path, file) for file in self.selected_files]
-                    self.subs[sid] = prepare_subs(paths, sid)
+                    self.subs[sid] = traverse_single(self.path, self.selected_files, sid)
+
+
+def traverse_single(path, selected, sid, ses='ses-preop'):
+    if ses is not None:
+        return prepare_subs(conv.get_content(path, ses), sid)
+    else:
+        return prepare_subs(conv.get_content(path, selected), sid)
 
 
 def find_matches(paths):
