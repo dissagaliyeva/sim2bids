@@ -99,7 +99,7 @@ def check_file(path, files, subs=None, save=False):
         save_output(subs, OUTPUT)
 
         # remove all empty folders
-        remove_empty_folders(path)
+        remove_empty_folders(OUTPUT)
 
     return subs, struct.create_layout(subs, OUTPUT)
 
@@ -184,7 +184,7 @@ def get_shape(file, sep):
 
 def to_tsv(path, file=None, sep=None):
     if file is None:
-        Path(path).touch()
+        return
     else:
         params = {'sep': '\t', 'header': None, 'index': None}
         sep = sep if sep != '\n' else '\0'
@@ -214,9 +214,14 @@ def to_json(path, shape, desc, key, coords=None, **kwargs):
 
 
 def remove_empty_folders(path):
-    for file in os.listdir(path):
-        temp = os.path.join(path, file)
+    """
+    Recursively traverse generated output folder and remove all empty folders.
+    :param path:
+    :return:
+    """
 
-        if os.path.isdir(temp):
-            if len(os.listdir(temp)) == 0:
-                os.removedirs(temp)
+    # get contents of the specified path
+    for root, dirs, files in os.walk(path):
+        # if folder is empty, remove it
+        if len(os.listdir(root)) == 0:
+            os.removedirs(root)
