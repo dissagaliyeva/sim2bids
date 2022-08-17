@@ -121,13 +121,16 @@ class FolderStructure:
         ses_exists = False
 
         for k, v in self.subs.items():
-            if 'sid' in v or not convert.MULTI_INPUT:
+            if ('sid' in v or not convert.MULTI_INPUT) and ('ses-preop' not in v.keys() and 'ses-postop' not in v.keys()):
+                print('im triggered @125 (structure), k, v:', k, v)
+
                 if k not in self.components['subjects'].keys():
                     self.components['subjects'][k] = {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []}
                     # traverse single-instance files
                     self.iterate(k, v, sid=k)
             else:
                 for k2, v2 in v.items():
+                    print('im triggered @132 (structure), k2, v2:', k2, v2)
                     if k not in self.components['subjects'].keys():
                         if k2 in ['ses-preop', 'ses-postop']:
                             self.components['subjects'][k] = {
