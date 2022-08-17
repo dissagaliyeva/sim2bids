@@ -214,4 +214,9 @@ def to_json(path, shape, desc, key, coords=None, **kwargs):
 
 
 def remove_empty_folders(path):
-    pass
+    for file in os.listdir(path):
+        temp = os.path.join(path, file)
+
+        if os.path.isdir(temp):
+            if len(os.listdir(temp)) == 0:
+                os.removedirs(temp)
