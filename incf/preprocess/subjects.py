@@ -17,119 +17,57 @@ TO_RENAME = None
 class Files:
     def __init__(self, path, files):
         self.path = path
-        self.selected_files = files
+        self.files = files
         self.subs = OrderedDict()
 
-        # decide whether input files are for one or more patients
+        # get all files' absolute paths
         self.content = conv.get_content(path, files)
+
+        # get all files' unique names
         self.basename = set(conv.get_content(path, files, basename=True))
-        self.single = len(self.content) == len(self.basename)
 
-        # set multi-subject input to true
-        conv.MULTI_INPUT = False if self.single else True
-        conv.ALL_FILES = self.content
+        # check for multi-subject in one folder
+        self.match = find_matches(self.basename)
 
-        # traverse files and create subjects
+        # check if the input is for single-subject or multi-subject
+        conv.MULTI_INPUT = not self.check_input()
+
+        # traverse folders
         self.traverse_files()
+
+    def check_input(self):
+        # simple check counting set literals
+        if len(self.content) == len(self.basename):
+            # check for multi-subject in one folder
+            if len(self.match) == 0:
+                return True
+            return False
+        return False
 
     def traverse_files(self):
         global TO_RENAME
 
-        # traverse multi-folder input
+        # if the whole folder is passed, open that folder
+        path, files = self.path, self.files
+
+        if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop', 'ses-postop']:
+            path = os.path.join(path, files[0])
+            files = os.listdir(path)
+
+        # traverse multi-subject inputs
         if conv.MULTI_INPUT:
-
-            files = self.selected_files
-            changed_path = False
-
-            # Step 1: change directory to the folders if only one folder is listed
-            if len(self.selected_files) == 1:
-                if len(set(os.listdir(os.path.join(self.path, self.selected_files[0]))).intersection(
-                        {'ses-preop', 'ses-postop'})) == 0:
-                    changed_path = True
-                    files = os.listdir(os.path.join(self.path, self.selected_files[0]))
-
-            # Step 1: traverse over the provided input
-            for file in files:
-                # Step 2: create individual ID; if it already has BIDS format, leave it as is but remove 'sub-'
-                sid = prep.create_uuid()
-
-                # Step 3: create a dictionary to store values
-                if sid not in self.subs.keys():
-                    self.subs[sid] = {}
-
-                # Step 4: change path to the files
-                if changed_path:
-                    path = os.path.join(self.path, self.selected_files[0], file)
-                else:
-                    path = os.path.join(self.path, file)
-
-                # Step 5: get all content
-                all_files = os.listdir(path)
-                conv.ALL_FILES = all_files
-
-                # Step 6: traverse ses-preop if present
-                if 'ses-preop' in all_files:
-                    if 'ses-preop' not in self.subs[sid]:
-                        self.subs[sid]['ses-preop'] = OrderedDict()
-
-                    self.subs[sid]['ses-preop'].update(prepare_subs(conv.get_content(path, 'ses-preop'), sid))
-
-                # Step 7: traverse ses-postop if present
-                if 'ses-postop' in all_files:
-                    if 'ses-postop' not in self.subs[sid]:
-                        self.subs[sid]['ses-postop'] = OrderedDict()
-
-                    self.subs[sid]['ses-postop'].update(prepare_subs(conv.get_content(path, 'ses-postop'), sid))
-
-                if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
-                    self.subs[sid] = prepare_subs(conv.get_content(self.path, file), sid)
-
-        # traverse over single-subject and multi-subject in one folder structure
-        else:
-            sid = prep.create_uuid()
-
-            # Step 1: check if the structure contains multi-subject
-            match = find_matches(self.basename)
-            # traverse multi-subject in one folder
-            if len(match) > 0:
-                convert.MULTI_INPUT = True
-                # get unique IDs for matches
-                TO_RENAME = get_extensions(self.basename, match)
-                for k, v in get_unique_subs(match, self.content).items():
+            if len(self.match) > 0:
+                print(get_unique_subs(self.match, self.content))
+                for k, v in get_unique_subs(self.match, self.content).items():
+                    # create a new ID
                     sid = prep.create_uuid()
-                    if sid not in self.subs.keys():
-                        self.subs[sid] = {}
-                    if len(self.selected_files) == 1:
-                        self.subs[sid].update(
-                            prepare_subs([os.path.join(self.path, self.selected_files[0], x) for x in v], sid))
-                    else:
-                        self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
+                    self.create_sid_sub(sid)
+                    self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
 
-            else:
-                # check if a folder with folders is passed
-                if len(self.selected_files) == 1:
-                    sel = self.selected_files[0]
-
-                    if os.path.isdir(os.path.join(self.path, sel)):
-                        path = os.path.join(self.path, sel)
-                        contents = os.listdir(path)
-
-                        # check if session-specific folders are passed
-                        if 'ses-preop' in contents:
-                            if sid not in self.subs.keys():
-                                self.subs[sid] = {}
-                            self.subs[sid]['ses-preop'] = traverse_single(self.path, sel, sid, ses='ses-preop')
-                        elif 'ses-postop' in contents:
-                            if sid not in self.subs.keys():
-                                self.subs[sid] = {}
-                            self.subs[sid]['ses-postop'] = traverse_single(self.path, sel, sid, ses='ses-postop')
-                    else:
-                        if sid not in self.subs.keys():
-                            self.subs[sid] = {}
-                        self.subs[sid] = traverse_single(self.path, self.selected_files, sid)
-
-                else:
-                    self.subs[sid] = traverse_single(self.path, self.selected_files, sid)
+    def create_sid_sub(self, sid):
+        # create a dictionary to store values
+        if sid not in self.subs.keys():
+            self.subs[sid] = {}
 
 
 def traverse_single(path, selected, sid, ses=None):
