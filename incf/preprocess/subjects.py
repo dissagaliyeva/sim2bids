@@ -32,6 +32,9 @@ class Files:
         # check if the input is for single-subject or multi-subject
         conv.MULTI_INPUT = not self.check_input()
 
+        #
+        self.ses_found = False
+
         # traverse folders
         self.traverse_files()
 
@@ -50,24 +53,57 @@ class Files:
         # if the whole folder is passed, open that folder
         path, files = self.path, self.files
 
-        if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop', 'ses-postop']:
+        if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop',
+                                                                                                'ses-postop']:
             path = os.path.join(path, files[0])
             files = os.listdir(path)
 
         # traverse multi-subject inputs
         if conv.MULTI_INPUT:
+            # traverse multi-subject in one folder structure
             if len(self.match) > 0:
-                print(get_unique_subs(self.match, self.content))
                 for k, v in get_unique_subs(self.match, self.content).items():
                     # create a new ID
-                    sid = prep.create_uuid()
-                    self.create_sid_sub(sid)
+                    sid = self.create_sid_sub()
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
+            else:
+                # traverse over the provided files
+                for file in files:
+                    # create a new ID
+                    sid = self.create_sid_sub()
+                    self.save_sessions('ses-preop', files, sid, path, file)
+                    self.save_sessions('ses-postop', files, sid, path, file)
 
-    def create_sid_sub(self, sid):
+                    if 'ses-preop' not in files and 'ses-postop' not in files:
+                        self.subs[sid] = prepare_subs(conv.get_content(path, file), sid)
+
+        else:
+            # check if there are no folders inside
+            sid = self.create_sid_sub()
+            self.save_sessions('ses-preop', files, sid, os.path.join(path, 'ses-preop'))
+            self.save_sessions('ses-postop', files, sid, os.path.join(path, 'ses-postop'))
+
+            if not self.ses_found:
+                self.create_sid_sub(sid)
+                self.subs[sid] = prepare_subs(conv.get_content(path, files), sid)
+
+    def save_sessions(self, ses, files, sid, path, file=None):
+        if ses in files:
+            self.ses_found = True
+            if ses not in self.subs[sid]:
+                self.subs[sid][ses] = OrderedDict()
+
+            if file is not None:
+                self.subs[sid][ses].update(prepare_subs(conv.get_content(os.path.join(path, file), ses), sid))
+
+    def create_sid_sub(self, sid=None):
+        sid = prep.create_uuid() if sid is None else sid
+
         # create a dictionary to store values
         if sid not in self.subs.keys():
             self.subs[sid] = {}
+
+        return sid
 
 
 def traverse_single(path, selected, sid, ses=None):

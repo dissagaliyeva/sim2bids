@@ -78,8 +78,7 @@ def get_content(path, files, basename=False):
         # Step 5.2: check if it's among the accepted files
         if ext in ACCEPTED_EXT:
             # Step 5.3: rename `tract_lengths` to `distances`
-            file = rename_tract_lengths(file)
-            contents.append(file)
+            contents.append(rename_tract_lengths(file_path))
 
     # Step 6: return contents
     return contents
