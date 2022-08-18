@@ -51,10 +51,10 @@ class Files:
         global TO_RENAME
 
         # if the whole folder is passed, open that folder
-        path, files = self.path, self.files
+        path, files, changed = self.path, self.files, False
 
-        if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop',
-                                                                                                'ses-postop']:
+        if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop', 'ses-postop']:
+            changed = True
             path = os.path.join(path, files[0])
             files = os.listdir(path)
 
@@ -67,15 +67,36 @@ class Files:
                     sid = self.create_sid_sub()
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
             else:
-                # traverse over the provided files
-                for file in files:
-                    # create a new ID
-                    sid = self.create_sid_sub()
-                    self.save_sessions('ses-preop', files, sid, path, file)
-                    self.save_sessions('ses-postop', files, sid, path, file)
+                changed_path = False
+                if len(self.files) == 1:
+                    changed_path = True
+                    files = os.listdir(os.path.join(self.path, self.files[0]))
 
-                    if 'ses-preop' not in files and 'ses-postop' not in files:
-                        self.subs[sid] = prepare_subs(conv.get_content(path, file), sid)
+                for file in files:
+                    sid = self.create_sid_sub()
+
+                    if changed_path:
+                        path = os.path.join(self.path, self.files[0], file)
+                    else:
+                        path = os.path.join(self.path, file)
+
+                    # Step 5: get all content
+                    all_files = os.listdir(path)
+                    conv.ALL_FILES = all_files
+
+                    # Step 6: traverse ses-preop if present
+                    if 'ses-preop' in all_files:
+                        self.save_sessions('ses-preop', all_files, sid, path)
+
+                    # Step 7: traverse ses-postop if present
+                    if 'ses-postop' in all_files:
+                        self.save_sessions('ses-postop', all_files, sid, path)
+
+                    if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
+                        if os.path.basename(path) == file:
+                            self.subs[sid] = prepare_subs(conv.get_content(path.replace(file, ''), file), sid)
+                        else:
+                            self.subs[sid] = prepare_subs(conv.get_content(path, file), sid)
 
         else:
             # check if there are no folders inside
@@ -87,14 +108,15 @@ class Files:
                 self.create_sid_sub(sid)
                 self.subs[sid] = prepare_subs(conv.get_content(path, files), sid)
 
-    def save_sessions(self, ses, files, sid, path, file=None):
+    def save_sessions(self, ses, files, sid, path):
         if ses in files:
             self.ses_found = True
-            if ses not in self.subs[sid]:
+            if sid not in self.subs.keys():
+                self.subs[sid] = OrderedDict()
+            if ses not in self.subs[sid].keys():
                 self.subs[sid][ses] = OrderedDict()
 
-            if file is not None:
-                self.subs[sid][ses].update(prepare_subs(conv.get_content(os.path.join(path, file), ses), sid))
+            self.subs[sid][ses].update(prepare_subs(conv.get_content(path, ses), sid))
 
     def create_sid_sub(self, sid=None):
         sid = prep.create_uuid() if sid is None else sid
