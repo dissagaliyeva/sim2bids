@@ -92,6 +92,8 @@ def rename_tract_lengths(file):
 
 
 def check_file(path, files, subs=None, save=False):
+    print(path, files)
+
     if subs is None:
         subs = subj.Files(path, files).subs
 
@@ -227,3 +229,26 @@ def remove_empty_folders(path):
         # if folder is empty, remove it
         if len(os.listdir(root)) == 0:
             os.removedirs(root)
+
+
+def duplicate_folder(path):
+    print('im triggered, duplicate folder')
+    # create folder if it doesn't exist
+    root = os.path.join('..', 'data')
+    new_path = os.path.join(root, os.path.basename(os.path.dirname(path + '/')))
+
+    if not os.path.exists(root):
+        os.mkdir(root)
+
+    if not os.path.exists(new_path):
+        shutil.copytree(path, new_path, symlinks=False, ignore=None, ignore_dangling_symlinks=False,
+                        dirs_exist_ok=False)
+        # # copy folder
+        # try:
+        #     shutil.copytree(path, new_path, symlinks=False, ignore=None, ignore_dangling_symlinks=False, dirs_exist_ok=False)
+        # except FileExistsError:
+        #     os.rmdir(new_path); os.rmdir('../data')
+        #     shutil.copytree(path, new_path, symlinks=False, ignore=None, ignore_dangling_symlinks=False, dirs_exist_ok=False)
+
+    # set PATH to a new path
+    return new_path

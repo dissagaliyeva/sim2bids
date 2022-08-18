@@ -54,6 +54,10 @@ class MainArea(param.Parameterized):
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
         if os.path.exists(self.text_input.value):
+            # whether to not alter original input folder
+            if self.checkbox_options[2] in self.checkbox_group.value:
+                self.text_input.value = convert.duplicate_folder(self.text_input.value)
+
             self.cross_select.options = os.listdir(self.text_input.value)
             self.cross_select.value = []
             self.structure.value = ''
@@ -115,7 +119,7 @@ class MainArea(param.Parameterized):
 
         # whether to not alter original input folder
         if self.checkbox_options[2] in self.checkbox_group.value:
-            convert.duplicate_folder()
+            self.text_input.value = convert.duplicate_folder(self.text_input.value)
 
     @pn.depends('output_path.value', watch=True)
     def _store_output(self):
@@ -123,10 +127,9 @@ class MainArea(param.Parameterized):
 
         if len(output) > 0:
             if not os.path.exists(output):
-                pn.state.notifications.error(f'Folder `{output}` does not exist!', duration=convert.DURATION)
+                pn.state.notifications.error(f'Folder `{output}` does not exist!')
             else:
-                pn.state.notifications.success(f'Folder `{output}` is selected as output folder',
-                                               duration=convert.DURATION)
+                pn.state.notifications.success(f'Folder `{output}` is selected as output folder')
                 convert.OUTPUT = output
 
     def _rename(self, event=None):
@@ -138,7 +141,7 @@ class MainArea(param.Parameterized):
 
         if old != new:
             convert.DESC = new
-            pn.state.notifications.success(f'Changed description from `{old}` to `{new}`.', duration=convert.DURATION)
+            pn.state.notifications.success(f'Changed description from `{old}` to `{new}`.')
 
     def view(self):
         main = pn.Tabs(
