@@ -1,6 +1,3 @@
-import os
-from incf.convert import convert
-
 IDS = []
 start = 1
 
