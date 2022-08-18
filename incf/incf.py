@@ -36,8 +36,8 @@ class MainArea(param.Parameterized):
     desc = pn.widgets.TextInput(value='default', max_length=30, margin=(-20, 10, 0, 10))
     convert.DESC = desc.value
 
-    checkbox_options = ['Traverse subfolders', 'Autocomplete columns', 'Option 3']
-    checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders', 'Autocomplete columns'],
+    checkbox_options = ['Traverse subfolders', 'Autocomplete columns', 'Copy input folder']
+    checkbox_group = pn.widgets.CheckBoxGroup(value=checkbox_options,
                                               options=checkbox_options,
                                               margin=(-20, 10, 0, 10))
     rename_files = pn.WidgetBox()
@@ -107,11 +107,15 @@ class MainArea(param.Parameterized):
     def _change_checkbox(self):
         global AUTOFILL
 
-        # set whether to traverse sub-folders
+        # whether to traverse sub-folders
         convert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
 
         # whether to autofill all files
         AUTOFILL = True if self.checkbox_options[1] in self.checkbox_group.value else False
+
+        # whether to not alter original input folder
+        if self.checkbox_options[2] in self.checkbox_group.value:
+            convert.duplicate_folder()
 
     @pn.depends('output_path.value', watch=True)
     def _store_output(self):

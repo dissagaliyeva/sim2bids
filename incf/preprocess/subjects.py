@@ -106,37 +106,33 @@ class Files:
                         self.subs[sid].update(prepare_subs([os.path.join(self.path, x) for x in v], sid))
 
             else:
-                sessions, path = [], None
-
                 # check if a folder with folders is passed
                 if len(self.selected_files) == 1:
-                    path = os.path.join(self.path, self.selected_files[0])
-                    contents = os.listdir(path)
+                    sel = self.selected_files[0]
 
-                    # check if session-specific folders are passed
-                    if 'ses-preop' in contents:
-                        sessions.append('ses-preop')
-                    elif 'ses-postop' in contents:
-                        sessions.append('ses-postop')
+                    if os.path.isdir(os.path.join(self.path, sel)):
+                        path = os.path.join(self.path, sel)
+                        contents = os.listdir(path)
 
-                if len(self.selected_files) == 1 and os.path.isdir(os.path.join(self.path, self.selected_files[0])):
-                    if len(sessions) == 0:
-                        self.subs[sid] = traverse_single(self.path, self.selected_files[0], sid)
+                        # check if session-specific folders are passed
+                        if 'ses-preop' in contents:
+                            if sid not in self.subs.keys():
+                                self.subs[sid] = {}
+                            self.subs[sid]['ses-preop'] = traverse_single(self.path, sel, sid, ses='ses-preop')
+                        elif 'ses-postop' in contents:
+                            if sid not in self.subs.keys():
+                                self.subs[sid] = {}
+                            self.subs[sid]['ses-postop'] = traverse_single(self.path, sel, sid, ses='ses-postop')
                     else:
                         if sid not in self.subs.keys():
-                            self.subs[sid] = {'ses-preop': {}, 'ses-postop': {}}
+                            self.subs[sid] = {}
+                        self.subs[sid] = traverse_single(self.path, self.selected_files, sid)
 
-                        for session in sessions:
-                            if path is None:
-                                self.subs[sid][session] = traverse_single(self.path, self.selected_files, sid,
-                                                                          ses=session)
-                            else:
-                                self.subs[sid][session] = traverse_single(path, self.selected_files, sid, ses=session)
                 else:
                     self.subs[sid] = traverse_single(self.path, self.selected_files, sid)
 
 
-def traverse_single(path, selected, sid, ses='ses-preop'):
+def traverse_single(path, selected, sid, ses=None):
     if ses is not None:
         return prepare_subs(conv.get_content(path, ses), sid)
     else:
