@@ -37,7 +37,7 @@ class MainArea(param.Parameterized):
     convert.DESC = desc.value
 
     checkbox_options = ['Traverse subfolders', 'Autocomplete columns', 'Copy input folder']
-    checkbox_group = pn.widgets.CheckBoxGroup(value=checkbox_options,
+    checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders', 'Autocomplete columns'],
                                               options=checkbox_options,
                                               margin=(-20, 10, 0, 10))
     rename_files = pn.WidgetBox()
@@ -279,22 +279,6 @@ class ViewResults(param.Parameterized):
     def view(self):
         return pn.Column(self.file_selection, self.widget)
 
-
-# class UserGuide(param.Parameterized):
-#     # content buttons
-#     intro = pn.widgets.Button(name='Introduction', button_type='light', value=True, width=100)
-#     sup_files = pn.widgets.Button(name='Supported Files', button_type='light', width=100)
-#     transform = pn.widgets.Button(name='Transforming Data', button_type='light', width=100)
-#     how_to = pn.widgets.Button(name='How to use the app', button_type='light', width=100)
-#     bep034 = pn.widgets.Button(name='BIDS Computational Data Standard', button_type='light', width=100)
-#
-#     def view(self):
-#         return pn.Tabs(
-#             ('How to Use the App', guide.how_to_use),
-#             ('Supported Files', guide.how_to_use),
-#             ('Transforming Data', guide.how_to_use),
-#             ('BEP034', guide.how_to_use)
-#         )
 
 class UserGuide(param.Parameterized):
     user_guide = pn.widgets.ToggleGroup(name='User Guide', value='App 101', behavior='radio',

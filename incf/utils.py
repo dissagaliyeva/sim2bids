@@ -20,8 +20,11 @@ def rm_tree(path: str = '../output'):
 def get_selector(name):
     return pn.widgets.Select(name=f'Specify {name}', groups={
         'Network (net)': ['weights', 'distances', 'delays', 'speed', 'weights & nodes'],
-        'Coordinates (coord)': ['times', 'centres', 'orientations', 'areas', 'hemisphere'],
-        'Timeseries (ts)': ['ts'],
+        'Coordinates (coord)': ['times', 'centres', 'orientations', 'areas', 'hemispheres',
+                                'cortical', 'nodes', 'labels', 'vertice', 'faces', 'vnormals',
+                                'fnormals', 'sensors', 'conv', 'map', 'volumes',
+                                'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d'],
+        'Timeseries (ts)': ['ts', 'vars', 'stimuli', 'noise', 'spikes', 'raster', 'ts', 'events'],
         'Spatial (spatial)': ['fc'],
         'Code (code)': ['code'],
         'Skip file type': ['skip']

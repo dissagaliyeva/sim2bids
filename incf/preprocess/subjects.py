@@ -62,12 +62,15 @@ class Files:
         if conv.MULTI_INPUT:
             # traverse multi-subject in one folder structure
             if len(self.match) > 0:
+                TO_RENAME = get_extensions(self.basename, self.match)
                 for k, v in get_unique_subs(self.match, self.content).items():
                     # create a new ID
                     sid = self.create_sid_sub()
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
             else:
                 changed_path = False
+
+                TO_RENAME = get_extensions(self.basename)
 
                 if len(self.files) == 1:
                     changed_path = True
@@ -100,6 +103,7 @@ class Files:
                             self.subs[sid] = prepare_subs(conv.get_content(path, file), sid)
 
         else:
+            TO_RENAME = get_extensions(self.basename)
             # check if there are no folders inside
             sid = self.create_sid_sub()
             self.save_sessions('ses-preop', files, sid, os.path.join(path, 'ses-preop'))
@@ -157,8 +161,21 @@ def get_unique_subs(match, contents):
 
 
 def get_extensions(files, ids=None):
+    to_rename = []
+
     if ids is not None:
-        return [x for x in list(set([remove_id(x, ids) for x in files])) if x is not None]
+        files = [x for x in list(set([remove_id(x, ids) for x in files])) if x is not None]
+
+    for file in files:
+        found = False
+        for acc in conv.ACCEPTED:
+            if file.lower().startswith(acc.lower()):
+                found = True
+
+        if not found:
+            to_rename.append(file)
+
+    return list(set(to_rename))
 
 
 def remove_id(file, ids):

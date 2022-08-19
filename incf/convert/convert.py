@@ -26,9 +26,20 @@ TRAVERSE_FOLDERS = True
 TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                                            # folder "net"
               'areas.txt', 'average_orientations.txt', 'cortical.txt', 'hemisphere.txt', 'normals.txt'  # folder "coord"
               ]
-ACCEPTED = ['weights', 'tract_lengths',                                                                 # network (net)
-            'centres', 'nodes', 'labels', 'areas', 'cortical', 'hemisphere', 'normals', 'orientations'  # coord
-            'fc', ]
+# ACCEPTED = {'net': ['weight', 'distance', 'tract',  'delay', 'speed'],                                # network (net)
+#             'coord': ['centres', 'nodes', 'labels', 'area', 'hemisphere', 'cortical', 'orientation',  # coordinates
+#                       'time', 'vertice', 'face', 'vnormal', 'fnormal', 'sensor', 'conv', 'map',       # coordinates
+#                       'volume', 'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d'],                  # coordinates
+#             'ts': ['vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event'],                     # ts
+#             'spatial': ['fc']}                                                                        # spatial
+
+ACCEPTED = ['weight', 'distance', 'tract',  'delay', 'speed', 'centres',
+            'nodes', 'labels', 'area', 'hemisphere', 'cortical', 'orientation',
+            'average_orientation', 'normal',
+            'time', 'vertice', 'face', 'vnormal', 'fnormal', 'sensor', 'conv', 'map',
+            'volume', 'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',
+            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'fc']
+
 ACCEPTED_EXT = ['txt', 'csv', 'mat', 'h5']
 ALL_FILES = None
 
@@ -242,12 +253,5 @@ def duplicate_folder(path):
     if not os.path.exists(new_path):
         shutil.copytree(path, new_path, symlinks=False, ignore=None, ignore_dangling_symlinks=False,
                         dirs_exist_ok=False)
-        # # copy folder
-        # try:
-        #     shutil.copytree(path, new_path, symlinks=False, ignore=None, ignore_dangling_symlinks=False, dirs_exist_ok=False)
-        # except FileExistsError:
-        #     os.rmdir(new_path); os.rmdir('../data')
-        #     shutil.copytree(path, new_path, symlinks=False, ignore=None, ignore_dangling_symlinks=False, dirs_exist_ok=False)
-
     # set PATH to a new path
     return new_path
