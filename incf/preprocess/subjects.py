@@ -68,6 +68,7 @@ class Files:
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
             else:
                 changed_path = False
+
                 if len(self.files) == 1:
                     changed_path = True
                     files = os.listdir(os.path.join(self.path, self.files[0]))
