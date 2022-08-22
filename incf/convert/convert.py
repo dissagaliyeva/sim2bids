@@ -1,6 +1,7 @@
 import os
 import json
 import shutil
+import time
 from collections import OrderedDict
 
 import pandas as pd
@@ -102,12 +103,8 @@ def rename_tract_lengths(file):
 
 
 def check_file(path, files, subs=None, save=False):
-    print(path, files)
-
     if subs is None:
         subs = subj.Files(path, files).subs
-
-    print(subs)
 
     if save:
         save_output(subs, OUTPUT)
@@ -128,18 +125,22 @@ def save_output(subs, output):
     def save(sub, ses=None):
         for k, v in sub.items():
             folders = create_sub_struct(output, v, ses_name=ses)
+            end = k if '_' not in k else k.split('_')[-1]
 
-            if k in ['weights.txt', 'distances.txt']:
+            if end in ['weights.txt', 'distances.txt']:
+                print('im triggered @134')
                 wdc.save(sub[k], output, folders, ses=ses)
-            elif k in ['centres.txt']:
+            elif end in ['centres.txt']:
+                print('im triggered @137')
                 wdc.save(sub[k], output, folders, center=True, ses=ses)
-            # elif k in ['areas.txt']:
-            #     wdc.save_areas(sub[k], output, ses=ses)
-            elif k in TO_EXTRACT[3:]:
+            elif end in TO_EXTRACT[3:]:
+                print('im triggered @140')
                 coords.save_coords(sub[k], folders)
-            elif k.endswith('.mat'):
+            elif end.endswith('.mat'):
+                print('im triggered @143')
                 mat.save(sub[k], folders, ses=ses)
-            elif k.endswith('.h5'):
+            elif end.endswith('.h5'):
+                print('im triggered @146')
                 h5.save(sub[k], output, folders, ses=ses)
 
     # remove existing content & prepare for new data
