@@ -113,11 +113,11 @@ def check_file(path, files, subs=None, save=False):
     if subs is None:
         subs = subj.Files(path, files).subs
 
-    if CODE is not None:
-        pass
-
     if save:
         save_output(subs, OUTPUT)
+
+        if CODE is not None:
+            save_code(subs, OUTPUT)
 
         # remove all empty folders
         remove_empty_folders(OUTPUT)
@@ -168,6 +168,17 @@ def save_output(subs, output):
 
         else:
             save(val)
+
+
+def save_code(subs, output):
+    template = f'desc-{DESC}_code.py'
+    path = os.path.join(output, 'code', template)
+    shutil.copy(CODE, path)
+
+    out = OrderedDict({x: '' for x in temp.struct['code']['recommend']})
+
+    with open(os.path.join(path.replace('py', 'json')), 'w') as file:
+        json.dump(out, file)
 
 
 def create_sub_struct(path, subs, ses_name=None):
