@@ -27,6 +27,8 @@ def validate(unique_files, all_files):
                     print(result)
                     extract_files(name, result[1], result[-1], all_files)
 
+            # elif value == ''
+
 
 def verify_weights(name):
     ext = get_ext(name)

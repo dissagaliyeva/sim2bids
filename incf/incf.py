@@ -27,7 +27,7 @@ class MainArea(param.Parameterized):
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
 
     # generate structure button
-    gen_struct = param.Action(lambda self: self._generate_struct(), label='Generate Structure')
+    gen_struct = param.Action(lambda self: self._generate_struct(), label='Show Folder Structure')
 
     # rename files button
     rename_btn = param.Action(lambda self: self._rename(), label='Rename Files')
