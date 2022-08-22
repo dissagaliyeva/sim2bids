@@ -26,6 +26,9 @@ class MainArea(param.Parameterized):
     # generate files button
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
 
+    # generate structure button
+    gen_struct = param.Action(lambda self: self._generate_struct(), label='Generate Structure')
+
     # rename files button
     rename_btn = param.Action(lambda self: self._rename(), label='Rename Files')
 
@@ -46,10 +49,11 @@ class MainArea(param.Parameterized):
         super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
                          cross_select=pn.widgets.CrossSelector(options=os.listdir()),
                          **params)
-        self.structure = pn.widgets.StaticText(margin=(50, 0, 50, 20))
+        self.structure = pn.widgets.StaticText(margin=(20, 0, 50, 20))
         self.subjects = None
         self.length = 0
         subj.TO_RENAME = None
+        self.struct = ''
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
@@ -86,7 +90,7 @@ class MainArea(param.Parameterized):
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
             # convert.check_input(path=self.text_input.value, files=self.cross_select.value)
-            self.subjects, self.structure.value = convert.check_file(path=self.text_input.value,
+            self.subjects, self.struct = convert.check_file(path=self.text_input.value,
                                                                      files=self.cross_select.value,
                                                                      save=False)
             if subj.TO_RENAME is not None:
@@ -106,6 +110,9 @@ class MainArea(param.Parameterized):
                                subs=self.subjects, save=True)
         subj.TO_RENAME = None
         convert.ALL_FILES = None
+
+    def _generate_struct(self, event=None):
+        self.structure.value = self.struct
 
     @pn.depends('checkbox_group.value', watch=True)
     def _change_checkbox(self):
@@ -148,9 +155,14 @@ class MainArea(param.Parameterized):
             ('Select Files', pn.Column(pn.pane.Markdown(GET_STARTED),
                                        self.text_input,
                                        self.cross_select,
-                                       self.structure,
-                                       pn.Param(self, parameters=['gen_btn'],
-                                                show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}))),
+                                       pn.Row(
+                                           pn.Param(self, parameters=['gen_struct'],
+                                                    show_name=False, widgets={'gen_struct': {'button_type': 'primary'}}),
+                                           pn.Param(self, parameters=['gen_btn'],
+                                                    show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}),
+                                       sizing_mode='stretch_width', margin=(50, 0, 0, 0)
+                                       ),
+                                       self.structure)),
             ('Preprocess Data', self.rename_files),
             ('View Results', ViewResults().view()),
             ('User Guide', UserGuide().view()),
