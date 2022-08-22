@@ -49,7 +49,7 @@ class MainArea(param.Parameterized):
         super().__init__(text_input=pn.widgets.TextInput(name='Insert Path'),
                          cross_select=pn.widgets.CrossSelector(options=os.listdir()),
                          **params)
-        self.structure = pn.widgets.StaticText(margin=(20, 0, 50, 20))
+        self.structure = pn.widgets.StaticText(margin=(5, 0, 50, 20))
         self.subjects = None
         self.length = 0
         subj.TO_RENAME = None

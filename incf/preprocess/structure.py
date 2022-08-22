@@ -52,6 +52,9 @@ class FolderStructure:
         elif k.endswith('.h5'):
             self.save_h5(v, ses=ses)
 
+        if convert.CODE is not None:
+            self.save_code(v)
+
     def save_wd(self, v, sid, ses=None):
         structure = common_structure(v)
 
@@ -116,6 +119,10 @@ class FolderStructure:
                 if len(list(keys)) > 0:
                     self.components['param'] += [coord_format.format(v['desc'], name, 'xml'),
                                                  coord_format.format(v['desc'], name, 'json')]
+
+    def save_code(self, v):
+        self.components['code'] = [coord_format.format(v['desc'], 'code', 'py'),
+                                   coord_format.format(v['desc'], 'code', 'json')]
 
     def populate(self):
         ses_exists = False
