@@ -196,8 +196,15 @@ def prepare_subs(file_paths, sid):
         if name == 'tract_lengths.txt':
             name = 'distances.txt'
 
+        print('file_path:', file_path)
+
+        if not os.path.exists(file_path) and 'distances' in file_path:
+            os.replace(file_path.replace('distances', 'tract_lengths'), file_path)
+
         # rename tract_lengths to distances in the physical folder location
-        if 'tract_lengths' in file_path and not os.path.exists(file_path.replace('tract_lengths', 'distances')):
+        if 'tract_lengths' in file_path:
+            print('about to rename and replace:', file_path)
+            print(file_path.replace('tract_lengths', 'distances'))
             new_path = file_path.replace('tract_lengths', 'distances')
             os.replace(file_path, new_path)
             file_path = new_path
@@ -267,7 +274,7 @@ def find_separator(path):
         try:
             delimiter = sniffer.sniff(fp.read(5000)).delimiter
         except Exception:
-            delimiter = sniffer.sniff(fp.read(100)).delimiter
+            delimiter = sniffer.sniff(fp.read(50)).delimiter
 
     delimiter = '\s' if delimiter == ' ' else delimiter
     return delimiter

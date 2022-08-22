@@ -15,6 +15,8 @@ def save(subs: dict, output: str, folders: list, center: bool = False, ses=None)
 
 
 def save_wd(subs, folders, ses=None):
+    print(folders)
+
     # check and create folders & return paths to them
     if ses is None:
         coords = None
@@ -51,12 +53,9 @@ def save_files(folders, subs, coords=None):
     name = DEFAULT_TMPL.format(subs['sid'], subs['desc'], subs['name'], 'tsv')
     file = read_csv(subs['path'], subs['sep'])
 
-    if len(folders) == 4:
-        net = folders[1]
-        save_txt(net, file, name, coords)
+    if len(folders) == 4 or len(folders) == 5:
+        save_txt(folders[1], file, name, coords)
     else:
-        coords = []
-
         save_txt(folders[2], file, name, coords)
 
 
