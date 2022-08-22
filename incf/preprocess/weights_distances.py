@@ -15,8 +15,6 @@ def save(subs: dict, output: str, folders: list, center: bool = False, ses=None)
 
 
 def save_wd(subs, folders, ses=None):
-    print(folders)
-
     # check and create folders & return paths to them
     if ses is None:
         coords = None

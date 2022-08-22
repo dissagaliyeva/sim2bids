@@ -43,9 +43,11 @@ ACCEPTED = ['weight', 'distance', 'tract',  'delay', 'speed', 'centres',
 
 ACCEPTED_EXT = ['txt', 'csv', 'mat', 'h5']
 ALL_FILES = None
+CODE = None
 
 
 def recursive_walk(path, basename=False):
+    global CODE
     content = []
 
     for root, _, files in os.walk(path):
@@ -53,6 +55,8 @@ def recursive_walk(path, basename=False):
             if file.endswith('.zip') and len(set(os.listdir(root)).intersection(set(TO_EXTRACT))) < 7:
                 content += z.extract_zip(os.path.join(root, file))
                 continue
+            if file.endswith('.py'):
+                CODE = os.path.join(root, file)
 
             file = rename_tract_lengths(file)
             if basename:
@@ -64,6 +68,7 @@ def recursive_walk(path, basename=False):
 
 
 def get_content(path, files, basename=False):
+    global CODE
     # if provided path contains only one sub-folder, and it's needed to traverse that, return the whole content
     # of the specified location.
     if isinstance(files, str):
@@ -91,6 +96,8 @@ def get_content(path, files, basename=False):
         if ext in ACCEPTED_EXT:
             # Step 5.3: rename `tract_lengths` to `distances`
             contents.append(rename_tract_lengths(file_path))
+        elif ext == 'py':
+            CODE = os.path.join(path, file)
 
     # Step 6: return contents
     return contents
@@ -105,6 +112,9 @@ def rename_tract_lengths(file):
 def check_file(path, files, subs=None, save=False):
     if subs is None:
         subs = subj.Files(path, files).subs
+
+    if CODE is not None:
+        pass
 
     if save:
         save_output(subs, OUTPUT)
@@ -128,19 +138,14 @@ def save_output(subs, output):
             end = k if '_' not in k else k.split('_')[-1]
 
             if end in ['weights.txt', 'distances.txt']:
-                print('im triggered @134')
                 wdc.save(sub[k], output, folders, ses=ses)
             elif end in ['centres.txt']:
-                print('im triggered @137')
                 wdc.save(sub[k], output, folders, center=True, ses=ses)
             elif end in TO_EXTRACT[3:]:
-                print('im triggered @140')
                 coords.save_coords(sub[k], folders)
             elif end.endswith('.mat'):
-                print('im triggered @143')
                 mat.save(sub[k], folders, ses=ses)
             elif end.endswith('.h5'):
-                print('im triggered @146')
                 h5.save(sub[k], output, folders, ses=ses)
 
     # remove existing content & prepare for new data
