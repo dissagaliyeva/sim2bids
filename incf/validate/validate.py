@@ -31,13 +31,13 @@ def validate(unique_files, all_files):
 
             # if the selection's value is "skip", remove the file from input folder
             elif value == 'skip':
-                pass
+                remove_files(name, all_files)
 
             elif value == 'map':
                 print(name, value, ext)
                 if ext in ['csv', 'dat', 'txt']:
                     print(True)
-                    rename_files(name, f'ts_{name.replace(ext, "")}', all_files)
+                    rename_files(name, f'map_{name.replace(ext, "")}', all_files)
 
 
 def verify_weights(name):
@@ -93,14 +93,16 @@ def get_nodes(arr: list) -> list:
 
 
 def rename_files(name, new_ext, all_files):
+    new_ext = new_ext.replace('.', '').lower()
+
     for file in all_files:
         print(file)
-        # if file.endswith(name):
-        #     if file.endswith('txt') or file.endswith('csv') or file.endswith('dat'):
-        #         print(file)
-        #         os.rename(file, file.replace(name, new_ext + '.txt'))
-        #     elif file.endswith('mat'):
-        #         pass
+        if file.endswith(name):
+            if file.endswith('txt') or file.endswith('csv') or file.endswith('dat'):
+                print(file)
+                os.rename(file, file.replace(name, new_ext + '.txt'))
+            elif file.endswith('mat'):
+                pass
 
 
 def get_file(files, end):
@@ -122,3 +124,9 @@ def open_mat(file):
         return
 
     return mat, matlab.find_mat_array(mat)
+
+
+def remove_files(name, all_files):
+    for file in all_files:
+        if file.endswith(name):
+            os.remove(file)
