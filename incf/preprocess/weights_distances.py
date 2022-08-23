@@ -22,9 +22,9 @@ def save_wd(subs, folders, ses=None):
         if convert.CENTERS:
             coords = [f'../coord/desc-{subs["desc"]}_labels.json', f'../coord/desc-{subs["desc"]}_nodes.json']
 
-        save_files(folders, subs, coords)
+        save_files(folders, subs, idx=1, coords=coords)
     else:
-        save_files(folders, subs)
+        save_files(folders, subs, idx=2)
 
 
 def save_areas(subs, output, ses=None):
@@ -47,14 +47,14 @@ def save_areas(subs, output, ses=None):
         save_txt(path, read_csv(sub_path, sep), DEFAULT_TMPL.format(subs['sid'], subs['desc'], subs['name'], 'tsv'))
 
 
-def save_files(folders, subs, coords=None):
+def save_files(folders, subs, idx, coords=None):
     name = DEFAULT_TMPL.format(subs['sid'], subs['desc'], subs['name'], 'tsv')
     file = read_csv(subs['path'], subs['sep'])
 
     if len(folders) == 4 or len(folders) == 5:
-        save_txt(folders[1], file, name, coords)
+        save_txt(folders[idx], file, name, coords)
     else:
-        save_txt(folders[2], file, name, coords)
+        save_txt(folders[idx], file, name, coords)
 
 
 def save_txt(path, f, name, coords=None):
@@ -67,8 +67,9 @@ def save_txt(path, f, name, coords=None):
     :return:
     """
     if isinstance(f, str):
-        Path(os.path.join(path, name)).touch()
-        Path(os.path.join(path, name.replace('tsv', 'json'))).touch()
+        pass
+        # Path(os.path.join(path, name)).touch()
+        # Path(os.path.join(path, name.replace('tsv', 'json'))).touch()
 
     else:
         # save to tsv

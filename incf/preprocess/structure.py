@@ -40,8 +40,10 @@ class FolderStructure:
         if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt',
                  'weights.csv', 'distances.csv', 'tract_lengths.csv']:
             self.save_wd(v, sid, ses=ses)
-        elif k == 'centres.txt':
+        elif k in ['centres.txt', 'centres.csv']:
             self.save_centres(v, sid, ses=ses)
+        elif k in ['map.txt', 'map.csv']:
+            self.save_map(v, sid, ses=ses)
         elif k in ['nodes.txt', 'nodes.csv', 'labels.txt', 'labels.csv', *convert.TO_EXTRACT[3:]]:
             self.save_centres(v, sid, ses=ses, name=v['name'])
         elif k.endswith('.mat'):
@@ -64,6 +66,15 @@ class FolderStructure:
         else:
             if len(set(structure).intersection(set(self.components['subjects'][sid][ses]['net']))) == 0:
                 self.components['subjects'][sid][ses]['net'] += structure
+
+    def save_map(self, v, sid, ses=None):
+        if ses is None:
+            if convert.MULTI_INPUT:
+                self.components['subjects'][sid]['spatial'] += common_structure(v, 'map')
+            else:
+                self.components['subjects']['spatial'] += coord_structure(v, ses)
+        else:
+            self.components['subjects'][sid][ses]['spatial'] += common_structure(v, 'map')
 
     def save_centres(self, v, sid, ses=None, name=None):
         structure = coord_structure(v, ses) if name is None else common_structure(v, name)
