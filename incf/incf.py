@@ -84,6 +84,7 @@ class MainArea(param.Parameterized):
             prep.reset_index()
             subj.TO_RENAME = None
             convert.ALL_FILES = None
+
             for _ in self.rename_files:
                 self.rename_files.pop(-1)
 
