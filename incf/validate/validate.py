@@ -11,23 +11,33 @@ import incf.preprocess.subjects as subj
 
 
 def validate(unique_files, all_files):
+    print(unique_files)
+
     for idx, file in enumerate(unique_files):
         if type(file) == pn.widgets.select.Select:
             name, value = file.name.replace('Specify ', ''), file.value
+            ext = name.split('.')[-1]
 
             if value == 'weights':
                 if verify_weights(name):
-                    rename_weights(name, 'weights', all_files)
+                    rename_files(name, 'weights', all_files)
             elif value == 'weights & nodes':
                 result = verify_weights_nodes(name, all_files)
 
                 if isinstance(result, bool):
                     pass
                 elif isinstance(result, list):
-                    print(result)
                     extract_files(name, result[1], result[-1], all_files)
 
-            # elif value == ''
+            # if the selection's value is "skip", remove the file from input folder
+            elif value == 'skip':
+                pass
+
+            elif value == 'map':
+                print(name, value, ext)
+                if ext in ['csv', 'dat', 'txt']:
+                    print(True)
+                    rename_files(name, f'ts_{name.replace(ext, "")}', all_files)
 
 
 def verify_weights(name):
@@ -82,10 +92,15 @@ def get_nodes(arr: list) -> list:
     return all_nodes
 
 
-def rename_weights(name, new_ext, all_files):
+def rename_files(name, new_ext, all_files):
     for file in all_files:
-        if file.endswith(name):
-            os.rename(file, file.replace(name, new_ext + '.txt'))
+        print(file)
+        # if file.endswith(name):
+        #     if file.endswith('txt') or file.endswith('csv') or file.endswith('dat'):
+        #         print(file)
+        #         os.rename(file, file.replace(name, new_ext + '.txt'))
+        #     elif file.endswith('mat'):
+        #         pass
 
 
 def get_file(files, end):

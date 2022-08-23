@@ -25,7 +25,7 @@ def get_selector(name):
                                 'fnormals', 'sensors', 'conv', 'map', 'volumes',
                                 'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d'],
         'Timeseries (ts)': ['ts', 'emp', 'vars', 'stimuli', 'noise', 'spikes', 'raster', 'events'],
-        'Spatial (spatial)': ['fc'],
+        'Spatial (spatial)': ['fc', 'map'],
         'Code (code)': ['code'],
         'Skip file type': ['skip']
     })
