@@ -14,6 +14,7 @@ import incf.preprocess.structure as struct
 import incf.preprocess.subjects as subj
 import incf.preprocess.weights_distances as wdc
 import incf.preprocess.zip_traversal as z
+import incf.preprocess.map_ts as mt
 import incf.templates.templates as temp
 import incf.preprocess.coords as coords
 import incf.utils as utils
@@ -27,12 +28,6 @@ TRAVERSE_FOLDERS = True
 TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                                            # folder "net"
               'areas.txt', 'average_orientations.txt', 'cortical.txt', 'hemisphere.txt', 'normals.txt'  # folder "coord"
               ]
-# ACCEPTED = {'net': ['weight', 'distance', 'tract',  'delay', 'speed'],                                # network (net)
-#             'coord': ['centres', 'nodes', 'labels', 'area', 'hemisphere', 'cortical', 'orientation',  # coordinates
-#                       'time', 'vertice', 'face', 'vnormal', 'fnormal', 'sensor', 'conv', 'map',       # coordinates
-#                       'volume', 'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d'],                  # coordinates
-#             'ts': ['vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event'],                     # ts
-#             'spatial': ['fc']}                                                                        # spatial
 
 ACCEPTED = ['weight', 'distance', 'tract',  'delay', 'speed', 'centres',
             'nodes', 'labels', 'area', 'hemisphere', 'cortical', 'orientation',
@@ -141,6 +136,8 @@ def save_output(subs, output):
                 wdc.save(sub[k], output, folders, ses=ses)
             elif end in ['centres.txt']:
                 wdc.save(sub[k], output, folders, center=True, ses=ses)
+            elif end == 'map.txt' or end == 'ts.txt':
+                mt.save(sub[k], output, folders, end, ses=ses)
             elif end in TO_EXTRACT[3:]:
                 coords.save_coords(sub[k], folders)
             elif end.endswith('.mat'):

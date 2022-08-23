@@ -11,8 +11,6 @@ import incf.preprocess.subjects as subj
 
 
 def validate(unique_files, all_files):
-    print(unique_files)
-
     for idx, file in enumerate(unique_files):
         if type(file) == pn.widgets.select.Select:
             name, value = file.name.replace('Specify ', ''), file.value
@@ -38,7 +36,6 @@ def validate(unique_files, all_files):
             elif value == 'ts':
                 if ext in ['csv', 'dat', 'txt']:
                     rename_files(name, 'ts', all_files)
-
 
 
 def verify_weights(name):
@@ -97,10 +94,8 @@ def rename_files(name, new_ext, all_files):
     new_ext = new_ext.replace('.', '').lower()
 
     for file in all_files:
-        print(file)
         if file.endswith(name):
             if file.endswith('txt') or file.endswith('csv') or file.endswith('dat'):
-                print(file)
                 os.rename(file, file.replace(name, new_ext + '.txt'))
             elif file.endswith('mat'):
                 pass
