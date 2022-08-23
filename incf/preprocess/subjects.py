@@ -23,6 +23,9 @@ class Files:
         # get all files' absolute paths
         self.content = conv.get_content(path, files)
 
+        # get all files
+        conv.ALL_FILES = self.content
+
         # get all files' unique names
         self.basename = set(conv.get_content(path, files, basename=True))
 
@@ -86,7 +89,6 @@ class Files:
 
                     # Step 5: get all content
                     all_files = os.listdir(path)
-                    conv.ALL_FILES = all_files
 
                     # Step 6: traverse ses-preop if present
                     if 'ses-preop' in all_files:
