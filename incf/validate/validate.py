@@ -32,12 +32,13 @@ def validate(unique_files, all_files):
             # if the selection's value is "skip", remove the file from input folder
             elif value == 'skip':
                 remove_files(name, all_files)
-
             elif value == 'map':
-                print(name, value, ext)
                 if ext in ['csv', 'dat', 'txt']:
-                    print(True)
-                    rename_files(name, f'map_{name.replace(ext, "")}', all_files)
+                    rename_files(name, 'map', all_files)
+            elif value == 'ts':
+                if ext in ['csv', 'dat', 'txt']:
+                    rename_files(name, 'ts', all_files)
+
 
 
 def verify_weights(name):

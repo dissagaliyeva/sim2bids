@@ -92,8 +92,8 @@ class MainArea(param.Parameterized):
             # Step 1: traverse files and check for problems
             # convert.check_input(path=self.text_input.value, files=self.cross_select.value)
             self.subjects, self.struct = convert.check_file(path=self.text_input.value,
-                                                                     files=self.cross_select.value,
-                                                                     save=False)
+                                                            files=self.cross_select.value,
+                                                            save=False)
             if subj.TO_RENAME is not None:
                 if len(subj.TO_RENAME) > len(self.rename_files):
                     self.rename_files += [*utils.append_widgets(subj.TO_RENAME)]
@@ -158,10 +158,11 @@ class MainArea(param.Parameterized):
                                        self.cross_select,
                                        pn.Row(
                                            pn.Param(self, parameters=['gen_struct'],
-                                                    show_name=False, widgets={'gen_struct': {'button_type': 'primary'}}),
+                                                    show_name=False,
+                                                    widgets={'gen_struct': {'button_type': 'primary'}}),
                                            pn.Param(self, parameters=['gen_btn'],
                                                     show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}),
-                                       sizing_mode='stretch_width', margin=(50, 0, 0, 0)
+                                           sizing_mode='stretch_width', margin=(50, 0, 0, 0)
                                        ),
                                        self.structure)),
             ('Preprocess Data', self.rename_files),
