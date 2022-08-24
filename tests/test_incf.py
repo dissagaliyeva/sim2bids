@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-"""Tests for `incf` package."""
+"""Tests for `app` package."""
 
 import pytest
 
 
-from incf import incf
+from incf import app
 
 
 @pytest.fixture
