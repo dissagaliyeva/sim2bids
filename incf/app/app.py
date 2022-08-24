@@ -36,12 +36,18 @@ def recursive_walk(path: str, basename: bool = False) -> list:
     Recursively collect file paths using os.walk. If `basename` is True,
     get only file names. Otherwise, get all absolute paths.
 
-    :param path:
+    Parameters
+    ----------
+    path: str
         Path to a folder
-    :param basename:
-        Whether to store file names only.
-    :return:
+    basename: bool
+         Whether to store file names only. (Default value = False)
+
+    Returns
+    -------
+    content: list
         List of either absolute paths or file names.
+
     """
 
     global CODE
@@ -52,19 +58,27 @@ def recursive_walk(path: str, basename: bool = False) -> list:
     # recursively walk the directory
     for root, _, files in os.walk(path):
         for file in files:
-            # extract files
+            # extract files from zip folder
             if file.endswith('.zip'):
+                # add zip content to the files
                 content += z.extract_zip(os.path.join(root, file))
 
                 # remove zip folder
                 os.remove(file)
-                continue
+
+            # capture code's location
             if file.endswith('.py'):
                 CODE = os.path.join(root, file)
 
-            file = utils.rename_tract_lengths(file)
+            # rename tract_lengths to distances
+            if 'tract_length' in files:
+                file = utils.rename_tract_lengths(file)
+
+            # save file name
             if basename:
                 content.append(file)
+
+            # save absolute path
             else:
                 content.append(os.path.join(root, file))
 
