@@ -35,9 +35,11 @@ def main(path, files, subs=None, save=False, layout=False):
 
     # whether to generate layout
     if layout:
+        # if no subjects are passed, define them
         if subs is None:
             subs = subjects.Files(path, files).subs
 
+    # generate files
     if save and subs is not None:
         save_output(subs, OUTPUT)
 
