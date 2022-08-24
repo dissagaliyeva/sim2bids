@@ -7,7 +7,7 @@ import panel as pn
 import param
 
 import incf.preprocess.preprocess as prep
-import incf.preprocess.subjects as subj
+import incf.generate.subjects as subj
 from incf.validate import validate
 from incf.convert import convert
 from incf import utils

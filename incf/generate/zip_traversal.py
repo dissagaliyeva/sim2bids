@@ -1,6 +1,6 @@
 import os
 import zipfile
-import incf.preprocess.subjects as subj
+import incf.generate.subjects as subj
 
 
 def extract_zip(path):
