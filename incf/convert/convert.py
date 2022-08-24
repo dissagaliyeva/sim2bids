@@ -1,7 +1,6 @@
 import os
 import json
 import shutil
-import time
 from collections import OrderedDict
 
 import pandas as pd
@@ -13,7 +12,7 @@ import incf.preprocess.simulations_matlab as mat
 import incf.preprocess.structure as struct
 import incf.preprocess.subjects as subj
 import incf.preprocess.weights_distances as wdc
-import incf.preprocess.zip_traversal as z
+import incf.generate.zip_traversal as z
 import incf.preprocess.map_ts as mt
 import incf.templates.templates as temp
 import incf.preprocess.coords as coords
