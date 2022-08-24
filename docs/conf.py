@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# incf documentation build configuration file, created by
+# app documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun  9 13:47:02 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -49,7 +49,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'incf'
+project = 'app'
 copyright = "2022, Dinara Issagaliyeva"
 author = "Dinara Issagaliyeva"
 
@@ -130,8 +130,8 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'incf.tex',
-     'incf Documentation',
+    (master_doc, 'app.tex',
+     'app Documentation',
      'Dinara Issagaliyeva', 'manual'),
 ]
 
@@ -141,8 +141,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'incf',
-     'incf Documentation',
+    (master_doc, 'app',
+     'app Documentation',
      [author], 1)
 ]
 
@@ -153,10 +153,10 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'incf',
-     'incf Documentation',
+    (master_doc, 'app',
+     'app Documentation',
      author,
-     'incf',
+     'app',
      'One line description of project.',
      'Miscellaneous'),
 ]

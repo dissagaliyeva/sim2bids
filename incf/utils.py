@@ -3,7 +3,7 @@ import shutil
 
 import panel as pn
 import incf.templates.templates as temp
-import incf.incf as app
+import incf.app as app
 
 
 def rm_tree(path: str = '../output'):

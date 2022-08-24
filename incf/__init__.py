@@ -1,4 +1,4 @@
-"""Top-level package for incf."""
+"""Top-level package for app."""
 
 __author__ = """Dinara Issagaliyeva"""
 __email__ = 'dinarissaa@gmail.com'
