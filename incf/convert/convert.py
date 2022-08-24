@@ -9,8 +9,8 @@ import panel as pn
 import incf.preprocess.preprocess as prep
 import incf.preprocess.simulations_h5 as h5
 import incf.preprocess.simulations_matlab as mat
-import incf.preprocess.structure as struct
-import incf.preprocess.subjects as subj
+import incf.generate.structure as struct
+import incf.generate.subjects as subj
 import incf.preprocess.weights_distances as wdc
 import incf.generate.zip_traversal as z
 import incf.preprocess.map_ts as mt

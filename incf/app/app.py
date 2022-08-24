@@ -6,7 +6,7 @@ import panel as pn
 
 # import local packages
 from incf.app import utils
-from incf.generate import zip_traversal as z
+from incf.generate import subjects, structure
 
 
 # define global variables
@@ -28,58 +28,24 @@ ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',             
             'fc']                                                                   # Spatial (spatial)
 
 # define accepted extensions
-ACCEPTED_EXTS = ['txt', 'csv', 'dat', 'h5', 'mat', 'zip', 'py']
+ACCEPTED_EXT = ['txt', 'csv', 'dat', 'h5', 'mat', 'zip', 'py']
 
 
-def recursive_walk(path: str, basename: bool = False) -> list:
-    """
-    Recursively collect file paths using os.walk. If `basename` is True,
-    get only file names. Otherwise, get all absolute paths.
+def main(path, files, subs=None, save=False, layout=False):
 
-    Parameters
-    ----------
-    path: str
-        Path to a folder
-    basename: bool
-         Whether to store file names only. (Default value = False)
+    # whether to generate layout
+    if layout:
+        if subs is None:
+            subs = subjects.Files(path, files).subs
 
-    Returns
-    -------
-    content: list
-        List of either absolute paths or file names.
+    if save and subs is not None:
+        save_output(subs, OUTPUT)
 
-    """
+        if CODE is not None:
+            save_code(subs, OUTPUT)
 
-    global CODE
+        # finally, remove all empty folders
+        remove_empty(OUTPUT)
 
-    # create empty list to store paths
-    content = []
-
-    # recursively walk the directory
-    for root, _, files in os.walk(path):
-        for file in files:
-            # extract files from zip folder
-            if file.endswith('.zip'):
-                # add zip content to the files
-                content += z.extract_zip(os.path.join(root, file))
-
-                # remove zip folder
-                os.remove(file)
-
-            # capture code's location
-            if file.endswith('.py'):
-                CODE = os.path.join(root, file)
-
-            # rename tract_lengths to distances
-            if 'tract_length' in files:
-                file = utils.rename_tract_lengths(file)
-
-            # save file name
-            if basename:
-                content.append(file)
-
-            # save absolute path
-            else:
-                content.append(os.path.join(root, file))
-
-    return content
+    if layout:
+        return subs, structure.create_layout(subs, OUTPUT)

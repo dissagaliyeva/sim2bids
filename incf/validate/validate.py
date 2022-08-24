@@ -7,7 +7,7 @@ import mat73
 import scipy
 
 import incf.preprocess.simulations_matlab as matlab
-import incf.preprocess.subjects as subj
+import incf.generate.subjects as subj
 
 
 def validate(unique_files, all_files):
