@@ -5,5 +5,9 @@ __email__ = 'dinarissaa@gmail.com'
 __version__ = '0.1.0'
 
 
-def appert():
+def convert():
+    return None
+
+
+def validate():
     return None

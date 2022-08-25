@@ -1,21 +1,19 @@
-import os
-from pathlib import Path
-
-import pandas as pd
-from incf.appert import appert
-from incf.preprocess import weights_distances as wd
+from incf.convert import save as save_files
+from incf.generate import subjects
 
 DEFAULT_TMPL = '{}_desc-{}_{}.{}'
 
 
 def save(sub, output, folders, end, ses=None):
+    file = save_files.open_file(sub['path'], subjects.find_separator(sub['path']))
+
     if ses is None:
         if end == 'map.txt':
-            wd.save_files(folders, sub, idx=2)
+            save_files.save_files(sub, folders[2], file)
         else:
-            wd.save_files(folders, sub, idx=-1)
+            save_files.save_files(sub, folders[-1], file)
     else:
         if end == 'map.txt':
-            wd.save_files(folders, sub, idx=3)
+            save_files.save_files(sub, folders[3], file)
         else:
-            wd.save_files(folders, sub, idx=-1)
+            save_files.save_files(sub, folders[-1], file)
