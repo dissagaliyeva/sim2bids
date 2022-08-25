@@ -28,12 +28,20 @@ def save(sub, folders, ses=None, name=None):
     if IGNORE_CENTRE and name == 'centres':
         return
 
+    # read file contents
+    file = open_file(sub['path'], subjects.find_separator(sub['path']))
+
     # get folder location for weights and distances
     if name == 'wd':
+        # set appropriate output path
         if ses is None:
             folder = folders[1]
         else:
             folder = folders[2]
+
+        # save contents
+        desc = temp.weights if 'weights' in sub['name'] else temp.distances
+        save_files(sub, folder, file, desc=desc, ftype='wd')
 
     # get folder location for centres
     if name == 'centres':
@@ -46,8 +54,7 @@ def save(sub, folders, ses=None, name=None):
             folder = os.path.join(app.OUTPUT, 'coord')
 
             # pass values to save json file
-            save_files(sub, folder, open_file(folder, subjects.find_separator(folder)),
-                       type='coord', centres=True, desc=desc)
+            save_files(sub, folder, file, type='coord', centres=True, desc=desc)
         else:
             desc = ['These are the region labels which are unique for each individual.',
                     'These are the 3d coordinate centres which are unique for each individual.']
@@ -60,11 +67,21 @@ def save(sub, folders, ses=None, name=None):
                 folder = os.path.join(app.OUTPUT, 'coord')
 
             # save files
-            save_files(sub, folder, open_file(sub['path'], subjects.find_separator(sub['path'])),
-                       type='default', centres=True, desc=desc)
+            save_files(sub, folder, file, type='default', centres=True, desc=desc)
 
 
-def save_files(sub, folder, content, type='default', centres=False, desc=None):
+def save_files(sub, folder, content, type='default', centres=False, desc=None, ftype='centres'):
+    """
+
+    :param sub:
+    :param folder:
+    :param content:
+    :param type:
+    :param centres:
+    :param desc:
+    :param ftype:
+    :return:
+    """
 
     if type == 'default':
         json_file = os.path.join(folder, DEFAULT_TEMPLATE.format(sub['sid'], sub['desc'], sub['name'], 'json'))
@@ -95,10 +112,15 @@ def save_files(sub, folder, content, type='default', centres=False, desc=None):
         to_tsv(nodes.replace('json', 'tsv'), content[1:])
     else:
         # otherwise, save files as usual
-        pass
+        to_json(json_file, shape=content.shape, key=ftype, desc=desc)
+        to_tsv(tsv_file, content)
 
 
 def check_centres():
+    """
+
+    :return:
+    """
     # get all centres files
     centres = get_specific('centres')
     file = open_file(centres[0], subjects.find_separator(centres[0]))
@@ -143,6 +165,25 @@ def open_file(path: str, sep: str):
     :return:
     """
 
+    ext = path.split('.')[-1]
+
+    if ext in ['txt', 'csv', 'dat']:
+        return open_text(path, sep)
+
+    elif ext == 'mat':
+        pass
+
+    elif ext == 'h5':
+        pass
+
+
+def open_text(path, sep):
+    """
+
+    :param path:
+    :param sep:
+    :return:
+    """
     try:
         f = pd.read_csv(path, sep=sep, header=None, index_col=False)
     except pd.errors.EmptyDataError:
@@ -153,25 +194,39 @@ def open_file(path: str, sep: str):
         return f
 
 
-def to_tsv(path, file=None, sep=None):
-    if file is None:
-        return
-    else:
-        params = {'sep': '\t', 'header': None, 'index': None}
-        sep = sep if sep != '\n' else '\0'
+def to_tsv(path, file, sep=None):
+    """
 
-        if isinstance(file, str) and sep is not None:
-            pd.read_csv(file, index_col=None, header=None, sep=sep).to_csv(path, **params)
-        else:
-            try:
-                pd.DataFrame(file).to_csv(path, **params)
-            except ValueError:
-                with open(file) as f:
-                    with open(path, 'w') as f2:
-                        f2.write(f.read())
+    :param path:
+    :param file:
+    :param sep:
+    :return:
+    """
+    params = {'sep': '\t', 'header': None, 'index': None}
+    sep = sep if sep != '\n' else '\0'
+
+    if isinstance(file, str) and sep is not None:
+        pd.read_csv(file, index_col=None, header=None, sep=sep).to_csv(path, **params)
+    else:
+        try:
+            pd.DataFrame(file).to_csv(path, **params)
+        except ValueError:
+            with open(file) as f:
+                with open(path, 'w') as f2:
+                    f2.write(f.read())
 
 
 def to_json(path, shape, desc, key, coords=None, **kwargs):
+    """
+
+    :param path:
+    :param shape:
+    :param desc:
+    :param key:
+    :param coords:
+    :param kwargs:
+    :return:
+    """
     inp = temp.required
     out = OrderedDict({x: '' for x in inp})
 

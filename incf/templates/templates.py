@@ -1,4 +1,6 @@
-from collections import OrderedDict
+weights = 'The Structural Connectivity (SC) that contains the connectome. Zeros in a matrix represent ' \
+          '`unconnected` areas.'
+distances = 'The distances between areas.'
 
 struct = {'coord': {'required': ['Units'],
                     'recommend': ['AnatomicalLandmarkCoordinates', 'AnatomicalLandmarkCoordinateSystem',
@@ -32,65 +34,3 @@ def populate_dict(dict1, shape, desc, coords=None, **kwargs):
         dict1[k] = v
 
     return dict1
-
-#
-# JSON_template = OrderedDict({
-#     "NumberOfRows": 0,
-#     "NumberOfColumns": 0,
-#     "CoordsRows": [],
-#     "CoordsColumns": [],
-#     "Description": ""
-# })
-#
-# JSON_simulations = OrderedDict({
-#         "ModelEq": "",
-#         "ModelParam": "",
-#         "SourceCode": "",
-#         "SourceCodeVersion": "",
-#         "SoftwareVersion": "",
-#         "SoftwareName": "",
-#         "SoftwareRepository": "",
-#         "Network": [],
-# })
-#
-# JSON_centers = {
-#     "Units": "",
-#     "AnatomicalLandmarkCoordinates": "",
-#     "AnatomicalLandmarkCoordinateSystem": "",
-#     "AnatomicalLandmarkCoordinateUnits": "",
-#     "AnatomicalLandmarkCoordinateSystemDescription": "",
-# }
-#
-# #     "": "",
-# JSON_TS = {
-#     "ModelEq": "",
-#     "ModelParam": "",
-#     "SourceCode": "",
-#     "SourceCodeVersion": "",
-#     "SoftwareVersion": "",
-#     "SoftwareName": "",
-#     "SoftwareRepository": "",
-#     "Network": "",
-#     "SamplingPeriod": "",
-#     "SamplingFrequency": ""
-# }
-#
-# JSON_SPATIAL = {
-#     "ModelEq": "",
-#     "ModelParam": "",
-#     "SourceCode": "",
-#     "SourceCodeVersion": "",
-#     "": "",
-#     "": "",
-#     "": "",
-#     "": "",
-#     "": "",
-#     "": "",
-# }
-#
-#
-#
-# def merge_dicts(dict1, dict2):
-#     return {**dict1, **dict2}
-#
-#
