@@ -9,6 +9,7 @@ import incf.utils
 from incf.app import utils
 from incf.generate import subjects, structure
 from incf.preprocess import preprocess as prep
+from incf.convert import save as conv
 
 
 # define global variables
@@ -86,7 +87,7 @@ def save_output(subs):
             folders = create_sub_struct(OUTPUT, v, ses_name=ses)
 
             if 'weight' in k or 'distance' in k:
-
+                conv.save(sub[k], folders, ses=ses, name='wd')
 
 
     # iterate over files and save them
