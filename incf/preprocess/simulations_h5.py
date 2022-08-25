@@ -1,6 +1,6 @@
 import os
 import h5py
-from incf.convert import convert
+from incf.appert import appert
 
 COLS = ['weights', 'tract_lengths', 'region_labels', 'centres']
 TXT_COLS = ['areas', 'centres', 'cortical', 'hemispheres', 'orientations', 'region_labels', 'tract_lengths', 'weights']
@@ -97,6 +97,6 @@ def create_params(exists, paths, subs, data):
         for idx, col in enumerate(COLS):
             shape = data[col][:].shape if col != 'region_labels' else (data[col][:].shape[0], 1)
             data_value = data[col][:] if col != 'region_labels' else [str(x).strip("b'") for x in data[col][:]]
-            convert.to_tsv(paths[idx][0], data_value)
-            convert.to_json(paths[idx][1], shape, desc='', key='param', coords=coords)
+            appert.to_tsv(paths[idx][0], data_value)
+            appert.to_json(paths[idx][1], shape, desc='', key='param', coords=coords)
 

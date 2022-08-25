@@ -5,11 +5,10 @@ import re
 import pandas as pd
 import panel as pn
 
-from incf.convert import convert
-import os
+from incf.app import app
 from collections import OrderedDict
 import incf.preprocess.preprocess as prep
-import incf.convert.convert as conv
+from incf.app import utils
 
 TO_RENAME = None
 
@@ -21,19 +20,19 @@ class Files:
         self.subs = OrderedDict()
 
         # get all files' absolute paths
-        self.content = conv.get_content(path, files)
+        self.content = utils.get_content(path, files)
 
         # get all files
-        conv.ALL_FILES = self.content
+        app.ALL_FILES = self.content
 
         # get all files' unique names
-        self.basename = set(conv.get_content(path, files, basename=True))
+        self.basename = set(utils.get_content(path, files, basename=True))
 
         # check for multi-subject in one folder
         self.match = find_matches(self.basename)
 
         # check if the input is for single-subject or multi-subject
-        conv.MULTI_INPUT = not self.check_input()
+        app.MULTI_INPUT = not self.check_input()
 
         #
         self.ses_found = False
@@ -62,7 +61,7 @@ class Files:
             files = os.listdir(path)
 
         # traverse multi-subject inputs
-        if conv.MULTI_INPUT:
+        if app.MULTI_INPUT:
             # traverse multi-subject in one folder structure
             if len(self.match) > 0:
                 TO_RENAME = get_extensions(self.basename, self.match)
@@ -100,9 +99,9 @@ class Files:
 
                     if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
                         if os.path.basename(path) == file:
-                            self.subs[sid] = prepare_subs(conv.get_content(path.replace(file, ''), file), sid)
+                            self.subs[sid] = prepare_subs(utils.get_content(path.replace(file, ''), file), sid)
                         else:
-                            self.subs[sid] = prepare_subs(conv.get_content(path, file), sid)
+                            self.subs[sid] = prepare_subs(utils.get_content(path, file), sid)
 
         else:
             TO_RENAME = get_extensions(self.basename)
@@ -113,7 +112,7 @@ class Files:
 
             if not self.ses_found:
                 self.create_sid_sub(sid)
-                self.subs[sid] = prepare_subs(conv.get_content(path, files), sid)
+                self.subs[sid] = prepare_subs(utils.get_content(path, files), sid)
 
     def save_sessions(self, ses, files, sid, path):
         if ses in files:
@@ -123,7 +122,7 @@ class Files:
             if ses not in self.subs[sid].keys():
                 self.subs[sid][ses] = OrderedDict()
 
-            self.subs[sid][ses].update(prepare_subs(conv.get_content(path, ses), sid))
+            self.subs[sid][ses].update(prepare_subs(utils.get_content(path, ses), sid))
 
     def create_sid_sub(self, sid=None):
         sid = prep.create_uuid() if sid is None else sid
@@ -137,9 +136,9 @@ class Files:
 
 def traverse_single(path, selected, sid, ses=None):
     if ses is not None:
-        return prepare_subs(conv.get_content(path, ses), sid)
+        return prepare_subs(utils.get_content(path, ses), sid)
     else:
-        return prepare_subs(conv.get_content(path, selected), sid)
+        return prepare_subs(utils.get_content(path, selected), sid)
 
 
 def find_matches(paths):
@@ -170,7 +169,7 @@ def get_extensions(files, ids=None):
 
     for file in files:
         found = False
-        for acc in conv.ACCEPTED:
+        for acc in app.ACCEPTED:
             if file.lower().startswith(acc.lower()):
                 found = True
 
@@ -192,7 +191,7 @@ def prepare_subs(file_paths, sid):
     for file_path in file_paths:
         name = get_filename(file_path)
         name = name.split('_')[-1] if '_' in name else name
-        desc = convert.DESC
+        desc = app.DESC
 
         # rename tract_lengths to distances
         if name == 'tract_lengths.txt':
@@ -232,7 +231,7 @@ def prepare_subs(file_paths, sid):
         }
 
         if subs[name]['name'] in ['centres', 'centers']:
-            conv.CENTERS = True
+            app.CENTERS = True
 
     return subs
 

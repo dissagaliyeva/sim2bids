@@ -6,7 +6,7 @@ import scipy
 import scipy.io.matlab._miobase
 from scipy.io import loadmat
 
-from incf.convert import convert
+from incf.appert import appert
 
 
 def save(subs, folders, ses=None):
@@ -19,15 +19,15 @@ def save(subs, folders, ses=None):
     except scipy.io.matlab._miobase.MatReadError:
         pn.state.notifications.error(f'File `{fname}` is empty! Aborting...')
     else:
-        convert_mat(mat, subs, folders, ses=ses)
+        appert_mat(mat, subs, folders, ses=ses)
 
 
 def save_mat73(subs, folders, ses):
     mat = mat73.loadmat(subs['path'])
-    convert_mat(mat, subs, folders, ses=ses)
+    appert_mat(mat, subs, folders, ses=ses)
 
 
-def convert_mat(mat, subs, folders, ses=None):
+def appert_mat(mat, subs, folders, ses=None):
     name, fname = subs['name'], subs['fname']
     sid, desc = subs['sid'], subs['desc']
     data = find_mat_array(mat)
@@ -40,14 +40,14 @@ def convert_mat(mat, subs, folders, ses=None):
         spatial_path = folders[2] if ses is None else folders[3]
 
         if 'fc' in name.lower():
-            if convert.MULTI_INPUT:
+            if appert.MULTI_INPUT:
                 coord_json = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.json')
                 coord_tsv = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.tsv')
             else:
                 coord_json = os.path.join(spatial_path, f'desc-{desc}_fc.json')
                 coord_tsv = os.path.join(spatial_path, f'desc-{desc}_fc.tsv')
         else:
-            if ses is None or not convert.MULTI_INPUT:
+            if ses is None or not appert.MULTI_INPUT:
                 coord_json = os.path.join(ts_path, f'desc-{desc}_{name}.json')
                 coord_tsv = os.path.join(ts_path, f'desc-{desc}_{name}.tsv')
             else:
@@ -64,9 +64,9 @@ def save_tsv_json(path, data, tsv=True, desc=None):
     desc = '' if desc is None else desc
 
     if tsv:
-        convert.to_tsv(path, data)
+        appert.to_tsv(path, data)
     else:
-        convert.to_json(path, data.shape, desc, 'ts')
+        appert.to_json(path, data.shape, desc, 'ts')
 
 
 def find_mat_array(mat):

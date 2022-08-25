@@ -1,9 +1,9 @@
-.. compconv documentation master file, created by
+.. compapp documentation master file, created by
    sphinx-quickstart on Tue Aug 16 14:33:10 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to compconv's documentation!
+Welcome to compapp's documentation!
 ====================================
 
 Contents:

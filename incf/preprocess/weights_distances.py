@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import pandas as pd
-from incf.convert import convert
+from incf.appert import appert
 
 DEFAULT_TMPL = '{}_desc-{}_{}.{}'
 
@@ -19,7 +19,7 @@ def save_wd(subs, folders, ses=None):
     if ses is None:
         coords = None
 
-        if convert.CENTERS:
+        if appert.CENTERS:
             coords = [f'../coord/desc-{subs["desc"]}_labels.json', f'../coord/desc-{subs["desc"]}_nodes.json']
 
         save_files(folders, subs, idx=1, coords=coords)
@@ -73,8 +73,8 @@ def save_txt(path, f, name, coords=None):
 
     else:
         # save to tsv
-        convert.to_tsv(os.path.join(path, name), f[:])
-        convert.to_json(os.path.join(path, name.replace('tsv', 'json')), f.shape, desc='', key='wd', coords=coords)
+        appert.to_tsv(os.path.join(path, name), f[:])
+        appert.to_json(os.path.join(path, name.replace('tsv', 'json')), f.shape, desc='', key='wd', coords=coords)
 
 
 def save_centers(subs, output, folders, ses=None):
@@ -90,23 +90,23 @@ def save_centers(subs, output, folders, ses=None):
 
     if ses is None:
         # save to tsv
-        convert.to_tsv(os.path.join(output, 'coord', lname), labels)
-        convert.to_tsv(os.path.join(output, 'coord', nname), nodes)
+        appert.to_tsv(os.path.join(output, 'coord', lname), labels)
+        appert.to_tsv(os.path.join(output, 'coord', nname), nodes)
 
         # save to json
         for content in ['labels', 'nodes']:
             cols = 1 if content == 'labels' else 3
-            convert.to_json(os.path.join(output, 'coord', COORD_TMPL.format(desc, content, 'json')),
+            appert.to_json(os.path.join(output, 'coord', COORD_TMPL.format(desc, content, 'json')),
                             shape=[labels.shape[0], cols], desc='Time steps of the simulated time series.',
                             key='coord')
     else:
-        convert.to_tsv(os.path.join(output, subs['sid'] + '_' + lname), labels)
-        convert.to_tsv(os.path.join(output, subs['sid'] + '_' + nname), nodes)
+        appert.to_tsv(os.path.join(output, subs['sid'] + '_' + lname), labels)
+        appert.to_tsv(os.path.join(output, subs['sid'] + '_' + nname), nodes)
 
         # save to json
         for content in ['labels', 'nodes']:
             cols = 1 if content == 'labels' else 3
-            convert.to_json(os.path.join(output, subs['sid'] + '_' + COORD_TMPL.format(desc, content, 'json')),
+            appert.to_json(os.path.join(output, subs['sid'] + '_' + COORD_TMPL.format(desc, content, 'json')),
                             shape=[labels.shape[0], cols], desc='Time steps of the simulated time series.',
                             key='coord')
 

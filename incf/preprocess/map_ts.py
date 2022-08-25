@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import pandas as pd
-from incf.convert import convert
+from incf.appert import appert
 from incf.preprocess import weights_distances as wd
 
 DEFAULT_TMPL = '{}_desc-{}_{}.{}'
