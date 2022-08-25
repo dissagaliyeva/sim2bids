@@ -9,7 +9,7 @@ import param
 import incf.preprocess.preprocess as prep
 import incf.generate.subjects as subj
 from incf.validate import validate
-from incf.convert import convert
+from incf.appert import appert
 from incf import utils
 from incf.templates import user_guide as ug
 
@@ -34,10 +34,10 @@ class MainArea(param.Parameterized):
 
     # sidebar components
     output_path = pn.widgets.TextInput(value='../output', margin=(-20, 10, 0, 10))
-    convert.OUTPUT = output_path.value
+    appert.OUTPUT = output_path.value
 
     desc = pn.widgets.TextInput(value='default', max_length=30, margin=(-20, 10, 0, 10))
-    convert.DESC = desc.value
+    appert.DESC = desc.value
 
     checkbox_options = ['Traverse subfolders', 'Autocomplete columns', 'Copy input folder']
     checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders', 'Autocomplete columns'],
@@ -60,14 +60,14 @@ class MainArea(param.Parameterized):
         if os.path.exists(self.text_input.value):
             # whether to not alter original input folder
             if self.checkbox_options[2] in self.checkbox_group.value:
-                self.text_input.value = convert.duplicate_folder(self.text_input.value)
+                self.text_input.value = appert.duplicate_folder(self.text_input.value)
 
             self.cross_select.options = os.listdir(self.text_input.value)
             self.cross_select.value = []
             self.structure.value = ''
             prep.reset_index()
             subj.TO_RENAME = None
-            convert.ALL_FILES = None
+            appert.ALL_FILES = None
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
@@ -76,22 +76,22 @@ class MainArea(param.Parameterized):
         if len(self.cross_select.value) == 0:
             prep.reset_index()
             subj.TO_RENAME = None
-            convert.ALL_FILES = None
+            appert.ALL_FILES = None
             for _ in self.rename_files:
                 self.rename_files.pop(-1)
 
         if self.length != len(self.cross_select.value):
             prep.reset_index()
             subj.TO_RENAME = None
-            convert.ALL_FILES = None
+            appert.ALL_FILES = None
 
             for _ in self.rename_files:
                 self.rename_files.pop(-1)
 
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
-            # convert.check_input(path=self.text_input.value, files=self.cross_select.value)
-            self.subjects, self.struct = convert.check_file(path=self.text_input.value,
+            # appert.check_input(path=self.text_input.value, files=self.cross_select.value)
+            self.subjects, self.struct = appert.check_file(path=self.text_input.value,
                                                             files=self.cross_select.value,
                                                             save=False)
             if subj.TO_RENAME is not None:
@@ -107,10 +107,10 @@ class MainArea(param.Parameterized):
             self.length = len(self.cross_select.value)
 
     def _generate_files(self, event=None):
-        _ = convert.check_file(path=self.text_input.value, files=self.cross_select.value,
+        _ = appert.check_file(path=self.text_input.value, files=self.cross_select.value,
                                subs=self.subjects, save=True)
         subj.TO_RENAME = None
-        convert.ALL_FILES = None
+        appert.ALL_FILES = None
 
     def _generate_struct(self, event=None):
         self.structure.value = self.struct
@@ -120,14 +120,14 @@ class MainArea(param.Parameterized):
         global AUTOFILL
 
         # whether to traverse sub-folders
-        convert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
+        appert.TRAVERSE_FOLDERS = True if self.checkbox_options[0] in self.checkbox_group.value else False
 
         # whether to autofill all files
         AUTOFILL = True if self.checkbox_options[1] in self.checkbox_group.value else False
 
         # whether to not alter original input folder
         if self.checkbox_options[2] in self.checkbox_group.value:
-            self.text_input.value = convert.duplicate_folder(self.text_input.value)
+            self.text_input.value = appert.duplicate_folder(self.text_input.value)
 
     @pn.depends('output_path.value', watch=True)
     def _store_output(self):
@@ -138,17 +138,17 @@ class MainArea(param.Parameterized):
                 pn.state.notifications.error(f'Folder `{output}` does not exist!')
             else:
                 pn.state.notifications.success(f'Folder `{output}` is selected as output folder')
-                convert.OUTPUT = output
+                appert.OUTPUT = output
 
     def _rename(self, event=None):
-        validate.validate(self.rename_files, convert.ALL_FILES)
+        validate.validate(self.rename_files, appert.ALL_FILES)
 
     @pn.depends('desc.value', watch=True)
     def _change_desc(self):
-        old, new = convert.DESC, self.desc.value
+        old, new = appert.DESC, self.desc.value
 
         if old != new:
-            convert.DESC = new
+            appert.DESC = new
             pn.state.notifications.success(f'Changed description from `{old}` to `{new}`.')
 
     def view(self):
@@ -198,7 +198,7 @@ class ViewResults(param.Parameterized):
 
     def __init__(self):
         super().__init__()
-        self.path = convert.OUTPUT
+        self.path = appert.OUTPUT
         self.layout = None
         self.widget = pn.WidgetBox('### Select File', self.select_options)
         self.je_widget = pn.WidgetBox()

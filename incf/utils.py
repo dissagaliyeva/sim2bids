@@ -22,7 +22,7 @@ def get_selector(name):
         'Network (net)': ['weights', 'distances', 'delays', 'speed', 'weights & nodes'],
         'Coordinates (coord)': ['times', 'centres', 'orientations', 'areas', 'hemispheres',
                                 'cortical', 'nodes', 'labels', 'vertices', 'faces', 'vnormals',
-                                'fnormals', 'sensors', 'conv', 'map', 'volumes',
+                                'fnormals', 'sensors', 'app', 'map', 'volumes',
                                 'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d'],
         'Timeseries (ts)': ['ts', 'emp', 'vars', 'stimuli', 'noise', 'spikes', 'raster', 'events'],
         'Spatial (spatial)': ['fc', 'map'],

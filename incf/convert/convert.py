@@ -31,7 +31,7 @@ TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                    
 ACCEPTED = ['weight', 'distance', 'tract',  'delay', 'speed', 'centres',
             'nodes', 'labels', 'area', 'hemisphere', 'cortical', 'orientation',
             'average_orientation', 'normal',
-            'time', 'vertice', 'face', 'vnormal', 'fnormal', 'sensor', 'conv', 'map',
+            'time', 'vertice', 'face', 'vnormal', 'fnormal', 'sensor', 'app', 'map',
             'volume', 'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',
             'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'fc']
 

@@ -1,7 +1,7 @@
 import os
 import h5py as h
 from pathlib import Path
-from incf.convert import convert
+from incf.app import app
 from collections import OrderedDict
 from incf.preprocess import simulations_h5 as sim
 
@@ -44,7 +44,7 @@ class FolderStructure:
             self.save_centres(v, sid, ses=ses)
         elif k in ['map.txt', 'map.csv']:
             self.save_map(v, sid, ses=ses)
-        elif k in ['nodes.txt', 'nodes.csv', 'labels.txt', 'labels.csv', *convert.TO_EXTRACT[3:]]:
+        elif k in ['nodes.txt', 'nodes.csv', 'labels.txt', 'labels.csv', *app.TO_EXTRACT[3:]]:
             self.save_centres(v, sid, ses=ses, name=v['name'])
         elif k.endswith('.mat'):
             if 'fc' in k.lower():
@@ -54,7 +54,7 @@ class FolderStructure:
         elif k.endswith('.h5'):
             self.save_h5(v, ses=ses)
 
-        if convert.CODE is not None:
+        if app.CODE is not None:
             self.save_code(v)
 
     def save_wd(self, v, sid, ses=None):
@@ -69,7 +69,7 @@ class FolderStructure:
 
     def save_map(self, v, sid, ses=None):
         if ses is None:
-            if convert.MULTI_INPUT:
+            if app.MULTI_INPUT:
                 self.components['subjects'][sid]['spatial'] += common_structure(v, 'map')
             else:
                 self.components['subjects']['spatial'] += coord_structure(v, ses)
@@ -79,7 +79,7 @@ class FolderStructure:
     def save_centres(self, v, sid, ses=None, name=None):
         structure = coord_structure(v, ses) if name is None else common_structure(v, name)
         if ses is None:
-            if convert.MULTI_INPUT:
+            if app.MULTI_INPUT:
                 if len(set(structure).intersection(set(self.components['subjects'][sid]['coord']))) == 0:
                     self.components['subjects'][sid]['coord'] += structure
             else:
@@ -122,7 +122,7 @@ class FolderStructure:
                 self.components['subjects'][sid]['net'] += common_structure(v, 'weights')
                 self.components['subjects'][sid]['net'] += common_structure(v, 'distances')
 
-                if not convert.MULTI_INPUT:
+                if not app.MULTI_INPUT:
                     self.components['coord'] += coord_structure(v)
                 else:
                     del self.components['coord']
@@ -139,7 +139,7 @@ class FolderStructure:
         ses_exists = False
 
         for k, v in self.subs.items():
-            if ('sid' in v or not convert.MULTI_INPUT) and ('ses-preop' not in v.keys() and 'ses-postop' not in v.keys()):
+            if ('sid' in v or not app.MULTI_INPUT) and ('ses-preop' not in v.keys() and 'ses-postop' not in v.keys()):
 
                 if k not in self.components['subjects'].keys():
                     self.components['subjects'][k] = {'net': [], 'ts': [], 'spatial': [], 'coord': [], 'map': []}

@@ -1,6 +1,6 @@
 alt = """<br>
-Using the app was created to ease your computational simulation conversion! Before passing your files to the
-conversion tool, make sure to <strong>run the preprocessing pipeline beforehand</strong>. We know that manually
+Using the app was created to ease your computational simulation appersion! Before passing your files to the
+appersion tool, make sure to <strong>run the preprocessing pipeline beforehand</strong>. We know that manually
 renaming your files is too time-consuming and, let’s be honest, annoying! Please run the cell under "Preprocess data"
 and follow the instructions there. <br><br>
 
@@ -13,7 +13,7 @@ or click on any space <strong>outside</strong> of the input box where you provid
 input folder to verify files exist.
 
 <h3>Step 2: Select files</h3>
-Select files you want to convert. You have three options:
+Select files you want to appert. You have three options:
 
 <center><h4>Go back one level and select the whole folder containing the files</h4></center>
 <center><img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/folder.gif" width="70%"/><br></center>
@@ -27,7 +27,7 @@ Select files you want to convert. You have three options:
 <h3>Step 3: Check out preliminary results</h3>
 Check out the automatically generated folder structure. Don't worry, no files are generated at this stage.
 The structure just shows the possible output. You might see some empty folders there, they will be removed when
-the structure gets generated. This conversion follows the BEP034 specification, therefore, we need to keep the
+the structure gets generated. This appersion follows the BEP034 specification, therefore, we need to keep the
 structure as minimal as possible. For more information, check out "BEP034" above.
 
 <h3>Step 4: Verify settings parameters </h3>
@@ -35,7 +35,7 @@ There are several settings on the left-hand side that you might consider crucial
 
 <ul>
     <li><strong>Provide output path</strong></li>
-    By default, the app stores all conversion output in the local folder (on the same level as "requirements.txt"). In case
+    By default, the app stores all appersion output in the local folder (on the same level as "requirements.txt"). In case
     you want to change the destination, simply provide a new path. If the folder doesn't exist, the app creates it ;)
 
     <li><strong>Provide a short description (max 30 chars)</strong></li>
@@ -57,7 +57,7 @@ There are several settings on the left-hand side that you might consider crucial
         By default, all folders get traversed. For example, if you pass in a folder that has sub-folders, the app
         traverses the sub-folders as well. If you don't want that behavior, simply click on the checkbox.
         <li><strong>Autocomplete columns</strong></li>
-        After file conversion, you will be able to see the generated JSON and TSV files in the "View Results" tab.
+        After file appersion, you will be able to see the generated JSON and TSV files in the "View Results" tab.
         If you specify the REQUIRED or RECOMMENDED fields, say, for "weights", then all the other "weights"
         files will inherit the same information. Columns "NumberOfRows" and "NumberOfColumns" won't be affected.
     </ul>
@@ -66,7 +66,7 @@ There are several settings on the left-hand side that you might consider crucial
 <h3>Step 5: Generate the files! </h3>
 If you’re happy with the possible structure and sure about the settings, click "Generate Files" button.
 
-<h3>Step 6 (OPTIONAL): Check out the JSON/TSV conversions in the "View Results" tab </h3>
+<h3>Step 6 (OPTIONAL): Check out the JSON/TSV appersions in the "View Results" tab </h3>
 
 <h3>Step 7 (OPTIONAL): Check out visualizations! (TO BE IMPLEMENTED...) </h3>
 
@@ -122,7 +122,7 @@ even identical.
 This is in contrast to the idea of BIDS of providing a generically interoperable
 specification that is independent of a specific product, concept or framework.
 Therefore, instead of interpreting computational model simulation results from the
-conceptual vantage point of a specific product or framework and to converge towards a
+conceptual vantage point of a specific product or framework and to apperge towards a
 common ground we introduce only highly <strong>generic datatypes</strong> to store computational models
 and simulation results:<ul>
 <li>network graphs (<code>net/</code>)</li>
@@ -352,8 +352,8 @@ Currently supported types of coordinates:<p></p>
 </tr>
 <tr>
 <td>Projection matrix</td>
-<td><code>conv</code></td>
-<td>like a <code>map</code>, but applied as convolution matrix (that is, multiplied with a <code>ts</code> or <code>spatial</code> object).</td>
+<td><code>app</code></td>
+<td>like a <code>map</code>, but applied as appolution matrix (that is, multiplied with a <code>ts</code> or <code>spatial</code> object).</td>
 </tr>
 <tr>
 <td>spatial extends of 2d objects</td>
@@ -524,7 +524,7 @@ time index <code>i</code>, while a value of <code>1</code> indicates a spike by 
 </table></div></div>
 <h3 id="ts-specific-metadata"><a class="toclink" href="http://127.0.0.1:8000/en/stable/04-modality-specific-files/10-computational-models.html#ts-specific-metadata"><code>"ts"</code>-specific metadata</a></h3>
 <p>While it is possible to use <code>coords/*_times.tsv</code> files to specify the time points of a
-time series, it is often more convenient to just specify the
+time series, it is often more appenient to just specify the
 <code>"SamplingPeriod"</code> or the <code>"SamplingFrequency"</code> (works only for equidistant sampling).</p>
 <div class="md-typeset__scrollwrap"><div class="md-typeset__table"><table>
 <thead>

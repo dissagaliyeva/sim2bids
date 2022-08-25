@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from collections import OrderedDict
@@ -9,13 +10,14 @@ import incf.utils
 from incf.app import utils
 from incf.generate import subjects, structure
 from incf.preprocess import preprocess as prep
-from incf.convert import save as conv
+from incf.convert import save as save_files
+from incf.templates import templates as temp
 
 
 # define global variables
 SID = None
 DESC = 'default'        # short description that identifies input data
-OUTPUT = '../output'    # output folder to store conversions
+OUTPUT = '../output'    # output folder to store appersions
 CENTRES = False         # whether centres.txt|nodes.txt|labels.txt were found
 MULTI_INPUT = False     # whether input files include single- or multi-subjects
 ALL_FILES = None        # list of all file paths (gets supplemented in subjects.py)
@@ -30,6 +32,10 @@ ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',             
             'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'emp'     # Timeseries (ts)
             'fc']                                                                   # Spatial (spatial)
 
+TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                                            # folder "net"
+              'areas.txt', 'average_orientations.txt', 'cortical.txt', 'hemisphere.txt', 'normals.txt'  # folder "coord"
+              ]
+
 # define accepted extensions
 ACCEPTED_EXT = ['txt', 'csv', 'dat', 'h5', 'mat', 'zip', 'py']
 
@@ -37,7 +43,7 @@ ACCEPTED_EXT = ['txt', 'csv', 'dat', 'h5', 'mat', 'zip', 'py']
 def main(path: str, files: list, subs: dict = None, save: bool = False, layout: bool = False):
     """
     Main brain function that creates subjects, auto-generated structure,
-    and saves converted files.
+    and saves apperted files.
 
     :param path:
     :param files:
@@ -52,9 +58,9 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
-    # only save conversions if 'save' is True
+    # only save appersions if 'save' is True
     if save and subs is not None:
-        # save conversions
+        # save appersions
         save_output(subs)
 
         # save code
@@ -87,15 +93,15 @@ def save_output(subs):
             folders = create_sub_struct(OUTPUT, v, ses_name=ses)
 
             if 'weight' in k or 'distance' in k:
-                conv.save(sub[k], folders, ses=ses, name='wd')
-
+                save_files.save(sub[k], folders, ses=ses, name='wd')
+            elif 'centre' in k:
+                save_files.save(sub[k], folders, ses=ses, name='centres')
 
     # iterate over files and save them
     for k, v in subs.items():
         if 'ses-preop' in v.keys() or 'ses-postop' in v.keys():
             for k2, v2 in v.items():
                 save(v2, ses=k2)
-
 
 
 def check_output_folder():
@@ -108,7 +114,7 @@ def check_output_folder():
         incf.utils.rm_tree(OUTPUT)
         prep.reset_index()
 
-    # create the folder that will store conversions
+    # create the folder that will store appersions
     if not os.path.exists(OUTPUT):
         os.mkdir(OUTPUT)
 
@@ -142,3 +148,28 @@ def create_sub_struct(path, subs, ses_name=None):
             os.mkdir(folder)
 
     return folders
+
+
+def save_code(subs, output):
+    template = f'desc-{DESC}_code.py'
+    path = os.path.join(output, 'code', template)
+    shutil.copy(CODE, path)
+
+    out = OrderedDict({x: '' for x in temp.struct['code']['recommend']})
+
+    with open(os.path.join(path.replace('py', 'json')), 'w') as file:
+        json.dump(out, file)
+
+
+def remove_empty():
+    """
+    Recursively traverse generated output folder and remove all empty folders.
+    :param path:
+    :return:
+    """
+
+    # get contents of the specified path
+    for root, dirs, files in os.walk(OUTPUT):
+        # if folder is empty, remove it
+        if len(os.listdir(root)) == 0:
+            os.removedirs(root)
