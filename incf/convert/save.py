@@ -73,7 +73,16 @@ def save_files(sub, folder, content, type='default', centres=False, desc=None):
         json_file = os.path.join(folder, COORD_TEMPLATE.format(sub['desc'], sub['name'], 'json'))
         tsv_file = json_file.replace('json', 'tsv')
 
+    # Save 'centres.txt' as 'nodes.txt' and 'labels.txt'. This will require breaking the
+    # 'centres.txt' file, the first column HAS TO BE labels, and the rest N dimensions
+    # are nodes.
     if centres:
+        # create names for nodes and labels
+        # Since the usual structure leaves the name of the files as is,
+        # we need to make sure we save 'nodes' and 'labels' appropriately.
+        # If we didn't create these two values below, both labels and nodes
+        # would be stored as 'sub-<ID>_desc-<label>_centres.txt', and the
+        # content would only have nodes.
         labels = json_file.replace(sub['name'], 'labels')
         nodes = json_file.replace(sub['name'], 'nodes')
 
@@ -84,6 +93,9 @@ def save_files(sub, folder, content, type='default', centres=False, desc=None):
         # save nodes to json and tsv
         to_json(nodes, shape=content.shape, key='coord', desc=desc[1])
         to_tsv(nodes.replace('json', 'tsv'), content[1:])
+    else:
+        # otherwise, save files as usual
+        pass
 
 
 def check_centres():
