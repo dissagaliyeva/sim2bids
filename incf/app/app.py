@@ -58,9 +58,9 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
-    # only save appersions if 'save' is True
+    # only save conversions if 'save' is True
     if save and subs is not None:
-        # save appersions
+        # save conversions
         save_output(subs)
 
         # save code
@@ -75,7 +75,7 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         return subs, structure.create_layout(subs)
 
     # otherwise, return None
-    return
+    return None, None
 
 
 def save_output(subs):
@@ -84,8 +84,16 @@ def save_output(subs):
     :param subs:
     :return:
     """
+
+    # create the folder that will store conversions
+    if not os.path.exists(OUTPUT):
+        os.mkdir(OUTPUT)
+
     # prepare the output folder
     check_output_folder()
+
+    # verify folders exist
+    structure.check_folders(OUTPUT)
 
     def save(sub, ses=None):
         for k, v in sub.items():
@@ -113,13 +121,6 @@ def check_output_folder():
         pn.state.notifications.info('Output folder contains files. Removing them...')
         incf.utils.rm_tree(OUTPUT)
         prep.reset_index()
-
-    # create the folder that will store appersions
-    if not os.path.exists(OUTPUT):
-        os.mkdir(OUTPUT)
-
-    # verify folders exist
-    structure.check_folders(OUTPUT)
 
 
 def create_sub_struct(path, subs, ses_name=None):
@@ -150,9 +151,9 @@ def create_sub_struct(path, subs, ses_name=None):
     return folders
 
 
-def save_code(subs, output):
+def save_code(subs):
     template = f'desc-{DESC}_code.py'
-    path = os.path.join(output, 'code', template)
+    path = os.path.join(OUTPUT, 'code', template)
     shutil.copy(CODE, path)
 
     out = OrderedDict({x: '' for x in temp.struct['code']['recommend']})
@@ -164,8 +165,7 @@ def save_code(subs, output):
 def remove_empty():
     """
     Recursively traverse generated output folder and remove all empty folders.
-    :param path:
-    :return:
+
     """
 
     # get contents of the specified path
@@ -173,3 +173,19 @@ def remove_empty():
         # if folder is empty, remove it
         if len(os.listdir(root)) == 0:
             os.removedirs(root)
+
+
+def duplicate_folder(path):
+    print('im triggered, duplicate folder')
+    # create folder if it doesn't exist
+    root = os.path.join('..', 'data')
+    new_path = os.path.join(root, os.path.basename(os.path.dirname(path + '/')))
+
+    if not os.path.exists(root):
+        os.mkdir(root)
+
+    if not os.path.exists(new_path):
+        shutil.copytree(path, new_path, symlinks=False, ignore=None, ignore_dangling_symlinks=False,
+                        dirs_exist_ok=False)
+    # set PATH to a new path
+    return new_path

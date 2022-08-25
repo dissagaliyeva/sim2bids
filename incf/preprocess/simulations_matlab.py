@@ -6,7 +6,8 @@ import scipy
 import scipy.io.matlab._miobase
 from scipy.io import loadmat
 
-from incf.appert import appert
+from incf.app import app
+from incf.convert import save as save_files
 
 
 def save(subs, folders, ses=None):
@@ -40,14 +41,14 @@ def appert_mat(mat, subs, folders, ses=None):
         spatial_path = folders[2] if ses is None else folders[3]
 
         if 'fc' in name.lower():
-            if appert.MULTI_INPUT:
+            if app.MULTI_INPUT:
                 coord_json = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.json')
                 coord_tsv = os.path.join(spatial_path, f'{sid}_desc-{desc}_fc.tsv')
             else:
                 coord_json = os.path.join(spatial_path, f'desc-{desc}_fc.json')
                 coord_tsv = os.path.join(spatial_path, f'desc-{desc}_fc.tsv')
         else:
-            if ses is None or not appert.MULTI_INPUT:
+            if ses is None or not app.MULTI_INPUT:
                 coord_json = os.path.join(ts_path, f'desc-{desc}_{name}.json')
                 coord_tsv = os.path.join(ts_path, f'desc-{desc}_{name}.tsv')
             else:
@@ -64,9 +65,9 @@ def save_tsv_json(path, data, tsv=True, desc=None):
     desc = '' if desc is None else desc
 
     if tsv:
-        appert.to_tsv(path, data)
+        save_files.to_tsv(path, data)
     else:
-        appert.to_json(path, data.shape, desc, 'ts')
+        save_files.to_json(path, data.shape, desc, 'ts')
 
 
 def find_mat_array(mat):

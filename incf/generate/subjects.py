@@ -198,7 +198,10 @@ def prepare_subs(file_paths, sid):
             name = 'distances.txt'
 
         if not os.path.exists(file_path) and 'distances' in file_path:
-            os.replace(file_path.replace('distances', 'tract_lengths'), file_path)
+            if os.path.exists(file_path.replace('distances', 'tract_lengths')):
+                os.replace(file_path.replace('distances', 'tract_lengths'), file_path)
+            else:
+                continue
 
         # rename tract_lengths to distances in the physical folder location
         if 'tract_lengths' in file_path:

@@ -35,8 +35,7 @@ def recursive_walk(path: str, basename: bool = False) -> list:
                 # add zip content to the files
                 content += z.extract_zip(os.path.join(root, file))
 
-                # remove zip folder
-                os.remove(file)
+                continue
 
             # if code is found, save its location
             if file.endswith('.py'):
@@ -117,7 +116,5 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 
 
 def rename_tract_lengths(file: str) -> str:
-    if 'tract_lengths' in file:
-        return file.replace('tract_lengths', 'distances')
-    return file
+    return file.replace('tract_lengths', 'distances')
 

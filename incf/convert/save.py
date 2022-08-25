@@ -40,12 +40,18 @@ def save(sub, folders, ses=None, name=None):
         # check if all centres are of the same content
         if check_centres():
             IGNORE_CENTRE = True
+            desc = ['These are the region labels which are the same for all individuals.',
+                    'These are the 3d coordinate centres which are the same for all individuals.']
 
             folder = os.path.join(app.OUTPUT, 'coord')
 
             # pass values to save json file
-            save_files(sub, folder, open_file(folder, subjects.find_separator(folder)), type='coord', centres=True)
+            save_files(sub, folder, open_file(folder, subjects.find_separator(folder)),
+                       type='coord', centres=True, desc=desc)
         else:
+            desc = ['These are the region labels which are unique for each individual.',
+                    'These are the 3d coordinate centres which are unique for each individual.']
+
             if ses is not None:
                 folder = folders[4]
             elif app.MULTI_INPUT and ses is None:
@@ -54,10 +60,11 @@ def save(sub, folders, ses=None, name=None):
                 folder = os.path.join(app.OUTPUT, 'coord')
 
             # save files
-            save_files(sub, folder, open_file(folder, subjects.find_separator(folder)), type='coord', centres=True)
+            save_files(sub, folder, open_file(sub['path'], subjects.find_separator(sub['path'])),
+                       type='default', centres=True, desc=desc)
 
 
-def save_files(sub, folder, content, type='default', centres=False):
+def save_files(sub, folder, content, type='default', centres=False, desc=None):
 
     if type == 'default':
         json_file = os.path.join(folder, DEFAULT_TEMPLATE.format(sub['sid'], sub['desc'], sub['name'], 'json'))
@@ -67,15 +74,16 @@ def save_files(sub, folder, content, type='default', centres=False):
         tsv_file = json_file.replace('json', 'tsv')
 
     if centres:
+        labels = json_file.replace(sub['name'], 'labels')
+        nodes = json_file.replace(sub['name'], 'nodes')
+
         # save labels to json and tsv
-        to_json(folder, shape=[content.shape[0], 1], key='coord',
-                desc='These are the region labels which are the same for all individuals.')
-        to_tsv(folder, content[0])
+        to_json(labels, shape=[content.shape[0], 1], key='coord', desc=desc[0])
+        to_tsv(labels.replace('json', 'tsv'), content[0])
 
         # save nodes to json and tsv
-        to_json(folder, shape=content.shape, key='coord',
-                desc='These are the 3d coordinate centres which are the same for all individuals.')
-        to_tsv(folder, content[1:])
+        to_json(nodes, shape=content.shape, key='coord', desc=desc[1])
+        to_tsv(nodes.replace('json', 'tsv'), content[1:])
 
 
 def check_centres():
@@ -122,6 +130,7 @@ def open_file(path: str, sep: str):
     :param sep:
     :return:
     """
+
     try:
         f = pd.read_csv(path, sep=sep, header=None, index_col=False)
     except pd.errors.EmptyDataError:
