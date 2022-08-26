@@ -110,6 +110,8 @@ def save_output(subs):
         if 'ses-preop' in v.keys() or 'ses-postop' in v.keys():
             for k2, v2 in v.items():
                 save(v2, ses=k2)
+        else:
+            save(v)
 
 
 def check_output_folder():
