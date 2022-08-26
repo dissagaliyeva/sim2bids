@@ -24,8 +24,7 @@ COORDS = None
 
 
 def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
-    """
-    Main engine to save all conversions. Several functionalities to understand:
+    """Main engine to save all conversions. Several functionalities to understand:
 
     1. Check all centres files to see if they have identical content. If so,
        only one copy gets saved in the main area of the output folder (by default
@@ -67,12 +66,24 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
     4. Save files.
 
+    Parameters
+    ----------
+    sub :
+        param folders:
+    ses :
+        param name:
+    sub: dict :
 
-    :param sub:
-    :param folders:
-    :param ses:
-    :param name:
-    :return:
+    folders: list :
+
+    ses: str :
+         (Default value = None)
+    name: str :
+         (Default value = None)
+
+    Returns
+    -------
+
     """
     global IGNORE_CENTRE
 
@@ -129,14 +140,26 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 def save_files(sub, folder, content, type='default', centres=False, desc=None, ftype='centres'):
     """
 
-    :param sub:
-    :param folder:
-    :param content:
-    :param type:
-    :param centres:
-    :param desc:
-    :param ftype:
-    :return:
+    Parameters
+    ----------
+    sub :
+        param folder:
+    content :
+        param type:
+    centres :
+        param desc: (Default value = False)
+    ftype :
+        return: (Default value = 'centres')
+    folder :
+
+    type :
+         (Default value = 'default')
+    desc :
+         (Default value = None)
+
+    Returns
+    -------
+
     """
     global COORDS
 
@@ -179,7 +202,7 @@ def save_files(sub, folder, content, type='default', centres=False, desc=None, f
 def check_centres():
     """
 
-    :return:
+
     """
     # get all centres files
     centres = get_specific('centres')
@@ -199,13 +222,20 @@ def check_centres():
 
 
 def get_specific(filetype: str) -> list:
-    """
-    Get all files that correspond to the filetype. For example,
+    """Get all files that correspond to the filetype. For example,
     if filetype is equal to "areas", this function will return
     all files containing that keyword.
 
-    :param filetype:
-    :return:
+    Parameters
+    ----------
+    filetype :
+        return:
+    filetype: str :
+
+
+    Returns
+    -------
+
     """
 
     content = []
@@ -220,9 +250,18 @@ def get_specific(filetype: str) -> list:
 def open_file(path: str, sep: str):
     """
 
-    :param path:
-    :param sep:
-    :return:
+    Parameters
+    ----------
+    path :
+        param sep:
+    path: str :
+
+    sep: str :
+
+
+    Returns
+    -------
+
     """
 
     ext = path.split('.')[-1]
@@ -240,9 +279,16 @@ def open_file(path: str, sep: str):
 def open_text(path, sep):
     """
 
-    :param path:
-    :param sep:
-    :return:
+    Parameters
+    ----------
+    path :
+        param sep:
+    sep :
+
+
+    Returns
+    -------
+
     """
     try:
         f = pd.read_csv(path, sep=sep, header=None, index_col=False)
@@ -257,10 +303,18 @@ def open_text(path, sep):
 def to_tsv(path, file, sep=None):
     """
 
-    :param path:
-    :param file:
-    :param sep:
-    :return:
+    Parameters
+    ----------
+    path :
+        param file:
+    sep :
+        return: (Default value = None)
+    file :
+
+
+    Returns
+    -------
+
     """
     params = {'sep': '\t', 'header': None, 'index': None}
     sep = sep if sep != '\n' else '\0'
@@ -279,12 +333,24 @@ def to_tsv(path, file, sep=None):
 def to_json(path, shape, desc, key, **kwargs):
     """
 
-    :param path:
-    :param shape:
-    :param desc:
-    :param key:
-    :param kwargs:
-    :return:
+    Parameters
+    ----------
+    path :
+        param shape:
+    desc :
+        param key:
+    kwargs :
+        return:
+    shape :
+
+    key :
+
+    **kwargs :
+
+
+    Returns
+    -------
+
     """
     inp = temp.required
     out = OrderedDict({x: '' for x in inp})
