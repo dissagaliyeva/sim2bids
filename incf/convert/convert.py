@@ -1,233 +1,409 @@
-import os
 import json
-import shutil
+import os
 from collections import OrderedDict
 
+import numpy as np
 import pandas as pd
-import panel as pn
 
-import incf.preprocess.preprocess as prep
-import incf.preprocess.simulations_h5 as h5
-import incf.preprocess.simulations_matlab as mat
-import incf.generate.structure as struct
-import incf.generate.subjects as subj
-import incf.preprocess.weights_distances as wdc
-import incf.generate.zip_traversal as z
-import incf.preprocess.map_ts as mt
+from incf.app import app
+from incf.generate import subjects
 import incf.templates.templates as temp
-import incf.preprocess.coords as coords
-import incf.utils as utils
 
-SID = None
-OUTPUT = '../output'
-DESC = 'default'
-CENTERS = False
-MULTI_INPUT = False
-TRAVERSE_FOLDERS = True
-TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                                            # folder "net"
-              'areas.txt', 'average_orientations.txt', 'cortical.txt', 'hemisphere.txt', 'normals.txt'  # folder "coord"
-              ]
+# define naming conventions
+DEFAULT_TEMPLATE = '{}_desc-{}_{}.{}'
+COORD_TEMPLATE = 'desc-{}_{}.{}'
 
-ACCEPTED = ['weight', 'distance', 'tract',  'delay', 'speed', 'centres',
-            'nodes', 'labels', 'area', 'hemisphere', 'cortical', 'orientation',
-            'average_orientation', 'normal',
-            'time', 'vertice', 'face', 'vnormal', 'fnormal', 'sensor', 'app', 'map',
-            'volume', 'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',
-            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'fc']
+# set to true if centres.txt (nodes and labels) are the same
+# for all files. In that case, store only one copy of the files
+# in the main 'coord' folder in the same scope as CHANGES.txt
+IGNORE_CENTRE = False
 
-ACCEPTED_EXT = ['txt', 'csv', 'mat', 'h5']
-ALL_FILES = None
-CODE = None
+# location of coord files (nodes and labels) in the scope of
+# converted files. This information is used to supplement JSON
+# sidecars, specifically `CoordsRows` and `CoordsColumns`
+COORDS = None
 
 
-def recursive_walk(path, basename=False):
-    global CODE
+def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
+    """Main engine to save all conversions. Several functionalities to understand:
+
+    1. Check all centres files to see if they have identical content. If so,
+       only one copy gets saved in the main area of the output folder (by default
+       this folder is in root level of the project in 'output' folder), specifically,
+       in 'coord' folder. The same structure is applied for single-subject inputs.
+       The final structure will have the following layout:
+                            |__ output
+                                |__ coord
+                                    |__ desc-<label>_<suffix>.json
+                                    |__ desc-<label>_<suffix>.tsv
+
+       Otherwise, if input data has multi-subject files, the 'coord' folder will be
+       deleted in the root-level. The final structure will have the following layout:
+                            |__ output
+                                |__ sub-<ID>
+                                    |__ coord
+                                        |__ sub-<ID>_desc-<label>_<suffix>.json
+                                        |__ sub-<ID>_desc-<label>_<suffix>.tsv
+
+       To overcome redundancy, the first run will happen as usual; it will check all
+       centres files and update the global parameter IGNORE_CENTRE. This argument indicates
+       whether the following centres should be omitted or not. If true, the function will
+       immediately break. Otherwise, all centres will be stored in their respective folders.
+
+    2. Read file contents. This is pretty straight-forward, given a file location,
+       the app gets its contents. Supported file types are '.txt', '.csv', '.dat', '.mat',
+       and '.h5'.
+
+       Tips:
+            1. Make sure to have 1 (!) array in MATLAB (.mat), HDF5 (.h5) files. If there
+               are multiple arrays, the app will ignore them.
+            2. Make sure to store textual data (e.g., 'lh_bankssts') in the first column (!)
+               of 'centres.txt' file. When 'centres.txt' file is passed, the app divides its
+               columns to labels (Nx1, 1st column) and nodes (NxN-1, 2nd-Nth column). If you
+               have nodes and labels separated in 'nodes.txt' and 'labels.txt' files, you
+               can safely ignore this information.
+
+    3. Get folder locations. Depending on the passed file, get its respective folder location.
+
+    4. Save files.
+
+    Parameters
+    ----------
+    sub (dict):
+        Dictionary containing information of one file only. For example,
+        {'name': 'centres', 'fname': 'centres.txt', 'sid': 'sub-01', 'desc': 'default',
+        'sep': '\t', 'path': PATH_TO_FILE, 'ext': 'txt'}
+    folders (list):
+        List of folders corresponding to whether input files have single- or
+        multi-subject, or session-based structure. Each structure contains a
+        different sequence of folders created in 'app.py' in 'create_sub_struct' function.
+    ses (str):
+        Session type (ses-preop, ses-postop, None). If sessions are present,
+        appropriate files are stored in their appropriate session folders.
+        Otherwise, the structure follows the standard layout.
+    name (str):
+        Name of the file. Accepted names:
+            'weight', 'distance', 'tract_length', 'delay', 'speed',                 # Network (net)
+            'nodes', 'labels', 'centres', 'area', 'hemisphere', 'cortical',         # Coordinates (coord)
+            'orientation', 'average_orientation', 'normal', 'times', 'vertices',    # Coordinates (coord)
+            'faces', 'vnormal', 'fnormal', 'sensor', 'map', 'volume',               # Coordinates (coord)
+            'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',                     # Coordinates (coord)
+            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'emp'     # Timeseries (ts)
+            'fc'                                                                    # Spatial (spatial)
+    """
+    global IGNORE_CENTRE
+
+    # check if centres should be ignored. If so, immediately break
+    # the function. Otherwise, continue iteration.
+    if IGNORE_CENTRE and name == 'centres':
+        return
+
+    # read file contents
+    file = open_file(sub['path'], sub['sep'])
+
+    # get folder location for weights and distances
+    if name == 'wd':
+        # set appropriate output path depending on session type
+        if ses is None:
+            folder = folders[1]
+        else:
+            folder = folders[2]
+
+        # get description for weights or distances
+        desc = temp.weights if 'weights' in sub['name'] else temp.distances
+
+        # save conversion results
+        save_files(sub, folder, file, desc=desc, ftype='wd')
+
+    # get folder location for centres
+    if name == 'centres':
+        # check if all centres are of the same content
+        if check_centres():
+            # ignore preceding centres files
+            IGNORE_CENTRE = True
+
+            # set output path to store coords in
+            folder = os.path.join(app.OUTPUT, 'coord')
+
+            # save conversion results
+            save_files(sub, folder, file, type='coord', centres=True, desc=temp.centres['multi-same'])
+        else:
+            # get description for centres depending on input files
+            desc = temp.centres['multi-unique'] if app.MULTI_INPUT else temp.centres['single']
+
+            # set appropriate output path depending on session and subject types
+            if ses is not None:
+                folder = folders[4]
+            elif app.MULTI_INPUT and ses is None:
+                folder = folders[3]
+            else:
+                folder = os.path.join(app.OUTPUT, 'coord')
+
+            # save conversion results
+            save_files(sub, folder, file, type='default', centres=True, desc=desc)
+
+
+def save_files(sub: dict, folder: str, content, type: str = 'default', centres: bool = False,
+               desc: [str, list, None] = None, ftype: str = 'centres'):
+    """
+    This function prepares the data to be stored in JSON/TSV formats. It first creates
+    absolute paths where data is to be stored, deals with 'centres.txt' file and
+    preprocesses it. Then, sends the finalized versions to the function that
+    saves JSON and TSV files.
+
+    Parameters
+    ----------
+    sub (dict):
+        Dictionary containing information of one file only. For example,
+        {'name': 'centres', 'fname': 'centres.txt', 'sid': 'sub-01', 'desc': 'default',
+        'sep': '\t', 'path': PATH_TO_FILE, 'ext': 'txt'}
+    folder (str):
+        Folder where to store output conversions for the specific file. For example,
+        if the passed file is 'weights.txt' and the input files have both sessions and
+        multi-subject structure, then 'weights.txt' will be stored like:
+                            |__ output
+                                |__ sub-<ID>
+                                    |__ ses-preop
+                                        |__ net
+                                            |__ sub-<ID>_desc-<label>_weights.json
+                                            |__ sub-<ID>_desc-<label>_weights.tsv
+    content (pd.DataFrame, np.array, ...)
+        Content of the specific file.
+    type (str):
+        Type of default name to use. There are two options: default and coordinate.
+        The first creates the following file name:
+                                sub-<ID>_desc-<label>_<suffix>.json|.tsv
+        The other creates the following file name (basically, omitting the ID):
+                                    desc-<label>_<suffix>.json|.tsv
+    centres (bool):
+        Whether the file is 'centres.txt'. Centres require additional treatment as
+        splitting the folder into 'nodes.txt' and 'labels.txt', therefore, it should
+        be distinguished from others.
+    desc (str):
+        Description of the file; this information will be added to the JSON sidecar.
+    ftype (str):
+        File type of the passed file. Accepted types:
+            'wd' (weights and distances), 'coord' (coordinate), 'ts' (time series),
+            'spatial', 'eq' (equations), 'param' (parameters), and 'code'.
+    """
+    global COORDS
+
+    if type == 'default':
+        json_file = os.path.join(folder, DEFAULT_TEMPLATE.format(sub['sid'], sub['desc'], sub['name'], 'json'))
+        tsv_file = json_file.replace('json', 'tsv')
+    else:
+        json_file = os.path.join(folder, COORD_TEMPLATE.format(sub['desc'], sub['name'], 'json'))
+        tsv_file = json_file.replace('json', 'tsv')
+
+    # Save 'centres.txt' as 'nodes.txt' and 'labels.txt'. This will require breaking the
+    # 'centres.txt' file, the first column HAS TO BE labels, and the rest N dimensions
+    # are nodes.
+    if centres:
+        # create names for nodes and labels
+        # Since the usual structure leaves the name of the files as is,
+        # we need to make sure we save 'nodes' and 'labels' appropriately.
+        # If we didn't create these two values below, both labels and nodes
+        # would be stored as 'sub-<ID>_desc-<label>_centres.txt', and the
+        # content would only have nodes.
+        labels = json_file.replace(sub['name'], 'labels')
+        nodes = json_file.replace(sub['name'], 'nodes')
+
+        if COORDS is None:
+            COORDS = [labels, nodes]
+
+        # save labels to json and tsv
+        to_json(labels, shape=[content.shape[0], 1], key='coord', desc=desc[0])
+        to_tsv(labels.replace('json', 'tsv'), content[0])
+
+        # save nodes to json and tsv
+        to_json(nodes, shape=content.shape, key='coord', desc=desc[1])
+        to_tsv(nodes.replace('json', 'tsv'), content[1:])
+    else:
+        # otherwise, save files as usual
+        to_json(json_file, shape=content.shape, key=ftype, desc=desc)
+        to_tsv(tsv_file, content)
+
+
+def check_centres():
+    """
+    This function checks all centres files in the input folder and
+    decides whether they have the same content or not. The logic of
+    this functionality is the following, we take the first arbitrary
+    centres.txt file and compare it to the rest. We don't check every
+    single centres file against the rest. Thus, only one checking round
+    happens here.
+
+    It's important to note that if users pass in 2+ subject folders and only
+    one contains centres.txt, the 'coord' folder is created for one subject only.
+    """
+
+    # get all centres files
+    centres = get_specific('centres')
+
+    # get the first element
+    file = open_file(centres[0], subjects.find_separator(centres[0]))
+
+    # define set literal
+    same = {}
+
+    # iterate over centres
+    for centre in centres[1:]:
+        # append to the set literal whether the contents of the first element
+        # are the same with the rest
+        same.update(file == open_file(centre, subjects.find_separator(centre)))
+
+    # check if set literal contains only one element
+    if len(same) == 1:
+        if bool(same):
+            # if files are the same, return True
+            return True
+        # False otherwise
+        return False
+    return False
+
+
+def get_specific(filetype: str) -> list:
+    """
+    Get all files that correspond to the filetype. For example,
+    if filetype is equal to "areas", this function will return
+    all files containing that keyword.
+
+    Parameters
+    ----------
+    filetype: str
+        Type of the file to search for. Accepted types:
+            'weight', 'distance', 'tract_length', 'delay', 'speed',                 # Network (net)
+            'nodes', 'labels', 'centres', 'area', 'hemisphere', 'cortical',         # Coordinates (coord)
+            'orientation', 'average_orientation', 'normal', 'times', 'vertices',    # Coordinates (coord)
+            'faces', 'vnormal', 'fnormal', 'sensor', 'map', 'volume',               # Coordinates (coord)
+            'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',                     # Coordinates (coord)
+            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'emp'     # Timeseries (ts)
+            'fc'                                                                    # Spatial (spatial)
+
+    Returns
+    -------
+        Returns a list of all files that end with the specified filetype.
+    """
+
+    # create emtpy list to store appropriate files
     content = []
 
-    for root, _, files in os.walk(path):
-        for file in files:
-            if file.endswith('.zip') and len(set(os.listdir(root)).intersection(set(TO_EXTRACT))) < 7:
-                content += z.extract_zip(os.path.join(root, file))
-                continue
-            if file.endswith('.py'):
-                CODE = os.path.join(root, file)
+    # iterate over all files found by the app previously
+    for file in app.ALL_FILES:
+        # check if the keyword is present
+        if filetype in file:
+            # if yes, append the value
+            content.append(file)
 
-            file = rename_tract_lengths(file)
-            if basename:
-                content.append(file)
-            else:
-                content.append(os.path.join(root, file))
-
+    # return the list of newly-found files
     return content
 
 
-def get_content(path, files, basename=False):
-    global CODE
-    # if provided path contains only one sub-folder, and it's needed to traverse that, return the whole content
-    # of the specified location.
-    if isinstance(files, str):
-        return recursive_walk(os.path.join(path, files))
+def open_file(path: str, sep: str):
+    """
 
-    # otherwise, traverse all folders and get contents
-    # Step 1: instantiate content holder
-    contents = []
+    Parameters
+    ----------
+    path :
+        param sep:
+    path: str :
 
-    # Step 2: traverse every selected input
-    for file in files:
-        # Step 3: combine path
-        file_path = os.path.join(path, file)
-
-        # Step 4: check whether the selection is a directory
-        if os.path.isdir(file_path):
-            # Step 4.1: traverse its content and append results
-            contents += recursive_walk(file_path, basename)
-
-        # Step 5: iterate single-files
-        # Step 5.1: get the file's extension
-        ext = os.path.basename(file).split('.')[-1]
-
-        # Step 5.2: check if it's among the accepted files
-        if ext in ACCEPTED_EXT:
-            # Step 5.3: rename `tract_lengths` to `distances`
-            contents.append(rename_tract_lengths(file_path))
-        elif ext == 'py':
-            CODE = os.path.join(path, file)
-
-    # Step 6: return contents
-    return contents
+    sep: str :
 
 
-def rename_tract_lengths(file):
-    if 'tract_lengths' in file:
-        return file.replace('tract_lengths', 'distances')
-    return file
+    Returns
+    -------
+
+    """
+
+    ext = path.split('.')[-1]
+
+    if ext in ['txt', 'csv', 'dat']:
+        return open_text(path, sep)
+
+    elif ext == 'mat':
+        pass
+
+    elif ext == 'h5':
+        pass
 
 
-def check_file(path, files, subs=None, save=False):
-    if subs is None:
-        subs = subj.Files(path, files).subs
+def open_text(path, sep):
+    """
 
-    if save:
-        save_output(subs, OUTPUT)
-
-        if CODE is not None:
-            save_code(subs, OUTPUT)
-
-        # remove all empty folders
-        remove_empty_folders(OUTPUT)
-
-    return subs, struct.create_layout(subs, OUTPUT)
+    Parameters
+    ----------
+    path :
+        param sep:
+    sep :
 
 
-def save_output(subs, output):
-    if not os.path.exists(output):
-        os.mkdir(output)
+    Returns
+    -------
 
-    # verify there are no conflicting folders
-    conflict = len(os.listdir(output)) > 0
-
-    def save(sub, ses=None):
-        for k, v in sub.items():
-            folders = create_sub_struct(output, v, ses_name=ses)
-            end = k if '_' not in k else k.split('_')[-1]
-
-            if end in ['weights.txt', 'distances.txt']:
-                wdc.save(sub[k], output, folders, ses=ses)
-            elif end in ['centres.txt']:
-                wdc.save(sub[k], output, folders, center=True, ses=ses)
-            elif end == 'map.txt' or end == 'ts.txt':
-                mt.save(sub[k], output, folders, end, ses=ses)
-            elif end in TO_EXTRACT[3:]:
-                coords.save_coords(sub[k], folders)
-            elif end.endswith('.mat'):
-                mat.save(sub[k], folders, ses=ses)
-            elif end.endswith('.h5'):
-                h5.save(sub[k], output, folders, ses=ses)
-
-    # remove existing content & prepare for new data
-    if conflict:
-        pn.state.notifications.info('Output folder contains files. Removing them...')
-        utils.rm_tree(output)
-        prep.reset_index()
-
-    # verify folders exist
-    struct.check_folders(output)
-
-    # save output files
-    for k, val in subs.items():
-        if 'ses-preop' in val.keys() or 'ses-postop' in val.keys():
-            for k2, v in val.items():
-                save(v, ses=k2)
-
-            if os.path.exists(os.path.join(output, 'coord')):
-                os.rmdir(os.path.join(output, 'coord'))
-
-        else:
-            save(val)
-
-
-def save_code(subs, output):
-    template = f'desc-{DESC}_code.py'
-    path = os.path.join(output, 'code', template)
-    shutil.copy(CODE, path)
-
-    out = OrderedDict({x: '' for x in temp.struct['code']['recommend']})
-
-    with open(os.path.join(path.replace('py', 'json')), 'w') as file:
-        json.dump(out, file)
-
-
-def create_sub_struct(path, subs, ses_name=None):
-    if ses_name in ['ses-preop', 'ses-postop']:
-        sub = os.path.join(path, subs['sid'])
-        ses = os.path.join(sub, ses_name)
-        net_ses = os.path.join(ses, 'net')
-        spatial_ses = os.path.join(ses, 'spatial')
-        coord_ses = os.path.join(ses, 'coord')
-        ts_ses = os.path.join(ses, 'ts')
-        folders = [sub, ses, net_ses, spatial_ses, coord_ses, ts_ses]
+    """
+    try:
+        f = pd.read_csv(path, sep=sep, header=None, index_col=False)
+    except pd.errors.EmptyDataError:
+        return ''
+    except ValueError:
+        return ''
     else:
-        sub = os.path.join(path, subs['sid'])
-        net = os.path.join(sub, 'net')
-        spatial = os.path.join(sub, 'spatial')
-        ts = os.path.join(sub, 'ts')
-
-        if MULTI_INPUT:
-            coord = os.path.join(sub, 'coord')
-            folders = [sub, net, spatial, coord, ts]
-        else:
-            folders = [sub, net, spatial, ts]
-
-    for folder in folders:
-        if not os.path.exists(folder):
-            os.mkdir(folder)
-
-    return folders
+        return f
 
 
-def get_shape(file, sep):
-    return pd.read_csv(file, sep=sep, index_col=None, header=None).shape
+def to_tsv(path, file, sep=None):
+    """
+
+    Parameters
+    ----------
+    path :
+        param file:
+    sep :
+        return: (Default value = None)
+    file :
 
 
-def to_tsv(path, file=None, sep=None):
-    if file is None:
-        return
+    Returns
+    -------
+
+    """
+    params = {'sep': '\t', 'header': None, 'index': None}
+    sep = sep if sep != '\n' else '\0'
+
+    if isinstance(file, str) and sep is not None:
+        pd.read_csv(file, index_col=None, header=None, sep=sep).to_csv(path, **params)
     else:
-        params = {'sep': '\t', 'header': None, 'index': None}
-        sep = sep if sep != '\n' else '\0'
-
-        if isinstance(file, str) and sep is not None:
-            pd.read_csv(file, index_col=None, header=None, sep=sep).to_csv(path, **params)
-        else:
-            try:
-                pd.DataFrame(file).to_csv(path, **params)
-            except ValueError:
-                with open(file) as f:
-                    with open(path, 'w') as f2:
-                        f2.write(f.read())
+        try:
+            pd.DataFrame(file).to_csv(path, **params)
+        except ValueError:
+            with open(file) as f:
+                with open(path, 'w') as f2:
+                    f2.write(f.read())
 
 
-def to_json(path, shape, desc, key, coords=None, **kwargs):
+def to_json(path, shape, desc, key, **kwargs):
+    """
+
+    Parameters
+    ----------
+    path :
+        param shape:
+    desc :
+        param key:
+    kwargs :
+        return:
+    shape :
+
+    key :
+
+    **kwargs :
+
+
+    Returns
+    -------
+
+    """
     inp = temp.required
     out = OrderedDict({x: '' for x in inp})
 
@@ -237,34 +413,4 @@ def to_json(path, shape, desc, key, coords=None, **kwargs):
         out.update({x: '' for x in struct['recommend']})
 
     with open(path, 'w') as file:
-        json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coords, **kwargs), file)
-
-
-def remove_empty_folders(path):
-    """
-    Recursively traverse generated output folder and remove all empty folders.
-    :param path:
-    :return:
-    """
-
-    # get contents of the specified path
-    for root, dirs, files in os.walk(path):
-        # if folder is empty, remove it
-        if len(os.listdir(root)) == 0:
-            os.removedirs(root)
-
-
-def duplicate_folder(path):
-    print('im triggered, duplicate folder')
-    # create folder if it doesn't exist
-    root = os.path.join('..', 'data')
-    new_path = os.path.join(root, os.path.basename(os.path.dirname(path + '/')))
-
-    if not os.path.exists(root):
-        os.mkdir(root)
-
-    if not os.path.exists(new_path):
-        shutil.copytree(path, new_path, symlinks=False, ignore=None, ignore_dangling_symlinks=False,
-                        dirs_exist_ok=False)
-    # set PATH to a new path
-    return new_path
+        json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=COORDS, **kwargs), file)

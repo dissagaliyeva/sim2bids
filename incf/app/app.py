@@ -10,7 +10,7 @@ import incf.utils
 from incf.app import utils
 from incf.generate import subjects, structure
 from incf.preprocess import preprocess as prep
-from incf.convert import save as save_files
+from incf.convert import convert
 from incf.templates import templates as temp
 
 
@@ -53,9 +53,9 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     layout :
         return:
     path: str :
-        
+
     files: list :
-        
+
     subs: dict :
          (Default value = None)
     save: bool :
@@ -122,7 +122,7 @@ def save_output(subs):
         Parameters
         ----------
         sub :
-            
+
         ses :
              (Default value = None)
 
@@ -135,9 +135,9 @@ def save_output(subs):
             folders = create_sub_struct(OUTPUT, v, ses_name=ses)
 
             if 'weight' in k or 'distance' in k:
-                save_files.save(sub[k], folders, ses=ses, name='wd')
+                convert.save(sub[k], folders, ses=ses, name='wd')
             elif 'centre' in k:
-                save_files.save(sub[k], folders, ses=ses, name='centres')
+                convert.save(sub[k], folders, ses=ses, name='centres')
 
     # iterate over files and save them
     for k, v in subs.items():
@@ -166,9 +166,9 @@ def create_sub_struct(path, subs, ses_name=None):
     Parameters
     ----------
     path :
-        
+
     subs :
-        
+
     ses_name :
          (Default value = None)
 
@@ -209,7 +209,7 @@ def save_code(subs):
     Parameters
     ----------
     subs :
-        
+
 
     Returns
     -------
@@ -241,7 +241,7 @@ def duplicate_folder(path):
     Parameters
     ----------
     path :
-        
+
 
     Returns
     -------

@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from incf.convert import save
+from incf.convert import convert
 
 
 def save_coords(subs: dict, folders):
@@ -12,12 +12,12 @@ def save_coords(subs: dict, folders):
     path = os.path.join(folders[4], template.format(sid, desc, name, 'tsv'))
 
     # to tsv
-    save.to_tsv(path, subs['path'], sep=subs['sep'])
+    convert.to_tsv(path, subs['path'], sep=subs['sep'])
 
     # to json
     file = pd.DataFrame(open(subs['path'])).apply(lambda x: x.str.strip('\n'))
 
-    save.to_json(path=path.replace('tsv', 'json'), shape=file.shape, desc=desc, key='coord')
+    convert.to_json(path=path.replace('tsv', 'json'), shape=file.shape, desc=desc, key='coord')
 
 
 
