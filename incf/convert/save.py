@@ -2,6 +2,7 @@ import json
 import os
 from collections import OrderedDict
 
+import numpy as np
 import pandas as pd
 
 from incf.app import app
@@ -68,22 +69,27 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
     Parameters
     ----------
-    sub :
-        param folders:
-    ses :
-        param name:
-    sub: dict :
-
-    folders: list :
-
-    ses: str :
-         (Default value = None)
-    name: str :
-         (Default value = None)
-
-    Returns
-    -------
-
+    sub (dict):
+        Dictionary containing information of one file only. For example,
+        {'name': 'centres', 'fname': 'centres.txt', 'sid': 'sub-01', 'desc': 'default',
+        'sep': '\t', 'path': PATH_TO_FILE, 'ext': 'txt'}
+    folders (list):
+        List of folders corresponding to whether input files have single- or
+        multi-subject, or session-based structure. Each structure contains a
+        different sequence of folders created in 'app.py' in 'create_sub_struct' function.
+    ses (str):
+        Session type (ses-preop, ses-postop, None). If sessions are present,
+        appropriate files are stored in their appropriate session folders.
+        Otherwise, the structure follows the standard layout.
+    name (str):
+        Name of the file. Accepted names:
+            'weight', 'distance', 'tract_length', 'delay', 'speed',                 # Network (net)
+            'nodes', 'labels', 'centres', 'area', 'hemisphere', 'cortical',         # Coordinates (coord)
+            'orientation', 'average_orientation', 'normal', 'times', 'vertices',    # Coordinates (coord)
+            'faces', 'vnormal', 'fnormal', 'sensor', 'map', 'volume',               # Coordinates (coord)
+            'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',                     # Coordinates (coord)
+            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'emp'     # Timeseries (ts)
+            'fc'                                                                    # Spatial (spatial)
     """
     global IGNORE_CENTRE
 
@@ -137,29 +143,48 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             save_files(sub, folder, file, type='default', centres=True, desc=desc)
 
 
-def save_files(sub, folder, content, type='default', centres=False, desc=None, ftype='centres'):
+def save_files(sub: dict, folder: str, content, type: str = 'default', centres: bool = False,
+               desc: [str, list, None] = None, ftype: str = 'centres'):
     """
+    This function prepares the data to be stored in JSON/TSV formats. It first creates
+    absolute paths where data is to be stored, deals with 'centres.txt' file and
+    preprocesses it. Then, sends the finalized versions to the function that
+    saves JSON and TSV files.
 
     Parameters
     ----------
-    sub :
-        param folder:
-    content :
-        param type:
-    centres :
-        param desc: (Default value = False)
-    ftype :
-        return: (Default value = 'centres')
-    folder :
-
-    type :
-         (Default value = 'default')
-    desc :
-         (Default value = None)
-
-    Returns
-    -------
-
+    sub (dict):
+        Dictionary containing information of one file only. For example,
+        {'name': 'centres', 'fname': 'centres.txt', 'sid': 'sub-01', 'desc': 'default',
+        'sep': '\t', 'path': PATH_TO_FILE, 'ext': 'txt'}
+    folder (str):
+        Folder where to store output conversions for the specific file. For example,
+        if the passed file is 'weights.txt' and the input files have both sessions and
+        multi-subject structure, then 'weights.txt' will be stored like:
+                            |__ output
+                                |__ sub-<ID>
+                                    |__ ses-preop
+                                        |__ net
+                                            |__ sub-<ID>_desc-<label>_weights.json
+                                            |__ sub-<ID>_desc-<label>_weights.tsv
+    content (pd.DataFrame, np.array, ...)
+        Content of the specific file.
+    type (str):
+        Type of default name to use. There are two options: default and coordinate.
+        The first creates the following file name:
+                                sub-<ID>_desc-<label>_<suffix>.json|.tsv
+        The other creates the following file name (basically, omitting the ID):
+                                    desc-<label>_<suffix>.json|.tsv
+    centres (bool):
+        Whether the file is 'centres.txt'. Centres require additional treatment as
+        splitting the folder into 'nodes.txt' and 'labels.txt', therefore, it should
+        be distinguished from others.
+    desc (str):
+        Description of the file; this information will be added to the JSON sidecar.
+    ftype (str):
+        File type of the passed file. Accepted types:
+            'wd' (weights and distances), 'coord' (coordinate), 'ts' (time series),
+            'spatial', 'eq' (equations), 'param' (parameters), and 'code'.
     """
     global COORDS
 
@@ -238,28 +263,39 @@ def check_centres():
 
 
 def get_specific(filetype: str) -> list:
-    """Get all files that correspond to the filetype. For example,
+    """
+    Get all files that correspond to the filetype. For example,
     if filetype is equal to "areas", this function will return
     all files containing that keyword.
 
     Parameters
     ----------
-    filetype :
-        return:
-    filetype: str :
-
+    filetype: str
+        Type of the file to search for. Accepted types:
+            'weight', 'distance', 'tract_length', 'delay', 'speed',                 # Network (net)
+            'nodes', 'labels', 'centres', 'area', 'hemisphere', 'cortical',         # Coordinates (coord)
+            'orientation', 'average_orientation', 'normal', 'times', 'vertices',    # Coordinates (coord)
+            'faces', 'vnormal', 'fnormal', 'sensor', 'map', 'volume',               # Coordinates (coord)
+            'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',                     # Coordinates (coord)
+            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'emp'     # Timeseries (ts)
+            'fc'                                                                    # Spatial (spatial)
 
     Returns
     -------
-
+        Returns a list of all files that end with the specified filetype.
     """
 
+    # create emtpy list to store appropriate files
     content = []
 
+    # iterate over all files found by the app previously
     for file in app.ALL_FILES:
+        # check if the keyword is present
         if filetype in file:
+            # if yes, append the value
             content.append(file)
 
+    # return the list of newly-found files
     return content
 
 
