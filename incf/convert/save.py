@@ -201,22 +201,38 @@ def save_files(sub, folder, content, type='default', centres=False, desc=None, f
 
 def check_centres():
     """
+    This function checks all centres files in the input folder and
+    decides whether they have the same content or not. The logic of
+    this functionality is the following, we take the first arbitrary
+    centres.txt file and compare it to the rest. We don't check every
+    single centres file against the rest. Thus, only one checking round
+    happens here.
 
-
+    It's important to note that if users pass in 2+ subject folders and only
+    one contains centres.txt, the 'coord' folder is created for one subject only.
     """
+
     # get all centres files
     centres = get_specific('centres')
+
+    # get the first element
     file = open_file(centres[0], subjects.find_separator(centres[0]))
 
+    # define set literal
     same = {}
 
     # iterate over centres
     for centre in centres[1:]:
+        # append to the set literal whether the contents of the first element
+        # are the same with the rest
         same.update(file == open_file(centre, subjects.find_separator(centre)))
 
+    # check if set literal contains only one element
     if len(same) == 1:
         if bool(same):
+            # if files are the same, return True
             return True
+        # False otherwise
         return False
     return False
 
