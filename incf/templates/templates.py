@@ -2,6 +2,14 @@ weights = 'The Structural Connectivity (SC) that contains the connectome. Zeros 
           '`unconnected` areas.'
 distances = 'The distances between areas.'
 
+centres = {'multi-unique': ['These are the region labels which are unique for each individual.',
+                            'These are the 3d coordinate centres which are unique for each individual.'],
+           'multi-same': ['These are the region labels which are the same for all individuals.',
+                          'These are the 3d coordinate centres which are the same for all individuals.'],
+           'single': ['These are the region labels for a single subject.',
+                      'These are the 3d coordinate centres for a single subject.']
+           }
+
 struct = {'coord': {'required': ['Units'],
                     'recommend': ['AnatomicalLandmarkCoordinates', 'AnatomicalLandmarkCoordinateSystem',
                                   'AnatomicalLandmarkCoordinateUnits',

@@ -25,6 +25,8 @@ def save(sub, folders, ses=None, name=None):
     """
     global IGNORE_CENTRE
 
+    print('Passed in subject file:', sub)
+
     if IGNORE_CENTRE and name == 'centres':
         return
 
@@ -48,16 +50,13 @@ def save(sub, folders, ses=None, name=None):
         # check if all centres are of the same content
         if check_centres():
             IGNORE_CENTRE = True
-            desc = ['These are the region labels which are the same for all individuals.',
-                    'These are the 3d coordinate centres which are the same for all individuals.']
 
             folder = os.path.join(app.OUTPUT, 'coord')
 
             # pass values to save json file
-            save_files(sub, folder, file, type='coord', centres=True, desc=desc)
+            save_files(sub, folder, file, type='coord', centres=True, desc=temp.centres['multi-same'])
         else:
-            desc = ['These are the region labels which are unique for each individual.',
-                    'These are the 3d coordinate centres which are unique for each individual.']
+            desc = temp.centres['multi-unique'] if app.MULTI_INPUT else temp.centres['single']
 
             if ses is not None:
                 folder = folders[4]
@@ -89,6 +88,9 @@ def save_files(sub, folder, content, type='default', centres=False, desc=None, f
     else:
         json_file = os.path.join(folder, COORD_TEMPLATE.format(sub['desc'], sub['name'], 'json'))
         tsv_file = json_file.replace('json', 'tsv')
+
+    print('JSON file:', json_file)
+    print('TSV file:', tsv_file)
 
     # Save 'centres.txt' as 'nodes.txt' and 'labels.txt'. This will require breaking the
     # 'centres.txt' file, the first column HAS TO BE labels, and the rest N dimensions
