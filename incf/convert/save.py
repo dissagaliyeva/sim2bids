@@ -11,12 +11,58 @@ import incf.templates.templates as temp
 # define naming conventions
 DEFAULT_TEMPLATE = '{}_desc-{}_{}.{}'
 COORD_TEMPLATE = 'desc-{}_{}.{}'
+
+# set to true if centres.txt (nodes and labels) are the same
+# for all files. In that case, store only one copy of the files
+# in the main 'coord' folder in the same scope as CHANGES.txt
 IGNORE_CENTRE = False
+
+# location of coord files (nodes and labels) in the scope of
+# converted files. This information is used to supplement JSON
+# sidecars, specifically `CoordsRows` and `CoordsColumns`
 COORDS = None
 
 
 def save(sub, folders, ses=None, name=None):
     """
+    Main engine to save all conversions. Several functionalities to understand:
+
+    1. Checks all centres files to see if they have identical content. If so,
+       only one copy gets saved in the main area of the output folder (by default
+       this folder is in root level of the project in 'output' folder), specifically,
+       in 'coord' folder. The same structure is applied for single-subject inputs.
+       The final structure will have the following layout:
+                            |__ output
+                                |__ coord
+                                    |__ desc-<label>_<suffix>.json
+                                    |__ desc-<label>_<suffix>.tsv
+
+       Otherwise, if input data has multi-subject files, the 'coord' folder will be
+       deleted in the root-level. The final structure will have the following layout:
+                            |__ output
+                                |__ sub-<ID>
+                                    |__ coord
+                                        |__ sub-<ID>_desc-<label>_<suffix>.json
+                                        |__ sub-<ID>_desc-<label>_<suffix>.tsv
+
+       To overcome redundancy, the first run will happen as usual; it will check all
+       centres files and update the global parameter IGNORE_CENTRE. This argument indicates
+       whether the following centres should be omitted or not. If true, the function will
+       immediately break. Otherwise, all centres will be stored in their respective folders.
+
+    2. Reads file contents. This is pretty straight-forward, given a file location,
+       the app gets its contents. Supported file types are '.txt', '.csv', '.dat', '.mat',
+       and '.h5'.
+
+       Tips:
+            1. Make sure to have 1 (!) array in MATLAB (.mat), HDF5 (.h5) files. If there
+               are multiple arrays, the app will ignore them.
+            2. Make sure to store textual data (e.g., 'lh_bankssts') in the first column (!)
+               of 'centres.txt' file. When 'centres.txt' file is passed, the app divides its
+               columns to labels (Nx1, 1st column) and nodes (NxN-1, 2nd-Nth column). If you
+               have nodes and labels separated in 'nodes.txt' and 'labels.txt' files, you
+               can safely ignore this information.
+
 
     :param sub:
     :param folders:
@@ -30,7 +76,7 @@ def save(sub, folders, ses=None, name=None):
         return
 
     # read file contents
-    file = open_file(sub['path'], subjects.find_separator(sub['path']))
+    file = open_file(sub['path'], sub['sep'])
 
     # get folder location for weights and distances
     if name == 'wd':
