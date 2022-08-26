@@ -41,16 +41,31 @@ ACCEPTED_EXT = ['txt', 'csv', 'dat', 'h5', 'mat', 'zip', 'py']
 
 
 def main(path: str, files: list, subs: dict = None, save: bool = False, layout: bool = False):
-    """
-    Main brain function that creates subjects, auto-generated structure,
+    """Main brain function that creates subjects, auto-generated structure,
     and saves apperted files.
 
-    :param path:
-    :param files:
-    :param subs:
-    :param save:
-    :param layout:
-    :return:
+    Parameters
+    ----------
+    path :
+        param files:
+    subs :
+        param save:
+    layout :
+        return:
+    path: str :
+        
+    files: list :
+        
+    subs: dict :
+         (Default value = None)
+    save: bool :
+         (Default value = False)
+    layout: bool :
+         (Default value = False)
+
+    Returns
+    -------
+
     """
     # whether to generate layout
     if layout:
@@ -81,8 +96,14 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 def save_output(subs):
     """
 
-    :param subs:
-    :return:
+    Parameters
+    ----------
+    subs :
+        return:
+
+    Returns
+    -------
+
     """
 
     # create the folder that will store conversions
@@ -96,6 +117,19 @@ def save_output(subs):
     structure.check_folders(OUTPUT)
 
     def save(sub, ses=None):
+        """
+
+        Parameters
+        ----------
+        sub :
+            
+        ses :
+             (Default value = None)
+
+        Returns
+        -------
+
+        """
         for k, v in sub.items():
             # create folders according to session and subject count types
             folders = create_sub_struct(OUTPUT, v, ses_name=ses)
@@ -115,6 +149,7 @@ def save_output(subs):
 
 
 def check_output_folder():
+    """ """
     # check if the output folder already contains files,
     # if true, notify about removal and remove folder with its contents
     conflict = len(os.listdir(OUTPUT)) > 0
@@ -126,6 +161,21 @@ def check_output_folder():
 
 
 def create_sub_struct(path, subs, ses_name=None):
+    """
+
+    Parameters
+    ----------
+    path :
+        
+    subs :
+        
+    ses_name :
+         (Default value = None)
+
+    Returns
+    -------
+
+    """
     if ses_name in ['ses-preop', 'ses-postop']:
         sub = os.path.join(path, subs['sid'])
         ses = os.path.join(sub, ses_name)
@@ -154,6 +204,17 @@ def create_sub_struct(path, subs, ses_name=None):
 
 
 def save_code(subs):
+    """
+
+    Parameters
+    ----------
+    subs :
+        
+
+    Returns
+    -------
+
+    """
     template = f'desc-{DESC}_code.py'
     path = os.path.join(OUTPUT, 'code', template)
     shutil.copy(CODE, path)
@@ -165,10 +226,7 @@ def save_code(subs):
 
 
 def remove_empty():
-    """
-    Recursively traverse generated output folder and remove all empty folders.
-
-    """
+    """Recursively traverse generated output folder and remove all empty folders."""
 
     # get contents of the specified path
     for root, dirs, files in os.walk(OUTPUT):
@@ -178,6 +236,17 @@ def remove_empty():
 
 
 def duplicate_folder(path):
+    """
+
+    Parameters
+    ----------
+    path :
+        
+
+    Returns
+    -------
+
+    """
     print('im triggered, duplicate folder')
     # create folder if it doesn't exist
     root = os.path.join('..', 'data')
