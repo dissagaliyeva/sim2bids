@@ -8,10 +8,11 @@ from incf.app import app
 from incf.generate import subjects
 import incf.templates.templates as temp
 
-# define naming appentions
+# define naming conventions
 DEFAULT_TEMPLATE = '{}_desc-{}_{}.{}'
 COORD_TEMPLATE = 'desc-{}_{}.{}'
 IGNORE_CENTRE = False
+COORDS = None
 
 
 def save(sub, folders, ses=None, name=None):
@@ -24,8 +25,6 @@ def save(sub, folders, ses=None, name=None):
     :return:
     """
     global IGNORE_CENTRE
-
-    print('Passed in subject file:', sub)
 
     if IGNORE_CENTRE and name == 'centres':
         return
@@ -81,6 +80,7 @@ def save_files(sub, folder, content, type='default', centres=False, desc=None, f
     :param ftype:
     :return:
     """
+    global COORDS
 
     if type == 'default':
         json_file = os.path.join(folder, DEFAULT_TEMPLATE.format(sub['sid'], sub['desc'], sub['name'], 'json'))
@@ -88,9 +88,6 @@ def save_files(sub, folder, content, type='default', centres=False, desc=None, f
     else:
         json_file = os.path.join(folder, COORD_TEMPLATE.format(sub['desc'], sub['name'], 'json'))
         tsv_file = json_file.replace('json', 'tsv')
-
-    print('JSON file:', json_file)
-    print('TSV file:', tsv_file)
 
     # Save 'centres.txt' as 'nodes.txt' and 'labels.txt'. This will require breaking the
     # 'centres.txt' file, the first column HAS TO BE labels, and the rest N dimensions
@@ -104,6 +101,9 @@ def save_files(sub, folder, content, type='default', centres=False, desc=None, f
         # content would only have nodes.
         labels = json_file.replace(sub['name'], 'labels')
         nodes = json_file.replace(sub['name'], 'nodes')
+
+        if COORDS is None:
+            COORDS = [labels, nodes]
 
         # save labels to json and tsv
         to_json(labels, shape=[content.shape[0], 1], key='coord', desc=desc[0])
@@ -218,14 +218,13 @@ def to_tsv(path, file, sep=None):
                     f2.write(f.read())
 
 
-def to_json(path, shape, desc, key, coords=None, **kwargs):
+def to_json(path, shape, desc, key, **kwargs):
     """
 
     :param path:
     :param shape:
     :param desc:
     :param key:
-    :param coords:
     :param kwargs:
     :return:
     """
@@ -238,4 +237,4 @@ def to_json(path, shape, desc, key, coords=None, **kwargs):
         out.update({x: '' for x in struct['recommend']})
 
     with open(path, 'w') as file:
-        json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coords, **kwargs), file)
+        json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=COORDS, **kwargs), file)

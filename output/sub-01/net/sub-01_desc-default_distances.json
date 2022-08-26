@@ -1,1 +1,1 @@
-{"NumberOfRows": 68, "NumberOfColumns": 68, "CoordsRows": "", "CoordsColumns": "", "Description": "The distances between areas."}
+{"NumberOfRows": 68, "NumberOfColumns": 68, "CoordsRows": ["../output\\coord\\sub-01_desc-default_labels.json", "../output\\coord\\sub-01_desc-default_nodes.json"], "CoordsColumns": ["../output\\coord\\sub-01_desc-default_labels.json", "../output\\coord\\sub-01_desc-default_nodes.json"], "Description": "The distances between areas."}

@@ -4,6 +4,7 @@ import shutil
 import panel as pn
 import incf.templates.templates as temp
 import incf.app as app
+from incf import incf
 
 
 def rm_tree(path: str = '../output'):
@@ -41,7 +42,7 @@ def append_widgets(files):
 
 
 def get_settings(json_editor, selected):
-    app.REQUIRED = []
+    incf.REQUIRED = []
 
     widget = pn.WidgetBox()
 
@@ -52,13 +53,13 @@ def get_settings(json_editor, selected):
         req = k in specs[root]['required']
 
         if k in reqs or req:
-            app.REQUIRED.append(k)
+            incf.REQUIRED.append(k)
             name = f'Specify {k} (REQUIRED):'
         else:
             name = f'Specify {k} (RECOMMENDED):'
 
         if k == 'Units' and v == '' and name is not None:
-            widget.append(pn.widgets.Select(name=name, options=app.UNITS, value=''))
+            widget.append(pn.widgets.Select(name=name, options=incf.UNITS, value=''))
         elif k not in ['NumberOfColumns', 'NumberOfRows', 'Units']:
             if len(v) > 0 and k in ['CoordsColumns', 'CoordsRows']:
                 continue
@@ -72,6 +73,6 @@ def get_settings(json_editor, selected):
 def verify_complete(widgets):
     for widget in widgets:
         name = widget.name.split(' ')[-2]
-        if name in app.REQUIRED and widget.value == '':
+        if name in incf.REQUIRED and widget.value == '':
             return False
     return True
