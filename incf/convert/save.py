@@ -23,11 +23,11 @@ IGNORE_CENTRE = False
 COORDS = None
 
 
-def save(sub, folders, ses=None, name=None):
+def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     """
     Main engine to save all conversions. Several functionalities to understand:
 
-    1. Checks all centres files to see if they have identical content. If so,
+    1. Check all centres files to see if they have identical content. If so,
        only one copy gets saved in the main area of the output folder (by default
        this folder is in root level of the project in 'output' folder), specifically,
        in 'coord' folder. The same structure is applied for single-subject inputs.
@@ -50,7 +50,7 @@ def save(sub, folders, ses=None, name=None):
        whether the following centres should be omitted or not. If true, the function will
        immediately break. Otherwise, all centres will be stored in their respective folders.
 
-    2. Reads file contents. This is pretty straight-forward, given a file location,
+    2. Read file contents. This is pretty straight-forward, given a file location,
        the app gets its contents. Supported file types are '.txt', '.csv', '.dat', '.mat',
        and '.h5'.
 
@@ -63,6 +63,10 @@ def save(sub, folders, ses=None, name=None):
                have nodes and labels separated in 'nodes.txt' and 'labels.txt' files, you
                can safely ignore this information.
 
+    3. Get folder locations. Depending on the passed file, get its respective folder location.
+
+    4. Save files.
+
 
     :param sub:
     :param folders:
@@ -72,6 +76,8 @@ def save(sub, folders, ses=None, name=None):
     """
     global IGNORE_CENTRE
 
+    # check if centres should be ignored. If so, immediately break
+    # the function. Otherwise, continue iteration.
     if IGNORE_CENTRE and name == 'centres':
         return
 
@@ -80,29 +86,35 @@ def save(sub, folders, ses=None, name=None):
 
     # get folder location for weights and distances
     if name == 'wd':
-        # set appropriate output path
+        # set appropriate output path depending on session type
         if ses is None:
             folder = folders[1]
         else:
             folder = folders[2]
 
-        # save contents
+        # get description for weights or distances
         desc = temp.weights if 'weights' in sub['name'] else temp.distances
+
+        # save conversion results
         save_files(sub, folder, file, desc=desc, ftype='wd')
 
     # get folder location for centres
     if name == 'centres':
         # check if all centres are of the same content
         if check_centres():
+            # ignore preceding centres files
             IGNORE_CENTRE = True
 
+            # set output path to store coords in
             folder = os.path.join(app.OUTPUT, 'coord')
 
-            # pass values to save json file
+            # save conversion results
             save_files(sub, folder, file, type='coord', centres=True, desc=temp.centres['multi-same'])
         else:
+            # get description for centres depending on input files
             desc = temp.centres['multi-unique'] if app.MULTI_INPUT else temp.centres['single']
 
+            # set appropriate output path depending on session and subject types
             if ses is not None:
                 folder = folders[4]
             elif app.MULTI_INPUT and ses is None:
@@ -110,7 +122,7 @@ def save(sub, folders, ses=None, name=None):
             else:
                 folder = os.path.join(app.OUTPUT, 'coord')
 
-            # save files
+            # save conversion results
             save_files(sub, folder, file, type='default', centres=True, desc=desc)
 
 
