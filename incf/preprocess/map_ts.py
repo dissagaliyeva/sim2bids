@@ -1,4 +1,4 @@
-from incf.convert import save as save_files
+from incf.convert import convert as save_files
 from incf.generate import subjects
 
 DEFAULT_TMPL = '{}_desc-{}_{}.{}'

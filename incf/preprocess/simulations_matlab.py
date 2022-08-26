@@ -7,7 +7,7 @@ import scipy.io.matlab._miobase
 from scipy.io import loadmat
 
 from incf.app import app
-from incf.convert import save as save_files
+from incf.convert import convert as save_files
 
 
 def save(subs, folders, ses=None):
