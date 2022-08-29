@@ -222,8 +222,8 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         to_tsv(nodes.replace('json', 'tsv'), content[1:])
     else:
         # otherwise, save files as usual
-        to_json(json_file, shape=content.shape, key=ftype, desc=desc)
-        to_tsv(tsv_file, content)
+        to_json(json_file.lower(), shape=content.shape, key=ftype, desc=desc)
+        to_tsv(tsv_file.lower(), content)
 
 
 def check_centres():
