@@ -98,8 +98,6 @@ class FolderStructure:
                                                                 coord_format.format(desc, 'times', 'json')]
             else:
                 self.components['subjects'][sid]['ts'] += common_structure(v)
-                self.components['subjects'][sid]['coord'] += [coord_format.format(desc, 'times', 'tsv'),
-                                                              coord_format.format(desc, 'times', 'json')]
         else:
             if fc:
                 self.components['subjects'][sid][ses]['spatial'] += [
