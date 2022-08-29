@@ -189,11 +189,25 @@ def prepare_subs(file_paths, sid):
     subs = {}
 
     for file_path in file_paths:
-        print('Preparing file', file_path, 'in subject traversal')
-
         name = get_filename(file_path)
         name = name.split('_')[-1] if '_' in name else name
         desc = app.DESC
+
+        # get extensions
+        ext = os.path.basename(file_path).split('.')[-1]
+
+        # check if file ends with CSV or dat, if true, change file
+        # extension to plain TXT. It's necessary so that there's minimal
+        # number of "if" statements in the future traversals
+        if ext.endswith('csv') or ext.endswith('dat'):
+            # instantiate a new path
+            new_path = file_path.replace(ext, 'txt')
+
+            # replace the existing path with the new path
+            os.replace(file_path, new_path)
+
+            # set the new path
+            file_path = new_path
 
         # rename tract_lengths to distances
         if name == 'tract_lengths.txt':

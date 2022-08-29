@@ -235,12 +235,14 @@ def save_code(subs):
     """
     template = f'desc-{DESC}_code.py'
     path = os.path.join(OUTPUT, 'code', template)
-    shutil.copy(CODE, path)
 
-    out = OrderedDict({x: '' for x in temp.struct['code']['recommend']})
+    if CODE is not None:
+        shutil.copy(CODE, path)
 
-    with open(os.path.join(path.replace('py', 'json')), 'w') as file:
-        json.dump(out, file)
+        out = OrderedDict({x: '' for x in temp.struct['code']['recommend']})
+
+        with open(os.path.join(path.replace('py', 'json')), 'w') as file:
+            json.dump(out, file)
 
 
 def remove_empty():
