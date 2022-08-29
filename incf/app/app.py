@@ -130,14 +130,34 @@ def save_output(subs):
         -------
 
         """
+        name = None
+
         for k, v in sub.items():
             # create folders according to session and subject count types
             folders = create_sub_struct(OUTPUT, v, ses_name=ses)
+            k_lower = k.lower()
 
-            if 'weight' in k or 'distance' in k:
-                convert.save(sub[k], folders, ses=ses, name='wd')
-            elif 'centre' in k:
-                convert.save(sub[k], folders, ses=ses, name='centres')
+            if 'weight' in k_lower or 'distance' in k_lower:
+                name = 'wd'
+            elif 'centre' in k_lower:
+                name = 'centres'
+            elif 'node' in k_lower or 'label' in k_lower:
+                name = 'nodes_labels'
+            elif 'fc' in k_lower:
+                name = 'spatial'
+            elif 'vars' in k_lower or 'stimuli' in k_lower or 'noise' in k_lower \
+                 or 'spike' in k_lower or 'raster' in k_lower or 'ts' in k_lower \
+                 or 'event' in k_lower or 'emp' in k_lower:
+                name = 'ts'
+            elif k_lower.endswith('mat'):
+                pass
+            elif k_lower.endswith('.h5'):
+                pass
+            elif k_lower.endswith('txt') or k_lower.endswith('csv') or k_lower.endswith('dat'):
+                name = 'coord'
+
+            if name is not None:
+                convert.save(sub[k], folders, ses=ses, name=name)
 
     # iterate over files and save them
     for k, v in subs.items():

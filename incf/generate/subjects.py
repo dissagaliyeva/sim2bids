@@ -189,6 +189,8 @@ def prepare_subs(file_paths, sid):
     subs = {}
 
     for file_path in file_paths:
+        print('Preparing file', file_path, 'in subject traversal')
+
         name = get_filename(file_path)
         name = name.split('_')[-1] if '_' in name else name
         desc = app.DESC
@@ -236,6 +238,7 @@ def prepare_subs(file_paths, sid):
         if subs[name]['name'] in ['centres', 'centers']:
             app.CENTERS = True
 
+    print(subs)
     return subs
 
 
@@ -258,7 +261,7 @@ def find_separator(path):
         return
 
     try:
-        file = pd.read_csv(path, index_col=None, header=None)
+        file = pd.read_csv(path, index_col=None, header=None, sep='\s')
     except pd.errors.EmptyDataError:
         pn.state.notifications.error(f'File {os.path.basename(path)} is empty! Removing the file...')
         return 'remove'
@@ -267,6 +270,9 @@ def find_separator(path):
     if path.endswith('hemisphere.txt') or path.endswith('cortical.txt') or path.endswith('areas.txt'):
         file.to_csv(path, sep='\n', header=None, index=None)
         return '\n'
+
+    if file.shape[0] > 1 and file.shape[1] > 1:
+        return '\s'
 
     sniffer = csv.Sniffer()
 

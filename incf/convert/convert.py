@@ -116,7 +116,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
         save_files(sub, folder, file, desc=desc, ftype='wd')
 
     # get folder location for centres
-    if name == 'centres':
+    elif name == 'centres':
         # check if all centres are of the same content
         if check_centres():
             # ignore preceding centres files
@@ -141,6 +141,8 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
             # save conversion results
             save_files(sub, folder, file, type='default', centres=True, desc=desc)
+
+    # elif name
 
 
 def save_files(sub: dict, folder: str, content, type: str = 'default', centres: bool = False,
