@@ -2,9 +2,25 @@ import os
 import shutil
 
 import panel as pn
-import incf.templates.templates as temp
+
 import incf.app as app
+import incf.generate.subjects as subj
+import incf.preprocess.preprocess as prep
+import incf.templates.templates as temp
 from incf import incf
+from incf.convert import convert
+
+
+def reset_values():
+    prep.reset_index()
+    subj.TO_RENAME = None
+    app.ALL_FILES = None
+    app.MULTI_INPUT = False
+    app.CODE = None
+    app.CENTRES = False
+    app.SID = None
+    convert.IGNORE_CENTRE = False
+    convert.COORDS = None
 
 
 def rm_tree(path: str = '../output'):

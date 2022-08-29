@@ -6,13 +6,13 @@ import pandas as pd
 import panel as pn
 import param
 
-import incf.preprocess.preprocess as prep
 import incf.generate.subjects as subj
-from incf.validate import validate
-from incf.app import app
+import incf.preprocess.preprocess as prep
 from incf import utils
-from incf.templates import user_guide as ug
+from incf.app import app
 from incf.convert import convert
+from incf.templates import user_guide as ug
+from incf.validate import validate
 
 JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
@@ -53,7 +53,6 @@ class MainArea(param.Parameterized):
         self.structure = pn.widgets.StaticText(margin=(5, 0, 50, 20))
         self.subjects = None
         self.length = 0
-        subj.TO_RENAME = None
         self.struct = ''
 
     @pn.depends('text_input.value', watch=True)
@@ -66,29 +65,20 @@ class MainArea(param.Parameterized):
             self.cross_select.options = os.listdir(self.text_input.value)
             self.cross_select.value = []
             self.structure.value = ''
-            prep.reset_index()
-            subj.TO_RENAME = None
-            app.ALL_FILES = None
-            app.MULTI_INPUT = False
-            convert.IGNORE_CENTRE = False
+            utils.reset_values()
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
         self.structure.value = ''
 
         if len(self.cross_select.value) == 0:
-            prep.reset_index()
-            subj.TO_RENAME = None
-            app.ALL_FILES = None
-            app.MULTI_INPUT = False
-            convert.IGNORE_CENTRE = False
+            utils.reset_values()
+
             for _ in self.rename_files:
                 self.rename_files.pop(-1)
 
         if self.length != len(self.cross_select.value):
-            prep.reset_index()
-            subj.TO_RENAME = None
-            app.ALL_FILES = None
+            utils.reset_values()
 
             for _ in self.rename_files:
                 self.rename_files.pop(-1)
@@ -124,7 +114,6 @@ class MainArea(param.Parameterized):
                 self.rename_files.pop(-1)
 
         self.structure.value = self.struct
-
 
     @pn.depends('checkbox_group.value', watch=True)
     def _change_checkbox(self):
@@ -354,6 +343,10 @@ However, you can use the arrows to find the folders.
 
 GET_STARTED = """
 ## Welcome!
-Here you can select the folder(s) that you want to transform. Beware that we are using recursive walk to select all the content available in the specified folder. That means if the folder contains a sub-folder, we will transform the content if it falls into the accepted file formats.
-Below you will see the generated folder with content as specified at [BIDS Computational Model Specification](https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit?usp=sharing). If you are happy with the results, press `Transform Files` button at the bottom of the screen. We will not start generation until you press the button below.
+Here you can select the folder(s) that you want to transform. Beware that we are using recursive walk to select all the
+content available in the specified folder. That means if the folder contains a sub-folder, we will transform the content
+if it falls into the accepted file formats.
+Below you will see the generated folder with content as specified at [BIDS Computational Model Specification](https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit?usp=sharing){:target="_blank"}.
+If you are happy with the results, press `Transform Files` button at the bottom of the screen. We will not start
+generation until you press the button below.
 """

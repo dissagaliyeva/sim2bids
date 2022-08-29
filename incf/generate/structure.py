@@ -240,7 +240,7 @@ class FolderStructure:
 
 
 def common_structure(v, name=None):
-    name = v['name'] if name is None else name
+    name = v['name'].lower() if name is None else name.lower()
 
     return [default_format.format(v['sid'], v['desc'], name, 'tsv'),
             default_format.format(v['sid'], v['desc'], name, 'json')]

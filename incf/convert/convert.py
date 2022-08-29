@@ -2,7 +2,6 @@ import json
 import os
 from collections import OrderedDict
 
-import numpy as np
 import pandas as pd
 
 from incf.app import app
@@ -139,10 +138,16 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
         if 'nodes' in sub['name'] and IGNORE_CENTRE is False:
             save_centres(sub, file, ses, folders, centre_name='nodes')
         else:
-            if ses is None:
-                if app.MULTI_INPUT:
-                    pass
+            # set appropriate output path depending on session and subject types
+            if ses is not None:
+                folder = folders[4]
+            elif app.MULTI_INPUT and ses is None:
+                folder = folders[3]
+            else:
+                folder = os.path.join(app.OUTPUT, 'coord')
 
+            # save conversion results
+            save_files(sub, folder, file, type='default', centres=True)
 
 
 def save_centres(sub, file, ses, folders, centre_name='centres'):
