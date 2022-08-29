@@ -80,10 +80,11 @@ class FolderStructure:
 
     def save_centres(self, v, sid, ses=None, name=None):
         structure = coord_structure(v, ses) if name is None else common_structure(v, name)
+
         if ses is None:
             if app.MULTI_INPUT:
-                if len(set(structure).intersection(set(self.components['subjects'][sid]['coord']))) == 0:
-                    self.components['subjects'][sid]['coord'] += structure
+                if len(self.components['subjects'][sid]['coord']) == 0:
+                    self.components['subjects'][sid]['coord'] += coord_structure(v, ses='multi')
             else:
                 if len(set(structure).intersection(set(self.components['coord']))) == 0:
                     self.components['coord'] += structure
