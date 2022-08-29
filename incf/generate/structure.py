@@ -39,14 +39,13 @@ class FolderStructure:
         k = k.split('_')[-1] if '_' in k else k
         files = utils.get_files()
 
-        if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt',
-                 'weights.csv', 'distances.csv', 'tract_lengths.csv']:
+        if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
             self.save_wd(v, sid, ses=ses)
-        elif k in ['centres.txt', 'centres.csv']:
+        elif k in ['centres.txt']:
             self.save_centres(v, sid, ses=ses)
-        elif k in ['map.txt', 'map.csv']:
+        elif k in ['map.txt']:
             self.save_map(v, sid, ses=ses)
-        elif k in ['nodes.txt', 'nodes.csv', 'labels.txt', 'labels.csv', *app.TO_EXTRACT[3:]]:
+        elif k in ['nodes.txt', 'labels.txt', *app.TO_EXTRACT[3:]]:
             self.save_centres(v, sid, ses=ses, name=v['name'])
         elif k.endswith('.mat'):
             if 'fc' in k.lower():
