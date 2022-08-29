@@ -12,6 +12,7 @@ from incf.validate import validate
 from incf.app import app
 from incf import utils
 from incf.templates import user_guide as ug
+from incf.convert import convert
 
 JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
@@ -68,6 +69,8 @@ class MainArea(param.Parameterized):
             prep.reset_index()
             subj.TO_RENAME = None
             app.ALL_FILES = None
+            app.MULTI_INPUT = False
+            convert.IGNORE_CENTRE = False
 
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
@@ -77,6 +80,8 @@ class MainArea(param.Parameterized):
             prep.reset_index()
             subj.TO_RENAME = None
             app.ALL_FILES = None
+            app.MULTI_INPUT = False
+            convert.IGNORE_CENTRE = False
             for _ in self.rename_files:
                 self.rename_files.pop(-1)
 

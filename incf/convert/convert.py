@@ -117,32 +117,61 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
     # get folder location for centres
     elif name == 'centres':
-        # check if all centres are of the same content
-        if check_centres():
-            # ignore preceding centres files
-            IGNORE_CENTRE = True
+        save_centres(sub, file, ses, folders)
 
-            # set output path to store coords in
+    # get folder location for spatial
+    elif name == 'spatial':
+        if ses is None:
+            folder = folders[2]
+        else:
+            folder = folders[3]
+
+        # save conversion results
+        save_files(sub, folder, file, type='default', ftype='spatial')
+
+    # get folder location for time series
+    elif name == 'ts':
+        save_files(sub, folders[-1], file, type='default', ftype='ts')
+
+    # get folder location for coordinates
+    elif name == 'coord':
+        # check nodes
+        if 'nodes' in sub['name'] and IGNORE_CENTRE is False:
+            save_centres(sub, file, ses, folders, centre_name='nodes')
+        else:
+            if ses is None:
+                if app.MULTI_INPUT:
+                    pass
+
+
+
+def save_centres(sub, file, ses, folders, centre_name='centres'):
+    global IGNORE_CENTRE
+
+    # check if all centres are of the same content
+    if check_centres(name=centre_name):
+        # ignore preceding centres files
+        IGNORE_CENTRE = True
+
+        # set output path to store coords in
+        folder = os.path.join(app.OUTPUT, 'coord')
+
+        # save conversion results
+        save_files(sub, folder, file, type='coord', centres=True, desc=temp.centres['multi-same'])
+    else:
+        # get description for centres depending on input files
+        desc = temp.centres['multi-unique'] if app.MULTI_INPUT else temp.centres['single']
+
+        # set appropriate output path depending on session and subject types
+        if ses is not None:
+            folder = folders[4]
+        elif app.MULTI_INPUT and ses is None:
+            folder = folders[3]
+        else:
             folder = os.path.join(app.OUTPUT, 'coord')
 
-            # save conversion results
-            save_files(sub, folder, file, type='coord', centres=True, desc=temp.centres['multi-same'])
-        else:
-            # get description for centres depending on input files
-            desc = temp.centres['multi-unique'] if app.MULTI_INPUT else temp.centres['single']
-
-            # set appropriate output path depending on session and subject types
-            if ses is not None:
-                folder = folders[4]
-            elif app.MULTI_INPUT and ses is None:
-                folder = folders[3]
-            else:
-                folder = os.path.join(app.OUTPUT, 'coord')
-
-            # save conversion results
-            save_files(sub, folder, file, type='default', centres=True, desc=desc)
-
-    # elif name
+        # save conversion results
+        save_files(sub, folder, file, type='default', centres=True, desc=desc)
 
 
 def save_files(sub: dict, folder: str, content, type: str = 'default', centres: bool = False,
@@ -226,7 +255,7 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         to_tsv(tsv_file.lower(), content)
 
 
-def check_centres():
+def check_centres(name='centres'):
     """
     This function checks all centres files in the input folder and
     decides whether they have the same content or not. The logic of
@@ -240,7 +269,7 @@ def check_centres():
     """
 
     # get all centres files
-    centres = get_specific('centres')
+    centres = get_specific(name)
 
     # get the first element
     file = open_file(centres[0], subjects.find_separator(centres[0]))

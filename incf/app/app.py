@@ -142,7 +142,7 @@ def save_output(subs):
             elif 'centre' in k_lower:
                 name = 'centres'
             elif 'node' in k_lower or 'label' in k_lower:
-                name = 'nodes_labels'
+                name = 'coord'
             elif 'fc' in k_lower:
                 name = 'spatial'
             elif 'vars' in k_lower or 'stimuli' in k_lower or 'noise' in k_lower \
