@@ -149,8 +149,6 @@ def save_output(subs):
                  or 'spike' in k_lower or 'raster' in k_lower or 'ts' in k_lower \
                  or 'event' in k_lower or 'emp' in k_lower:
                 name = 'ts'
-            elif k_lower.endswith('mat'):
-                pass
             elif k_lower.endswith('.h5'):
                 pass
             elif k_lower.endswith('txt') or k_lower.endswith('csv') or k_lower.endswith('dat'):
