@@ -263,7 +263,6 @@ def find_separator(path):
     try:
         file = pd.read_csv(path, index_col=None, header=None, sep='\s')
     except pd.errors.EmptyDataError:
-        pn.state.notifications.error(f'File {os.path.basename(path)} is empty! Removing the file...')
         return 'remove'
 
     # if cortical.txt, hemisphere.txt, or areas.txt are present, return '\n' delimiter

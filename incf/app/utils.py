@@ -118,3 +118,14 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 def rename_tract_lengths(file: str) -> str:
     return file.replace('tract_lengths', 'distances')
 
+
+def get_files():
+    return {
+        'net': ['weights', 'distances', 'delays', 'speed'],
+        'coord': ['times', 'centres', 'orientations', 'areas', 'hemispheres',
+                  'cortical', 'nodes', 'labels', 'vertices', 'faces', 'vnormals',
+                  'fnormals', 'sensors', 'app', 'map', 'volumes',
+                  'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d'],
+        'ts': ['ts', 'emp', 'vars', 'stimuli', 'noise', 'spikes', 'raster', 'events'],
+        'spatial': ['fc']
+    }

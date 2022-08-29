@@ -4,6 +4,7 @@ from pathlib import Path
 from incf.app import app
 from collections import OrderedDict
 from incf.preprocess import simulations_h5 as sim
+import incf.app.utils as utils
 
 default_format, coord_format = '{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
 
@@ -36,6 +37,7 @@ class FolderStructure:
 
     def iterate_dict(self, k, v, sid, ses=None):
         k = k.split('_')[-1] if '_' in k else k
+        files = utils.get_files()
 
         if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt',
                  'weights.csv', 'distances.csv', 'tract_lengths.csv']:
@@ -50,7 +52,8 @@ class FolderStructure:
             if 'fc' in k.lower():
                 self.save_mat(v, sid, ses=ses, fc=True)
             else:
-                self.save_mat(v, sid, ses=ses)
+                if k.replace('.mat', '') in files['ts']:
+                    self.save_mat(v, sid, ses=ses)
         elif k.endswith('.h5'):
             self.save_h5(v, ses=ses)
 
