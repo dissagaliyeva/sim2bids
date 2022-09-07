@@ -4,6 +4,7 @@ import shutil
 from collections import OrderedDict
 
 import panel as pn
+import pylems_py2xml
 import pylems_py2xml as py2xml
 
 # import local packages
@@ -87,7 +88,9 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         # finally, remove all empty folders
         remove_empty()
 
-    print(convert.H5_CONTENT)
+    if convert.H5_CONTENT is not None:
+        pylems_py2xml.main.XML(inp=convert.H5_CONTENT, output_path=OUTPUT, uid=convert.H5_CONTENT['model'],
+                               app=True, suffix=DESC)
 
     # return subjects and possible layouts only if it's enabled
     if layout:

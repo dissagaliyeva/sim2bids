@@ -226,7 +226,7 @@ def save_h5(sub, folders, ses=None):
         if len(list(file.keys())) > 0:
             for k in file.keys():
                 if k not in H5_CONTENT.keys():
-                    H5_CONTENT[k] = file[k][:][0]
+                    H5_CONTENT[k] = [file[k][:][0]]
 
 
 def save_files(sub: dict, folder: str, content, type: str = 'default', centres: bool = False,
