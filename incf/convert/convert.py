@@ -2,7 +2,9 @@ import json
 import os
 from collections import OrderedDict
 
+import numpy as np
 import pandas as pd
+import h5py
 
 from incf.app import app
 from incf.generate import subjects
@@ -111,8 +113,11 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
         # get description for weights or distances
         desc = temp.weights if 'weights' in sub['name'] else temp.distances
 
-        # save conversion results
-        save_files(sub, folder, file, desc=desc, ftype='wd')
+        if 'content' in sub.keys():
+            save_files(sub, folder, sub['content'], ftype='wd')
+        else:
+            # save conversion results
+            save_files(sub, folder, file, desc=desc, ftype='wd')
 
     # get folder location for centres
     elif name == 'centres':
@@ -125,8 +130,11 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
         else:
             folder = folders[3]
 
-        # save conversion results
-        save_files(sub, folder, file, type='default', ftype='spatial')
+        if 'content' in sub.keys():
+            save_files(sub, folder, sub['content'], type='default', ftype='spatial')
+        else:
+            # save conversion results
+            save_files(sub, folder, file, type='default', ftype='spatial')
 
     # get folder location for time series
     elif name == 'ts':
@@ -136,7 +144,10 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     elif name == 'coord':
         # check nodes
         if 'nodes' in sub['name'] and IGNORE_CENTRE is False:
-            save_centres(sub, file, ses, folders, centre_name='nodes')
+            if 'content' in sub.keys():
+                save_centres(sub, sub['content'], ses, folders, centre_name='nodes')
+            else:
+                save_centres(sub, file, ses, folders, centre_name='nodes')
         else:
             # set appropriate output path depending on session and subject types
             if ses is not None:
@@ -146,8 +157,11 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             else:
                 folder = os.path.join(app.OUTPUT, 'coord')
 
-            # save conversion results
-            save_files(sub, folder, file, type='default', centres=True)
+            if 'content' in sub.keys():
+                save_files(sub, folder, file, type='default', centres=True)
+            else:
+                # save conversion results
+                save_files(sub, folder, file, type='default', centres=True)
 
 
 def save_centres(sub, file, ses, folders, centre_name='centres'):
@@ -177,6 +191,29 @@ def save_centres(sub, file, ses, folders, centre_name='centres'):
 
         # save conversion results
         save_files(sub, folder, file, type='default', centres=True, desc=desc)
+
+
+def save_h5(sub, folders, ses=None):
+
+    # check if the h5 file contains weights, distances, areas, cortical, and hemisphere
+    if 'datatypes' in sub['path']:
+        file = h5py.File(sub['path'])
+
+        for f in file.keys():
+            if f == 'region_labels': continue
+
+            content = file[f][:]
+
+            if f == 'centres':
+                content = np.column_stack([file['region_labels'][:], file['centres'][:]])
+
+            path = os.path.dirname(sub['path'])
+            np.savetxt(os.path.join(path, f'{f}.txt'), content, delimiter='\s')
+
+
+
+
+
 
 
 def save_files(sub: dict, folder: str, content, type: str = 'default', centres: bool = False,

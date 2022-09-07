@@ -12,6 +12,7 @@ from incf.generate import subjects, structure
 from incf.preprocess import preprocess as prep
 from incf.convert import convert
 from incf.templates import templates as temp
+from incf.preprocess import simulations_h5 as h5
 
 
 # define global variables
@@ -150,7 +151,8 @@ def save_output(subs):
                  or 'event' in k_lower or 'emp' in k_lower:
                 name = 'ts'
             elif k_lower.endswith('.h5'):
-                pass
+                # h5.save(subs, OUTPUT, folders, ses=ses)
+                convert.save_h5(sub[k], folders, ses=None)
             elif k_lower.endswith('txt') or k_lower.endswith('csv') or k_lower.endswith('dat'):
                 name = 'coord'
 
