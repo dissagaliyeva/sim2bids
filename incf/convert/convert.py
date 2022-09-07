@@ -102,6 +102,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     # read file contents
     file = open_file(sub['path'], sub['sep'])
     print(file)
+    print(sub['name'])
 
     # get folder location for weights and distances
     if name == 'wd':
@@ -165,7 +166,6 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
                 if 'centres' in sub['fname']:
                     save_files(sub, folder, file, type='default', centres=True)
                 else:
-                    print(file)
                     save_files(sub, folder, file, type='default')
 
 
@@ -210,15 +210,10 @@ def save_h5(sub, folders, ses=None):
             content = file[f][:]
 
             if f == 'centres':
-                content = np.column_stack([file['region_labels'][:], file['centres'][:]])
+                content = np.column_stack([file['region_labels'][:].astype(str), file['centres'][:]])
 
             path = os.path.dirname(sub['path'])
-            np.savetxt(os.path.join(path, f'{f}.txt'), content, delimiter='\s')
-
-
-
-
-
+            pd.DataFrame(content, index=None).to_csv(os.path.join(path, f'{f}.txt'), header=None, index=None, sep='\t')
 
 
 def save_files(sub: dict, folder: str, content, type: str = 'default', centres: bool = False,
@@ -297,9 +292,8 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         to_json(nodes, shape=content.shape, key='coord', desc=desc[1])
         to_tsv(nodes.replace('json', 'tsv'), content[1:])
     else:
-        print(content)
         # otherwise, save files as usual
-        to_json(json_file.lower(), shape=content.shape, key=ftype, desc=desc)
+        to_json(json_file.lower(), shape=content.shape, key='coord', desc=desc)
         to_tsv(tsv_file.lower(), content)
 
 
