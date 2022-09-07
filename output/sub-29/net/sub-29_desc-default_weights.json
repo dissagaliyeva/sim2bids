@@ -1,0 +1,1 @@
+{"NumberOfRows": 68, "NumberOfColumns": 68, "CoordsRows": "", "CoordsColumns": "", "Description": "The Structural Connectivity (SC) that contains the connectome. Zeros in a matrix represent `unconnected` areas."}

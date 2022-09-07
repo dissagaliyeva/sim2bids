@@ -4,10 +4,10 @@ import shutil
 from collections import OrderedDict
 
 import panel as pn
+import pylems_py2xml as py2xml
 
 # import local packages
 import incf.utils
-from incf.app import utils
 from incf.generate import subjects, structure
 from incf.preprocess import preprocess as prep
 from incf.convert import convert
@@ -80,7 +80,7 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 
         # save code
         if CODE is not None:
-            save_code(subs)
+            save_code()
 
         # finally, remove all empty folders
         remove_empty()
@@ -221,7 +221,7 @@ def create_sub_struct(path, subs, ses_name=None):
     return folders
 
 
-def save_code(subs):
+def save_code():
     """
 
     Parameters
@@ -243,6 +243,15 @@ def save_code(subs):
 
         with open(os.path.join(path.replace('py', 'json')), 'w') as file:
             json.dump(out, file)
+
+        # save JSON files
+        py2xml.main.XML(input_path=CODE, output_path=os.path.join(OUTPUT, 'param'),
+                        uid='delta_times', suffix=DESC, app=True)
+
+        # transfer results to appropriate folders
+        path = os.path.join(OUTPUT, 'param', f'desc-{DESC}_eq.xml')
+        if os.path.exists(path):
+            shutil.move(path, os.path.join(OUTPUT, 'eq'))
 
 
 def remove_empty():

@@ -23,7 +23,7 @@ struct = {'coord': {'required': ['Units'],
                                                'SoftwareName', 'SoftwareRepository']},
           'param': {'required': ['ModelEq'], 'recommend': ['SourceCode', 'SourceCodeVersion',
                                                            'SoftwareVersion', 'SoftwareName', 'SoftwareRepository']},
-          'code': {'required': [], 'recommend': ['ModelEq', 'ModelParam', 'SourceCode', 'SourceCodeVersion',
+          'code': {'required': [], 'recommend': ['ModelEq', 'SourceCode', 'SourceCodeVersion',
                                                  'SoftwareVersion', 'SoftwareName', 'SoftwareRepository']}, }
 
 required = ['NumberOfRows', 'NumberOfColumns', 'CoordsRows', 'CoordsColumns', 'Description']
