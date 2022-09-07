@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<Lems xmlns="http://www.neuroml.org/lems/0.7.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/lems/0.7.6 https://raw.githubusercontent.com/LEMS/LEMS/development/Schemas/LEMS/LEMS_v0.7.6.xsd">
+  <Component id="delta_times" type="SJHM3D" r="0.006" a="1.0" b="3.0" c="1.0" d="5.0" s="4.0" xo="1.6" K11="0.5" K12="0.1" K21="0.15" sigma="0.3" mu="2.2" x_1="-1.6"/>
+</Lems>
