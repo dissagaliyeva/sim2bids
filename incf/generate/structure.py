@@ -3,7 +3,6 @@ import h5py as h
 from pathlib import Path
 from incf.app import app
 from collections import OrderedDict
-from incf.preprocess import simulations_h5 as sim
 import incf.app.utils as utils
 
 default_format, coord_format = '{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
@@ -119,7 +118,7 @@ class FolderStructure:
             if sid not in self.components['subjects']:
                 self.components['subjects'][sid] = {'net': [], 'ts': [], 'spatial': [], 'map': [], 'coord': []}
 
-            if sim.check_params(file):
+            if len(set(app.TO_EXTRACT).intersection(set(file.keys()))) > 1:
                 self.components['subjects'][sid]['net'] += common_structure(v, 'weights')
                 self.components['subjects'][sid]['net'] += common_structure(v, 'distances')
 

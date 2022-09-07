@@ -151,8 +151,8 @@ def save_output(subs):
                  or 'event' in k_lower or 'emp' in k_lower:
                 name = 'ts'
             elif k_lower.endswith('.h5'):
-                # h5.save(subs, OUTPUT, folders, ses=ses)
                 convert.save_h5(sub[k], folders, ses=None)
+                continue
             elif k_lower.endswith('txt') or k_lower.endswith('csv') or k_lower.endswith('dat'):
                 name = 'coord'
 
