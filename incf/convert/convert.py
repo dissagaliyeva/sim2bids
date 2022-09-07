@@ -101,6 +101,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
     # read file contents
     file = open_file(sub['path'], sub['sep'])
+    print(file)
 
     # get folder location for weights and distances
     if name == 'wd':
@@ -161,7 +162,11 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
                 save_files(sub, folder, file, type='default', centres=True)
             else:
                 # save conversion results
-                save_files(sub, folder, file, type='default', centres=True)
+                if 'centres' in sub['fname']:
+                    save_files(sub, folder, file, type='default', centres=True)
+                else:
+                    print(file)
+                    save_files(sub, folder, file, type='default')
 
 
 def save_centres(sub, file, ses, folders, centre_name='centres'):
@@ -292,6 +297,7 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         to_json(nodes, shape=content.shape, key='coord', desc=desc[1])
         to_tsv(nodes.replace('json', 'tsv'), content[1:])
     else:
+        print(content)
         # otherwise, save files as usual
         to_json(json_file.lower(), shape=content.shape, key=ftype, desc=desc)
         to_tsv(tsv_file.lower(), content)
@@ -415,6 +421,9 @@ def open_text(path, sep):
     -------
 
     """
+    if sep == '\n':
+        return pd.read_csv(path, header=None, index_col=None)
+
     try:
         f = pd.read_csv(path, sep=sep, header=None, index_col=False)
     except pd.errors.EmptyDataError:
