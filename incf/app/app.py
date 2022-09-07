@@ -238,22 +238,54 @@ def save_code():
 
     if CODE is not None:
         shutil.copy(CODE, path)
-
-        out = OrderedDict({x: '' for x in temp.struct['code']['recommend']})
-        out['ModelEq'] = f'../eq/desc-{DESC}_eq.xml'
-        out['Description'] = 'The source code to reproduce results'
-
-        with open(os.path.join(path.replace('py', 'json')), 'w') as file:
-            json.dump(out, file)
+        supply_dict('code', os.path.join(path.replace('py', 'json')))
 
         # save JSON files
         py2xml.main.XML(input_path=CODE, output_path=os.path.join(OUTPUT, 'param'),
                         uid='delta_times', suffix=DESC, app=True)
 
         # transfer results to appropriate folders
-        path = os.path.join(OUTPUT, 'param', f'desc-{DESC}_eq.xml')
+        path = os.path.join(OUTPUT, 'param', f'desc-{DESC}_eq.json')
         if os.path.exists(path):
             shutil.move(path, os.path.join(OUTPUT, 'eq'))
+
+        # add json sidecars
+        supply_dict('eq', os.path.join(OUTPUT, 'eq', f'desc-{DESC}_eq.json'))
+        supply_dict('param', os.path.join(OUTPUT, 'param', f'desc-{DESC}_param.json'))
+
+        # add json sidecar for model
+        supply_dict('param', os.path.join(OUTPUT, 'param', 'model-SJHM3D_param.json'))
+
+
+def supply_dict(ftype, path):
+    file = OrderedDict()
+
+    def get_dict(reqs):
+        return {x: '' for x in temp.struct[ftype][reqs]}
+
+    def save():
+        with open(path, 'w') as f:
+            json.dump(file, f)
+
+    if len(temp.struct[ftype]['required']) > 0:
+        file.update(get_dict('required'))
+
+    file.update(get_dict('recommended'))
+
+    eq = f'../eq/desc-{DESC}_eq.xml'
+
+    if ftype == 'code':
+        file['ModelEq'] = eq
+        file['Description'] = 'The source code to reproduce results'
+    elif ftype == 'param':
+        file['ModelEq'] = eq
+        file['Description'] = 'These are the parameters for the SJHMR3D model for the delta series.'
+
+    elif ftype == 'eq':
+        file['Description'] = 'These are the equations to simulate the time series with the Stefanescu-Jirsa 3D ' \
+                              '(reduced Hindmarsh-Rose model) model.'
+
+    save()
 
 
 def remove_empty():
