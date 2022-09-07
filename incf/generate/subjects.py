@@ -56,7 +56,6 @@ class Files:
         path, files, changed = self.path, self.files, False
 
         if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop', 'ses-postop']:
-            changed = True
             path = os.path.join(path, files[0])
             files = os.listdir(path)
 
@@ -74,20 +73,22 @@ class Files:
 
                 TO_RENAME = get_extensions(self.basename)
 
-                if len(self.files) == 1:
-                    changed_path = True
-                    files = os.listdir(os.path.join(self.path, self.files[0]))
+                # if len(self.files) == 1:
+                #     changed_path = True
+                #     files = os.listdir(os.path.join(self.path, self.files[0]))
 
                 for file in files:
                     sid = self.create_sid_sub()
 
-                    if changed_path:
+                    if changed:
                         path = os.path.join(self.path, self.files[0], file)
                     else:
                         path = os.path.join(self.path, file)
 
                     # Step 5: get all content
                     all_files = os.listdir(path)
+
+                    print('all files:', all_files)
 
                     # Step 6: traverse ses-preop if present
                     if 'ses-preop' in all_files:
@@ -145,8 +146,8 @@ def find_matches(paths):
     unique_ids = []
 
     for path in paths:
-        match = re.findall('^[A-Za-z]{2,}_[0-9]{2,}', path)
-        if len(match) > 0:
+        match = re.findall('^[A-Za-z]{2,3}_[0-9]{2,}', path)
+        if len(match) > 0 and not path.endswith('.h5'):
             unique_ids.append(match[0])
 
     return list(set(unique_ids))
