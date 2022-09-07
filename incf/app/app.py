@@ -17,12 +17,12 @@ from incf.preprocess import simulations_h5 as h5
 
 # define global variables
 SID = None
-DESC = 'default'        # short description that identifies input data
-OUTPUT = '../output'    # output folder to store appersions
-CENTRES = False         # whether centres.txt|nodes.txt|labels.txt were found
-MULTI_INPUT = False     # whether input files include single- or multi-subjects
-ALL_FILES = None        # list of all file paths (gets supplemented in subjects.py)
-CODE = None             # path to python code if exists
+DESC = 'default'                            # short description that identifies input data
+OUTPUT = os.path.join('..', 'output')       # output folder to store appersions
+CENTRES = False                             # whether centres.txt|nodes.txt|labels.txt were found
+MULTI_INPUT = False                         # whether input files include single- or multi-subjects
+ALL_FILES = None                            # list of all file paths (gets supplemented in subjects.py)
+CODE = None                                 # path to python code if exists
 
 # define all accepted files
 ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',                 # Network (net)
@@ -33,8 +33,9 @@ ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',             
             'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'emp'     # Timeseries (ts)
             'fc']                                                                   # Spatial (spatial)
 
-TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                                            # folder "net"
-              'areas.txt', 'average_orientations.txt', 'cortical.txt', 'hemisphere.txt', 'normals.txt'  # folder "coord"
+TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                        # folder "net"
+              'areas.txt', 'average_orientations.txt', 'cortical.txt',              # folder "coord"
+              'hemisphere.txt', 'normals.txt'                                       # folder "coord"
               ]
 
 # define accepted extensions
