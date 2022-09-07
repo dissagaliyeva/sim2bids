@@ -86,6 +86,8 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         # finally, remove all empty folders
         remove_empty()
 
+    print(convert.H5_CONTENT)
+
     # return subjects and possible layouts only if it's enabled
     if layout:
         return subs, structure.create_layout(subs)

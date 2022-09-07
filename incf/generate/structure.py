@@ -127,9 +127,10 @@ class FolderStructure:
                 else:
                     del self.components['coord']
             else:
-                if len(list(keys)) > 0:
-                    self.components['param'] += [coord_format.format(v['desc'], name, 'xml'),
-                                                 coord_format.format(v['desc'], name, 'json')]
+                pass
+                # if len(list(keys)) > 0:
+                #     self.components['param'] += [coord_format.format(v['desc'], name, 'xml'),
+                #                                  coord_format.format(v['desc'], name, 'json')]
 
     def save_code(self, v):
         self.components['code'] = [coord_format.format(v['desc'], 'code', 'py'),
