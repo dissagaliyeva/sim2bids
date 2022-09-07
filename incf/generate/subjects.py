@@ -191,7 +191,11 @@ def prepare_subs(file_paths, sid):
 
     for file_path in file_paths:
         name = get_filename(file_path)
-        name = name.split('_')[-1] if '_' in name else name
+
+        if file_path.endswith('.h5'):
+            name = name.split('_')[0] + '.h5'
+        else:
+            name = name.split('_')[-1] if '_' in name else name
         desc = app.DESC
 
         # get extensions

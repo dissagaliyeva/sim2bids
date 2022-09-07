@@ -24,6 +24,9 @@ IGNORE_CENTRE = False
 # sidecars, specifically `CoordsRows` and `CoordsColumns`
 COORDS = None
 
+# store h5 file's parameters and save in the dictionary below
+H5_CONTENT = {}
+
 
 def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     """Main engine to save all conversions. Several functionalities to understand:
@@ -99,10 +102,10 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     if IGNORE_CENTRE and name == 'centres':
         return
 
+    print('file:', sub['name'])
+
     # read file contents
     file = open_file(sub['path'], sub['sep'])
-    print(file)
-    print(sub['name'])
 
     # get folder location for weights and distances
     if name == 'wd':
@@ -199,11 +202,12 @@ def save_centres(sub, file, ses, folders, centre_name='centres'):
 
 
 def save_h5(sub, folders, ses=None):
+    global H5_CONTENT
+
+    file = h5py.File(sub['path'])
 
     # check if the h5 file contains weights, distances, areas, cortical, and hemisphere
     if 'datatypes' in sub['path']:
-        file = h5py.File(sub['path'])
-
         for f in file.keys():
             if f == 'region_labels': continue
 
@@ -214,6 +218,15 @@ def save_h5(sub, folders, ses=None):
 
             path = os.path.dirname(sub['path'])
             pd.DataFrame(content, index=None).to_csv(os.path.join(path, f'{f}.txt'), header=None, index=None, sep='\t')
+
+    else:
+        if sub['name'].lower() in ['generic2doscillator']:
+            H5_CONTENT['model'] = sub['name'].lower()
+
+        if len(list(file.keys())) > 0:
+            for k in file.keys():
+                if k not in H5_CONTENT.keys():
+                    H5_CONTENT[k] = file[k][:][0]
 
 
 def save_files(sub: dict, folder: str, content, type: str = 'default', centres: bool = False,
