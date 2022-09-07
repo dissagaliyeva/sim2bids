@@ -28,7 +28,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="Holoviz app to load, transform, store, and download neuroscience data",
+    description="App to load, transform, store, and download neuroscience data",
     entry_points={
         'console_scripts': [
             'app=app.cli:main',
@@ -40,7 +40,7 @@ setup(
     include_package_data=True,
     keywords='app',
     name='app',
-    packages=find_packages(include=['app', 'app.*']),
+    packages=find_packages(),
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/dissagaliyeva/incf',
