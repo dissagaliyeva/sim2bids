@@ -69,19 +69,10 @@ class Files:
                     sid = self.create_sid_sub()
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
             else:
-                changed_path = False
-
                 TO_RENAME = get_extensions(self.basename)
 
                 for file in files:
                     sid = self.create_sid_sub()
-
-                    if changed:
-                        path = os.path.join(self.path, self.files[0], file)
-                    else:
-                        path = os.path.join(self.path, file)
-
-                    print('path:', path)
 
                     # Step 5: get all content
                     all_files = os.listdir(path)
