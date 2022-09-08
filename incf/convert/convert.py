@@ -102,8 +102,6 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     if IGNORE_CENTRE and name == 'centres':
         return
 
-    print('file:', sub['name'])
-
     # read file contents
     file = open_file(sub['path'], sub['sep'])
 
@@ -207,26 +205,14 @@ def save_h5(sub, folders, ses=None):
     file = h5py.File(sub['path'])
 
     # check if the h5 file contains weights, distances, areas, cortical, and hemisphere
-    if 'datatypes' in sub['path']:
-        for f in file.keys():
-            if f == 'region_labels': continue
-
-            content = file[f][:]
-
-            if f == 'centres':
-                content = np.column_stack([file['region_labels'][:].astype(str), file['centres'][:]])
-
-            path = os.path.dirname(sub['path'])
-            pd.DataFrame(content, index=None).to_csv(os.path.join(path, f'{f}.txt'), header=None, index=None, sep='\t')
-
-    else:
-        if sub['name'].lower() in ['generic2doscillator']:
-            H5_CONTENT['model'] = sub['name'].lower()
-
-        if len(list(file.keys())) > 0:
-            for k in file.keys():
-                if k not in H5_CONTENT.keys():
-                    H5_CONTENT[k] = [file[k][:][0]]
+    # if 'datatypes' not in sub['path']:
+    #     if sub['name'].lower() in ['generic2doscillator']:
+    #         H5_CONTENT['model'] = sub['name'].lower()
+    #
+    #     if len(list(file.keys())) > 0:
+    #         for k in file.keys():
+    #             if k not in H5_CONTENT.keys():
+    #                 H5_CONTENT[k] = [file[k][:][0]]
 
 
 def save_files(sub: dict, folder: str, content, type: str = 'default', centres: bool = False,

@@ -24,6 +24,7 @@ CENTRES = False                             # whether centres.txt|nodes.txt|labe
 MULTI_INPUT = False                         # whether input files include single- or multi-subjects
 ALL_FILES = None                            # list of all file paths (gets supplemented in subjects.py)
 CODE = None                                 # path to python code if exists
+H5_CONTENT = None
 
 # define all accepted files
 ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',                 # Network (net)
@@ -76,6 +77,8 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
+    print(subs)
+
     # only save conversions if 'save' is True
     if save and subs is not None:
         # save conversions
@@ -88,8 +91,8 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         # finally, remove all empty folders
         remove_empty()
 
-    if convert.H5_CONTENT is not None:
-        pylems_py2xml.main.XML(inp=convert.H5_CONTENT, output_path=OUTPUT, uid=convert.H5_CONTENT['model'],
+    if convert.H5_CONTENT is not None and 'model' in convert.H5_CONTENT.keys():
+        pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=OUTPUT, uid=convert.H5_CONTENT['model'],
                                app=True, suffix=DESC)
 
     # return subjects and possible layouts only if it's enabled

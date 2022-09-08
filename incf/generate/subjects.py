@@ -73,10 +73,6 @@ class Files:
 
                 TO_RENAME = get_extensions(self.basename)
 
-                # if len(self.files) == 1:
-                #     changed_path = True
-                #     files = os.listdir(os.path.join(self.path, self.files[0]))
-
                 for file in files:
                     sid = self.create_sid_sub()
 
@@ -84,6 +80,8 @@ class Files:
                         path = os.path.join(self.path, self.files[0], file)
                     else:
                         path = os.path.join(self.path, file)
+
+                    print('path:', path)
 
                     # Step 5: get all content
                     all_files = os.listdir(path)
@@ -257,7 +255,6 @@ def prepare_subs(file_paths, sid):
         if subs[name]['name'] in ['centres', 'centers']:
             app.CENTERS = True
 
-    print(subs)
     return subs
 
 

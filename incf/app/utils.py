@@ -4,8 +4,13 @@ Helper functions for app.py
 
 import os
 
+import h5py
+import numpy as np
+import pandas as pd
+
 from incf.app import app
 from incf.generate import zip_traversal as z
+from incf.generate import subjects as subj
 
 
 def recursive_walk(path: str, basename: bool = False) -> list:
@@ -34,8 +39,10 @@ def recursive_walk(path: str, basename: bool = False) -> list:
             if file.endswith('.zip'):
                 # add zip content to the files
                 content += z.extract_zip(os.path.join(root, file))
-
                 continue
+
+            if file.endswith('.h5'):
+                content += extract_h5(os.path.join(root, file))
 
             # if code is found, save its location
             if file.endswith('.py'):
@@ -103,6 +110,10 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
         # get the file's extension
         ext = os.path.basename(file).split('.')[-1]
 
+        if ext == 'h5':
+            extract_h5(file_path)
+            continue
+
         # check if it's among the accepted extensions
         if ext in app.ACCEPTED_EXT:
             # rename `tract_lengths` to `distances`
@@ -129,3 +140,41 @@ def get_files():
         'ts': ['ts', 'emp', 'vars', 'stimuli', 'noise', 'spikes', 'raster', 'events'],
         'spatial': ['fc']
     }
+
+
+def extract_h5(path) -> list:
+    contents = []
+
+    file = h5py.File(path)
+
+    # check if the h5 file contains weights, distances, areas, cortical, and hemisphere
+    if 'datatypes' in path:
+        for f in file.keys():
+            if f in ['region_labels', 'distances']: continue
+
+            content, name = file[f][:], f
+
+            if f == 'centres':
+                content = np.column_stack([file['region_labels'][:].astype(str), file['centres'][:]])
+
+            if f == 'tract_lengths':
+                name = 'distances'
+
+            new_path = os.path.join(os.path.dirname(path), f'{name}.txt')
+            pd.DataFrame(content, index=None).to_csv(new_path, header=None, index=None, sep='\t')
+            contents.append(new_path)
+    else:
+        name = subj.get_filename(path)
+
+        if app.H5_CONTENT is None:
+            app.H5_CONTENT = dict()
+
+        if name.lower() in ['generic2doscillator']:
+            app.H5_CONTENT['model'] = name.lower()
+
+        if len(list(file.keys())) > 0:
+            for k in file.keys():
+                if k not in app.H5_CONTENT.keys():
+                    app.H5_CONTENT[k] = [file[k][:][0]]
+
+    return contents
