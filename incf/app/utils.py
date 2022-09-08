@@ -167,7 +167,7 @@ def extract_h5(path) -> list:
         name = subj.get_filename(path)
         model = name.split('_')[0].lower()
 
-        if model in ['generic2doscillator']:
+        if model in ['generic2doscillator', 'hindmarshrose']:
             app.H5_CONTENT['model'] = model
 
         if len(list(file.keys())) > 0:
@@ -176,3 +176,11 @@ def extract_h5(path) -> list:
                     app.H5_CONTENT[k] = [file[k][:][0]]
 
     return contents
+
+
+def get_model():
+    files = os.listdir(os.path.join(app.OUTPUT, 'param'))
+
+    for file in files:
+        if file.startswith('model-'):
+            return file.split('_')[0].split('-')[-1]

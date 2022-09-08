@@ -13,6 +13,7 @@ from incf.generate import subjects, structure
 from incf.preprocess import preprocess as prep
 from incf.convert import convert
 from incf.templates import templates as temp
+from incf.app import utils
 
 
 # define global variables
@@ -24,6 +25,7 @@ MULTI_INPUT = False                         # whether input files include single
 ALL_FILES = None                            # list of all file paths (gets supplemented in subjects.py)
 CODE = None                                 # path to python code if exists
 H5_CONTENT = dict()
+MODEL_NAME = None
 
 # define all accepted files
 ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',                 # Network (net)
@@ -70,6 +72,8 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     -------
 
     """
+    global MODEL_NAME
+
     # whether to generate layout
     if layout:
         # if no subjects are passed, define them
@@ -85,14 +89,14 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if CODE is not None:
             save_code()
 
-        # finally, remove all empty folders
-        remove_empty()
-
-    print(H5_CONTENT)
-
     if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
-        print(H5_CONTENT)
-        pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=OUTPUT, uid=H5_CONTENT['model'], app=True, suffix=DESC)
+        pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=os.path.join(OUTPUT, 'param'),
+                               uid=H5_CONTENT['model'], app=True, suffix=DESC)
+        MODEL_NAME = utils.get_model()
+        transfer_xml()
+
+    # finally, remove all empty folders
+    remove_empty()
 
     # return subjects and possible layouts only if it's enabled
     if layout:
@@ -243,6 +247,8 @@ def save_code():
     -------
 
     """
+    global MODEL_NAME
+
     template = f'desc-{DESC}_code.py'
     path = os.path.join(OUTPUT, 'code', template)
 
@@ -253,18 +259,22 @@ def save_code():
         # save JSON files
         py2xml.main.XML(inp=CODE, output_path=os.path.join(OUTPUT, 'param'),
                         uid='delta_times', suffix=DESC, app=True)
+        MODEL_NAME = utils.get_model()
+        transfer_xml()
 
-        # transfer results to appropriate folders
-        path = os.path.join(OUTPUT, 'param', f'desc-{DESC}_eq.xml')
-        if os.path.exists(path):
-            shutil.move(path, os.path.join(OUTPUT, 'eq'))
 
-        # add json sidecars
-        supply_dict('eq', os.path.join(OUTPUT, 'eq', f'desc-{DESC}_eq.json'))
-        supply_dict('param', os.path.join(OUTPUT, 'param', f'desc-{DESC}_param.json'))
+def transfer_xml():
+    # transfer results to appropriate folders
+    path = os.path.join(OUTPUT, 'param', f'desc-{DESC}_eq.xml')
+    if os.path.exists(path):
+        shutil.move(path, os.path.join(OUTPUT, 'eq'))
 
-        # add json sidecar for model
-        supply_dict('param', os.path.join(OUTPUT, 'param', 'model-SJHM3D_param.json'))
+    # add json sidecars
+    supply_dict('eq', os.path.join(OUTPUT, 'eq', f'desc-{DESC}_eq.json'))
+    supply_dict('param', os.path.join(OUTPUT, 'param', f'desc-{DESC}_param.json'))
+
+    # add json sidecar for model
+    supply_dict('param', os.path.join(OUTPUT, 'param', f'model-{MODEL_NAME}_param.json'))
 
 
 def supply_dict(ftype, path):
@@ -287,16 +297,17 @@ def supply_dict(ftype, path):
     # TODO: update when more models are added
     if ftype == 'code':
         file['ModelEq'] = eq
-        file['Description'] = 'The source code to reproduce results'
+        file['Description'] = 'The source code to reproduce results.'
     elif ftype == 'param':
         file['ModelEq'] = eq
-        file['Description'] = 'These are the parameters for the SJHMR3D model for the delta series.'
+        file['Description'] = f'These are the parameters for the {MODEL_NAME} model for the delta series.'
 
     elif ftype == 'eq':
-        code = os.path.basename(CODE)
-        file['SourceCode'] = f'../code/{code}'
-        file['Description'] = 'These are the equations to simulate the time series with the Stefanescu-Jirsa 3D ' \
-                              '(reduced Hindmarsh-Rose model) model.'
+        if CODE is not None:
+            code = os.path.basename(CODE)
+            file['SourceCode'] = f'../code/{code}'
+
+        file['Description'] = f'These are the equations to simulate the time series with the {MODEL_NAME} model.'
 
     save()
 
