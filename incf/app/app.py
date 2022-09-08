@@ -13,7 +13,6 @@ from incf.generate import subjects, structure
 from incf.preprocess import preprocess as prep
 from incf.convert import convert
 from incf.templates import templates as temp
-from incf.preprocess import simulations_h5 as h5
 
 
 # define global variables
@@ -24,7 +23,7 @@ CENTRES = False                             # whether centres.txt|nodes.txt|labe
 MULTI_INPUT = False                         # whether input files include single- or multi-subjects
 ALL_FILES = None                            # list of all file paths (gets supplemented in subjects.py)
 CODE = None                                 # path to python code if exists
-H5_CONTENT = None
+H5_CONTENT = dict()
 
 # define all accepted files
 ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',                 # Network (net)
@@ -77,8 +76,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
-    print(subs)
-
     # only save conversions if 'save' is True
     if save and subs is not None:
         # save conversions
@@ -91,9 +88,11 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         # finally, remove all empty folders
         remove_empty()
 
-    if convert.H5_CONTENT is not None and 'model' in convert.H5_CONTENT.keys():
-        pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=OUTPUT, uid=convert.H5_CONTENT['model'],
-                               app=True, suffix=DESC)
+    print(H5_CONTENT)
+
+    if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
+        print(H5_CONTENT)
+        pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=OUTPUT, uid=H5_CONTENT['model'], app=True, suffix=DESC)
 
     # return subjects and possible layouts only if it's enabled
     if layout:
@@ -252,11 +251,11 @@ def save_code():
         supply_dict('code', os.path.join(path.replace('py', 'json')))
 
         # save JSON files
-        py2xml.main.XML(input_path=CODE, output_path=os.path.join(OUTPUT, 'param'),
+        py2xml.main.XML(inp=CODE, output_path=os.path.join(OUTPUT, 'param'),
                         uid='delta_times', suffix=DESC, app=True)
 
         # transfer results to appropriate folders
-        path = os.path.join(OUTPUT, 'param', f'desc-{DESC}_eq.json')
+        path = os.path.join(OUTPUT, 'param', f'desc-{DESC}_eq.xml')
         if os.path.exists(path):
             shutil.move(path, os.path.join(OUTPUT, 'eq'))
 
@@ -281,10 +280,11 @@ def supply_dict(ftype, path):
     if len(temp.struct[ftype]['required']) > 0:
         file.update(get_dict('required'))
 
-    file.update(get_dict('recommended'))
+    file.update(get_dict('recommend'))
 
     eq = f'../eq/desc-{DESC}_eq.xml'
 
+    # TODO: update when more models are added
     if ftype == 'code':
         file['ModelEq'] = eq
         file['Description'] = 'The source code to reproduce results'
@@ -293,6 +293,8 @@ def supply_dict(ftype, path):
         file['Description'] = 'These are the parameters for the SJHMR3D model for the delta series.'
 
     elif ftype == 'eq':
+        code = os.path.basename(CODE)
+        file['SourceCode'] = f'../code/{code}'
         file['Description'] = 'These are the equations to simulate the time series with the Stefanescu-Jirsa 3D ' \
                               '(reduced Hindmarsh-Rose model) model.'
 

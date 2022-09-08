@@ -165,12 +165,10 @@ def extract_h5(path) -> list:
             contents.append(new_path)
     else:
         name = subj.get_filename(path)
+        model = name.split('_')[0].lower()
 
-        if app.H5_CONTENT is None:
-            app.H5_CONTENT = dict()
-
-        if name.lower() in ['generic2doscillator']:
-            app.H5_CONTENT['model'] = name.lower()
+        if model in ['generic2doscillator']:
+            app.H5_CONTENT['model'] = model
 
         if len(list(file.keys())) > 0:
             for k in file.keys():

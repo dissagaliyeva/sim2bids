@@ -73,12 +73,14 @@ class MainArea(param.Parameterized):
 
         if len(self.cross_select.value) == 0:
             utils.reset_values()
+            app.CODE = None
 
             for _ in self.rename_files:
                 self.rename_files.pop(-1)
 
         if self.length != len(self.cross_select.value):
             utils.reset_values()
+            app.CODE = None
 
             for _ in self.rename_files:
                 self.rename_files.pop(-1)
