@@ -1,9 +1,9 @@
 import os
 import h5py as h
 from pathlib import Path
-from incf.app import app
+from sim2bids.app import app
 from collections import OrderedDict
-import incf.app.utils as utils
+import sim2bids.app.utils as utils
 
 default_format, coord_format = '{}_desc-{}_{}.{}', 'desc-{}_{}.{}'
 

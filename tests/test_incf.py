@@ -5,9 +5,6 @@
 import pytest
 
 
-from incf import app
-
-
 @pytest.fixture
 def response():
     """Sample pytest fixture.

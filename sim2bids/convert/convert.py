@@ -2,13 +2,11 @@ import json
 import os
 from collections import OrderedDict
 
-import numpy as np
 import pandas as pd
-import h5py
 
-from incf.app import app
-from incf.generate import subjects
-import incf.templates.templates as temp
+from sim2bids.app import app
+from sim2bids.generate import subjects
+import sim2bids.templates.templates as temp
 
 # define naming conventions
 DEFAULT_TEMPLATE = '{}_desc-{}_{}.{}'
@@ -23,9 +21,6 @@ IGNORE_CENTRE = False
 # converted files. This information is used to supplement JSON
 # sidecars, specifically `CoordsRows` and `CoordsColumns`
 COORDS = None
-
-# store h5 file's parameters and save in the dictionary below
-H5_CONTENT = {}
 
 
 def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
@@ -200,19 +195,7 @@ def save_centres(sub, file, ses, folders, centre_name='centres'):
 
 
 def save_h5(sub, folders, ses=None):
-    global H5_CONTENT
-
-    file = h5py.File(sub['path'])
-
-    # check if the h5 file contains weights, distances, areas, cortical, and hemisphere
-    # if 'datatypes' not in sub['path']:
-    #     if sub['name'].lower() in ['generic2doscillator']:
-    #         H5_CONTENT['model'] = sub['name'].lower()
-    #
-    #     if len(list(file.keys())) > 0:
-    #         for k in file.keys():
-    #             if k not in H5_CONTENT.keys():
-    #                 H5_CONTENT[k] = [file[k][:][0]]
+    pass
 
 
 def save_files(sub: dict, folder: str, content, type: str = 'default', centres: bool = False,

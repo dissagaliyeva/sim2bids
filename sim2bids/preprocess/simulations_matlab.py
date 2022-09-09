@@ -6,8 +6,8 @@ import scipy
 import scipy.io.matlab._miobase
 from scipy.io import loadmat
 
-from incf.app import app
-from incf.convert import convert as save_files
+from sim2bids.app import app
+from sim2bids.convert import convert as save_files
 
 
 def save(subs, folders, ses=None):

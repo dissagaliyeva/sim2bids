@@ -6,13 +6,11 @@ import pandas as pd
 import panel as pn
 import param
 
-import incf.generate.subjects as subj
-import incf.preprocess.preprocess as prep
-from incf import utils
-from incf.app import app
-from incf.convert import convert
-from incf.templates import user_guide as ug
-from incf.validate import validate
+import sim2bids.generate.subjects as subj
+from sim2bids import utils
+from sim2bids.app import app
+from sim2bids.templates import user_guide as ug
+from sim2bids.validate import validate
 
 JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
@@ -73,12 +71,14 @@ class MainArea(param.Parameterized):
 
         if len(self.cross_select.value) == 0:
             utils.reset_values()
+            app.CODE = None
 
             for _ in self.rename_files:
                 self.rename_files.pop(-1)
 
         if self.length != len(self.cross_select.value):
             utils.reset_values()
+            app.CODE = None
 
             for _ in self.rename_files:
                 self.rename_files.pop(-1)
@@ -135,7 +135,8 @@ class MainArea(param.Parameterized):
 
         if len(output) > 0:
             if not os.path.exists(output):
-                pn.state.notifications.error(f'Folder `{output}` does not exist!')
+                os.mkdir(output)
+                app.OUTPUT = output
             else:
                 pn.state.notifications.success(f'Folder `{output}` is selected as output folder')
                 app.OUTPUT = output
@@ -181,12 +182,11 @@ class MainArea(param.Parameterized):
             self.checkbox_group,
         )
 
-        return pn.template.FastListTemplate(
-            title='Visualize | Transform | Download',
+        return pn.template.MaterialTemplate(
+            title='Preprocess | Transform | Download',
             sidebar=sidebar,
             site='INCF',
-            main=main,
-            sizing_mode="stretch_both"
+            main=main
         )
 
 

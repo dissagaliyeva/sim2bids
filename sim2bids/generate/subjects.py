@@ -3,12 +3,11 @@ import csv
 import re
 
 import pandas as pd
-import panel as pn
 
-from incf.app import app
+from sim2bids.app import app
 from collections import OrderedDict
-import incf.preprocess.preprocess as prep
-from incf.app import utils
+import sim2bids.preprocess.preprocess as prep
+from sim2bids.app import utils
 
 TO_RENAME = None
 
@@ -34,7 +33,8 @@ class Files:
         # check if the input is for single-subject or multi-subject
         app.MULTI_INPUT = not self.check_input()
 
-        #
+        # define a variable that is going to check whether input
+        # contains sessions-based subject. Sessions include `ses-preop` and 'ses-postop'
         self.ses_found = False
 
         # traverse folders
@@ -76,8 +76,6 @@ class Files:
 
                     # Step 5: get all content
                     all_files = os.listdir(path)
-
-                    print('all files:', all_files)
 
                     # Step 6: traverse ses-preop if present
                     if 'ses-preop' in all_files:
