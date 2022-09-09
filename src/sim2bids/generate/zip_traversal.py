@@ -1,6 +1,6 @@
 import os
 import zipfile
-import incf.generate.subjects as subj
+import sim2bids.generate.subjects as subj
 
 
 def extract_zip(path):

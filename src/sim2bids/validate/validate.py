@@ -6,8 +6,7 @@ from scipy.io import loadmat
 import mat73
 import scipy
 
-import incf.preprocess.simulations_matlab as matlab
-import incf.generate.subjects as subj
+import sim2bids.generate.subjects as subj
 
 
 def validate(unique_files, all_files):
@@ -119,10 +118,21 @@ def open_mat(file):
     except scipy.io.matlab._miobase.MatReadError:
         return
 
-    return mat, matlab.find_mat_array(mat)
+    return mat, find_mat_array(mat)
+
+
+def find_mat_array(mat):
+    data = []
+
+    for k, v in mat.items():
+        if type(v) not in [bytes, str, list]:
+            data.append(k)
+
+    return data
 
 
 def remove_files(name, all_files):
     for file in all_files:
         if file.endswith(name):
             os.remove(file)
+

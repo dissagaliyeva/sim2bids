@@ -3,12 +3,11 @@ import csv
 import re
 
 import pandas as pd
-import panel as pn
 
-from incf.app import app
+from sim2bids.app import app
 from collections import OrderedDict
-import incf.preprocess.preprocess as prep
-from incf.app import utils
+import sim2bids.preprocess.preprocess as prep
+from sim2bids.app import utils
 
 TO_RENAME = None
 

@@ -1,5 +1,5 @@
-from incf.convert import convert as save_files
-from incf.generate import subjects
+from sim2bids.convert import convert as save_files
+from sim2bids.generate import subjects
 
 DEFAULT_TMPL = '{}_desc-{}_{}.{}'
 

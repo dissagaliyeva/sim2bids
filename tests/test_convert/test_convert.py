@@ -3,9 +3,8 @@
 
 import os
 import unittest
-from mock import patch
-from incf.appert import appert
-from incf.utils import rm_tree
+from src.sim2bids import appert
+from src.sim2bids import rm_tree
 
 
 PATHS = ['../../data/timeseries_all.mat',

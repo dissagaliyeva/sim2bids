@@ -8,9 +8,8 @@ import h5py
 import numpy as np
 import pandas as pd
 
-from incf.app import app
-from incf.generate import zip_traversal as z
-from incf.generate import subjects as subj
+from sim2bids.app import app
+from sim2bids.generate import subjects as subj, zip_traversal as z
 
 
 def recursive_walk(path: str, basename: bool = False) -> list:

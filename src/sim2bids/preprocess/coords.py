@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from incf.convert import convert
+from sim2bids.convert import convert
 
 
 def save_coords(subs: dict, folders):

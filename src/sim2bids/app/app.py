@@ -8,12 +8,12 @@ import pylems_py2xml
 import pylems_py2xml as py2xml
 
 # import local packages
-import incf.utils
-from incf.generate import subjects, structure
-from incf.preprocess import preprocess as prep
-from incf.convert import convert
-from incf.templates import templates as temp
-from incf.app import utils
+import sim2bids.utils
+from sim2bids.generate import structure, subjects
+from sim2bids.preprocess import preprocess as prep
+from sim2bids.convert import convert
+from sim2bids.templates import templates as temp
+from sim2bids.app import utils
 
 
 # define global variables
@@ -188,7 +188,7 @@ def check_output_folder():
 
     if conflict:
         pn.state.notifications.info('Output folder contains files. Removing them...')
-        incf.utils.rm_tree(OUTPUT)
+        sim2bids.utils.rm_tree(OUTPUT)
         prep.reset_index()
 
 

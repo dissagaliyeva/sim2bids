@@ -4,9 +4,9 @@ from collections import OrderedDict
 
 import pandas as pd
 
-from incf.app import app
-from incf.generate import subjects
-import incf.templates.templates as temp
+from sim2bids.app import app
+from sim2bids.generate import subjects
+import sim2bids.templates.templates as temp
 
 # define naming conventions
 DEFAULT_TEMPLATE = '{}_desc-{}_{}.{}'

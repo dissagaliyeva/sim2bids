@@ -3,12 +3,12 @@ import shutil
 
 import panel as pn
 
-import incf.app as app
-import incf.generate.subjects as subj
-import incf.preprocess.preprocess as prep
-import incf.templates.templates as temp
-from incf import incf
-from incf.convert import convert
+import sim2bids.app as app
+import sim2bids.generate.subjects as subj
+import sim2bids.preprocess.preprocess as prep
+import sim2bids.templates.templates as temp
+from sim2bids import incf
+from sim2bids.convert import convert
 
 
 def reset_values():
