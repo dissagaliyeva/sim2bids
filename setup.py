@@ -36,7 +36,7 @@ setup(
     keywords=['simulations', 'computational data', 'Holoviz Panel'],
     packages=['sim2bids', 'sim2bids.app', 'sim2bids.convert', 'sim2bids.generate', 'sim2bids.preprocess',
               'sim2bids.templates', 'sim2bids.validate'],
-    package_dir={'sim2bids': 'src/sim2bids'},
+    # package_dir={'sim2bids': 'src/sim2bids'},
     url='https://github.com/dissagaliyeva/incf',
     zip_safe=False,
 )
