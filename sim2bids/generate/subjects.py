@@ -205,7 +205,7 @@ def prepare_subs(file_paths, sid):
         if name == 'tract_lengths.txt':
             name = 'distances.txt'
 
-        if not os.path.exists(file_path) and 'distances' in file_path:
+        if not os.path.exists(file_path) and 'distances' not in file_path:
             if os.path.exists(file_path.replace('distances', 'tract_lengths')):
                 os.replace(file_path.replace('distances', 'tract_lengths'), file_path)
             else:
@@ -218,31 +218,32 @@ def prepare_subs(file_paths, sid):
             file_path = new_path
 
         # rename average_orientations to normals in both subject- and physical levels
-        if name == 'average_orientations.txt':
+        if name in ['average_orientations.txt', 'orientations.txt']:
             name = 'normals.txt'
-            new_path = file_path.replace('average_orientations', 'normals')
+            new_path = file_path.replace(name.replace('.txt', ''), 'normals')
             os.replace(file_path, new_path)
             file_path = new_path
 
         # check if separator is missing, if so remove the file entirely
-        sep = find_separator(file_path)
+        if name in app.TO_EXTRACT:
+            sep = find_separator(file_path)
 
-        if sep == 'remove':
-            os.remove(file_path)
-            continue
+            if sep == 'remove':
+                os.remove(file_path)
+                continue
 
-        subs[name] = {
-            'name': name.split('.')[0],
-            'fname': name,
-            'sid': sid,
-            'desc': desc,
-            'sep': sep,
-            'path': file_path,
-            'ext': get_file_ext(file_path),
-        }
+            subs[name] = {
+                'name': name.split('.')[0],
+                'fname': name,
+                'sid': sid,
+                'desc': desc,
+                'sep': sep,
+                'path': file_path,
+                'ext': get_file_ext(file_path),
+            }
 
-        if subs[name]['name'] in ['centres', 'centers']:
-            app.CENTERS = True
+            if subs[name]['name'] in ['centres', 'centers']:
+                app.CENTERS = True
 
     return subs
 

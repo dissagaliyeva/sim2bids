@@ -3,6 +3,7 @@ Helper functions for app.py
 """
 
 import os
+import shutil
 
 import h5py
 import numpy as np
@@ -91,6 +92,13 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
     if isinstance(files, str):
         return recursive_walk(os.path.join(path, files))
 
+    for file in files:
+        if os.path.isdir(os.path.join(path, file)) and file.startswith('.'):
+            shutil.rmtree(os.path.join(path, file))
+
+    # preprocess folder and remove all folders/files starting with '.'
+    # files = preprocess_folders(files, path)
+
     # otherwise, traverse all folders and get contents
     # create empty list to store paths
     contents = []
@@ -102,6 +110,11 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 
         # check whether the selection is a directory
         if os.path.isdir(file_path):
+            # disregard folders that start with '.'
+            if file_path.startswith('.'):
+                shutil.rmtree(file_path)
+                continue
+
             # if true, traverse its content and append results
             contents += recursive_walk(file_path, basename)
 
