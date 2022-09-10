@@ -15,6 +15,7 @@ from sim2bids.validate import validate
 JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
 UNITS = ['s', 'm', 'ms', 'degrees', 'radians']
+OPTIONS = ['App 101', 'Preprocess data', 'Supported files', 'Functionality', 'BEP034']
 
 REQUIRED = None
 
@@ -297,17 +298,16 @@ class ViewResults(param.Parameterized):
 
 class UserGuide(param.Parameterized):
     user_guide = pn.widgets.ToggleGroup(name='User Guide', value='App 101', behavior='radio',
-                                        options=['App 101', 'Preprocess data', 'Supported files',
-                                                 'Functionality', 'BEP034'])
+                                        options=OPTIONS)
 
     def __init__(self, **params):
         super().__init__(**params)
-        self.map = {'App 101': ug.how_to_use,
-                    'Preprocess Data': ug.preprocess,
-                    'Format & Files': ug.supported,
-                    'Functionality': ug.functionality,
-                    'BEP034': ug.bep034}
-        self.text = pn.widgets.StaticText(value=self.map['App 101'])
+        self.map = {OPTIONS[0]: ug.how_to_use,
+                    OPTIONS[1]: ug.preprocess,
+                    OPTIONS[2]: ug.supported,
+                    OPTIONS[3]: ug.functionality,
+                    OPTIONS[4]: ug.bep034}
+        self.text = pn.widgets.StaticText(value=self.map[OPTIONS[0]])
 
     @pn.depends('user_guide.value', watch=True)
     def _change_sel(self):
@@ -317,7 +317,7 @@ class UserGuide(param.Parameterized):
         return pn.Column(self.user_guide, self.text, scroll=True, height=600)
 
 
-def get_files(path='../output', ftype='.json'):
+def get_files(path=app.OUTPUT, ftype='.json'):
     f = []
 
     for root, dirs, files in os.walk(path, topdown=False):
