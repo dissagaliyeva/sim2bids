@@ -187,7 +187,8 @@ class MainArea(param.Parameterized):
             title='Preprocess | Transform | Download',
             sidebar=sidebar,
             site='INCF',
-            main=main
+            main=main,
+            header_background='#4488c4'
         )
 
 
