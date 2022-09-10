@@ -98,6 +98,10 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     # finally, remove all empty folders
     remove_empty()
 
+    # add standard text to txt files in output folder's root level
+    with open(os.path.join(OUTPUT, 'CHANGES.txt'), 'w') as f:
+        f.write('None so far.')
+
     # return subjects and possible layouts only if it's enabled
     if layout:
         return subs, structure.create_layout(subs)
