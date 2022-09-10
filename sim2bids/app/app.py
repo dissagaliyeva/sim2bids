@@ -338,7 +338,7 @@ def duplicate_folder(path):
     -------
 
     """
-    print('im triggered, duplicate folder')
+
     # create folder if it doesn't exist
     root = os.path.join('..', 'data')
     new_path = os.path.join(root, os.path.basename(os.path.dirname(path + '/')))
