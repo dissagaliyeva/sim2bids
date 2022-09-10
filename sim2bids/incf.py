@@ -135,10 +135,11 @@ class MainArea(param.Parameterized):
 
         if len(output) > 0:
             if not os.path.exists(output):
+                pn.state.notifications.success(f'Folder {output} is created...')
                 os.mkdir(output)
                 app.OUTPUT = output
             else:
-                pn.state.notifications.success(f'Folder `{output}` is selected as output folder')
+                pn.state.notifications.success(f'Folder `{output}` is selected as output folder...')
                 app.OUTPUT = output
 
     def _rename(self, event=None):
