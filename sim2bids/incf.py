@@ -32,7 +32,7 @@ class MainArea(param.Parameterized):
     rename_btn = param.Action(lambda self: self._rename(), label='Rename Files')
 
     # sidebar components
-    output_path = pn.widgets.TextInput(value='../output', margin=(-20, 10, 0, 10))
+    output_path = pn.widgets.TextInput(value=app.OUTPUT, margin=(-20, 10, 0, 10))
     app.OUTPUT = output_path.value
 
     desc = pn.widgets.TextInput(value='default', max_length=30, margin=(-20, 10, 0, 10))
@@ -137,10 +137,9 @@ class MainArea(param.Parameterized):
             if not os.path.exists(output):
                 pn.state.notifications.success(f'Folder {output} is created...')
                 os.mkdir(output)
-                app.OUTPUT = output
-            else:
-                pn.state.notifications.success(f'Folder `{output}` is selected as output folder...')
-                app.OUTPUT = output
+
+            pn.state.notifications.success(f'Folder `{output}` is selected as output folder...')
+            app.OUTPUT = output
 
     def _rename(self, event=None):
         validate.validate(self.rename_files, app.ALL_FILES)
