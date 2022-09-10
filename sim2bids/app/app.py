@@ -19,7 +19,7 @@ from sim2bids.app import utils
 # define global variables
 SID = None
 DESC = 'default'                            # short description that identifies input data
-OUTPUT = os.path.join('..', 'output')       # output folder to store appersions
+OUTPUT = 'output'                           # output folder to store conversions
 CENTRES = False                             # whether centres.txt|nodes.txt|labels.txt were found
 MULTI_INPUT = False                         # whether input files include single- or multi-subjects
 ALL_FILES = None                            # list of all file paths (gets supplemented in subjects.py)
@@ -38,8 +38,8 @@ ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',             
 
 TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                        # folder "net"
               'areas.txt', 'average_orientations.txt', 'cortical.txt',              # folder "coord"
-              'hemisphere.txt', 'normals.txt'                                       # folder "coord"
-              ]
+              'hemisphere.txt', 'normals.txt']                                      # folder "coord"
+
 
 # define accepted extensions
 ACCEPTED_EXT = ['txt', 'csv', 'dat', 'h5', 'mat', 'zip', 'py']
