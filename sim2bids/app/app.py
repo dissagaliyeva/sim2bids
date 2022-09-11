@@ -261,8 +261,7 @@ def save_code():
         supply_dict('code', os.path.join(path.replace('py', 'json')))
 
         # save JSON files
-        py2xml.main.XML(inp=CODE, output_path=os.path.join(OUTPUT, 'param'),
-                        uid='delta_times', suffix=DESC, app=True)
+        py2xml.main.XML(inp=CODE, output_path=os.path.join(OUTPUT, 'param'), suffix=DESC, app=True)
         MODEL_NAME = utils.get_model()
         transfer_xml()
 
