@@ -80,8 +80,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
-    print('subjects:', subs)
-    print('all files:', ALL_FILES)
     # only save conversions if 'save' is True
     if save and subs is not None:
         # save conversions
@@ -91,6 +89,10 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if CODE is not None:
             save_code()
 
+        # add standard text to txt files in output folder's root level
+        with open(os.path.join(OUTPUT, 'CHANGES.txt'), 'w') as f:
+            f.write('None so far.')
+
     if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
         pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=os.path.join(OUTPUT, 'param'),
                                uid=H5_CONTENT['model'], app=True, suffix=DESC)
@@ -99,10 +101,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 
     # finally, remove all empty folders
     remove_empty()
-
-    # add standard text to txt files in output folder's root level
-    with open(os.path.join(OUTPUT, 'CHANGES.txt'), 'w') as f:
-        f.write('None so far.')
 
     # return subjects and possible layouts only if it's enabled
     if layout:
@@ -155,7 +153,6 @@ def save_output(subs):
             # create folders according to session and subject count types
             folders = create_sub_struct(OUTPUT, v, ses_name=ses)
             k_lower = k.lower()
-            print(k_lower)
 
             if 'weight' in k_lower or 'distance' in k_lower:
                 name = 'wd'

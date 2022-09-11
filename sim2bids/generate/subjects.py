@@ -177,8 +177,6 @@ def remove_id(file, ids):
 def prepare_subs(file_paths, sid):
     subs = {}
 
-    print('file_paths:', file_paths)
-
     for file_path in file_paths:
         name = get_filename(file_path)
 
@@ -208,7 +206,7 @@ def prepare_subs(file_paths, sid):
         if name == 'tract_lengths.txt':
             name = 'distances.txt'
 
-        if not os.path.exists(file_path) and 'distances' not in file_path:
+        if not os.path.exists(file_path) and 'distances' in file_path:
             if os.path.exists(file_path.replace('distances', 'tract_lengths')):
                 os.replace(file_path.replace('distances', 'tract_lengths'), file_path)
             else:

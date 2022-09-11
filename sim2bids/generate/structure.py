@@ -271,7 +271,7 @@ def coord_structure(v, ses=None):
             default_format.format(sid, desc, 'labels', 'json')]
 
 
-def create_layout(subs=None, output='../output'):
+def create_layout(subs=None, output='output'):
     """
     Create folder structure according to BEP034 and passed `subs` parameter.
     :param output:
