@@ -49,7 +49,7 @@ def get_selector(name):
 
 
 def append_widgets(files):
-    widgets = ['### Preprocessing step: rename files']
+    widgets = ['### Preprocessing step: Rename Files']
 
     for file in files:
         widgets.append(get_selector(file))
@@ -70,14 +70,14 @@ def get_settings(json_editor, selected):
         if k in json_editor and json_editor[k] == '':
             if k == 'Units':
                 widget.append(pn.widgets.Select(name=f'Specify {k} (REQUIRED):', options=sim2bids.UNITS, value=''))
-            else:
+        else:
+            if k not in ['NumberOfRows', 'NumberOfColumns', 'CoordsRows', 'CoordsColumns']:
                 widget.append(pn.widgets.TextInput(name=f'Specify {k} (REQUIRED):'))
                 sim2bids.REQUIRED.append(k)
 
     # iterate over recommended fields
     for k in recommend:
-        if k not in json_editor:
-            widget.append(pn.widgets.TextInput(name=f'Specify {k} (RECOMMENDED):'))
+        widget.append(pn.widgets.TextInput(name=f'Specify {k} (RECOMMENDED):'))
 
     # append button
     return widget
