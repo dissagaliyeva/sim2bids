@@ -1,4 +1,6 @@
 import os
+import re
+
 import h5py as h
 from pathlib import Path
 from sim2bids.app import app
@@ -181,6 +183,9 @@ class FolderStructure:
                         else:
                             self.iterate(k, v, sid=k)
                             # self.components['coord'] = list(set(self.components['coord']))
+
+        self.components = verify_structure(self.components)
+
         if ses_exists:
             self.create_ses_layout()
         else:
@@ -250,6 +255,19 @@ class FolderStructure:
 
         self.layout += [main_files.format(x) for x in self.components['files']]
         self.layout = ''.join(self.layout)
+
+
+def verify_structure(dictionary):
+    temp = dictionary.copy()
+
+    for k, v in dictionary.items():
+        if not k.startswith('sub-') and isinstance(v, list):
+            for idx, v2 in enumerate(v):
+                if v2.startswith('sub-'):
+                    match = re.match('sub-[0-9]+', v2)[0]
+                    temp[k][idx] = v2.replace(match, '').strip('_')
+
+    return temp
 
 
 def common_structure(v, name=None):

@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import shutil
 from collections import OrderedDict
 
@@ -92,6 +93,8 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         # add standard text to txt files in output folder's root level
         with open(os.path.join(OUTPUT, 'CHANGES.txt'), 'w') as f:
             f.write('None so far.')
+
+        check_output()
 
     if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
         pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=os.path.join(OUTPUT, 'param'),
@@ -348,3 +351,14 @@ def duplicate_folder(path):
                         dirs_exist_ok=False)
     # set PATH to a new path
     return new_path
+
+
+def check_output():
+    for directory in ['code', 'coord', 'eq', 'param']:
+        path = os.path.join(OUTPUT, directory)
+
+        if os.path.exists(path) and len(os.listdir(path)) > 0:
+            for file in os.listdir(path):
+                if file.startswith('sub-'):
+                    match = re.match('sub-[0-9]+', file)[0]
+                    os.replace(os.path.join(path, file), os.path.join(path, file.replace(match, '').strip('_')))
