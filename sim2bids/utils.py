@@ -69,15 +69,15 @@ def get_settings(json_editor, selected):
     for k in reqs:
         if k in json_editor and json_editor[k] == '':
             if k == 'Units':
-                widget.append(pn.widgets.Select(name=name, options=sim2bids.UNITS, value=''))
+                widget.append(pn.widgets.Select(name=f'Specify {k} (REQUIRED):', options=sim2bids.UNITS, value=''))
             else:
-                widget.append(pn.widgets.Select(name=f'Specify {k} (REQUIRED):', value=''))
+                widget.append(pn.widgets.TextInput(name=f'Specify {k} (REQUIRED):'))
                 sim2bids.REQUIRED.append(k)
 
     # iterate over recommended fields
     for k in recommend:
         if k not in json_editor:
-            widget.append(pn.widgets.Select(name=f'Specify {k} (RECOMMENDED):', value=''))
+            widget.append(pn.widgets.TextInput(name=f'Specify {k} (RECOMMENDED):'))
 
     # append button
     return widget
