@@ -69,5 +69,5 @@
 
 <!--    <ComponentType name="noise"/>-->
 
-  <Component id="delta_times" type="G2DOS" tau="1.0" I="0.1" a="0.5" b="0.4" c="-4.0" d="0.02" e="3.0" f="1.0" g="0.0" alpha="1.0" beta="1.0" gamma="1.0"/>
+  <Component id="default" type="G2DOS" tau="1.0" I="0.1" a="0.5" b="0.4" c="-4.0" d="0.02" e="3.0" f="1.0" g="0.0" alpha="1.0" beta="1.0" gamma="1.0"/>
 </Lems>

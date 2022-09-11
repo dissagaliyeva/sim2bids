@@ -268,11 +268,11 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
 
         # save labels to json and tsv
         to_json(labels, shape=[content.shape[0], 1], key='coord', desc=desc[0])
-        to_tsv(labels.replace('json', 'tsv'), content[0])
+        to_tsv(labels.replace('json', 'tsv'), content.iloc[:, 0])
 
         # save nodes to json and tsv
-        to_json(nodes, shape=content.shape, key='coord', desc=desc[1])
-        to_tsv(nodes.replace('json', 'tsv'), content[1:])
+        to_json(nodes, shape=[content.shape[0], content.shape[1] - 1], key='coord', desc=desc[1])
+        to_tsv(nodes.replace('json', 'tsv'), content.iloc[:, 1:])
     else:
         # otherwise, save files as usual
         to_json(json_file.lower(), shape=content.shape, key='coord', desc=desc)
