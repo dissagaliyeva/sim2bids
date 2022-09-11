@@ -293,7 +293,7 @@ def supply_dict(ftype, path):
     if len(temp.struct[ftype]['required']) > 0:
         file.update(get_dict('required'))
 
-    file.update(get_dict('recommend'))
+    # file.update(get_dict('recommend'))
 
     eq = f'..\\eq\\desc-{DESC}_eq.xml'
 
@@ -303,7 +303,7 @@ def supply_dict(ftype, path):
         file['Description'] = 'The source code to reproduce results.'
     elif ftype == 'param':
         file['ModelEq'] = eq
-        file['Description'] = f'These are the parameters for the {MODEL_NAME} model for the delta series.'
+        file['Description'] = f'These are the parameters for the {MODEL_NAME} model.'
 
     elif ftype == 'eq':
         if CODE is not None:
