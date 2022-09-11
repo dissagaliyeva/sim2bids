@@ -141,7 +141,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     # get folder location for coordinates
     elif name == 'coord':
         # check nodes
-        if 'nodes' in sub['name'] and IGNORE_CENTRE is False:
+        if 'nodes' in sub['name'] and not IGNORE_CENTRE:
             if 'content' in sub.keys():
                 save_centres(sub, sub['content'], ses, folders, centre_name='nodes')
             else:
@@ -160,9 +160,15 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             else:
                 # save conversion results
                 if 'centres' in sub['fname']:
-                    save_files(sub, folder, file, type='default', centres=True)
+                    if IGNORE_CENTRE or not app.MULTI_INPUT:
+                        save_files(sub, folder, file, type='other', centres=True)
+                    else:
+                        save_files(sub, folder, file, type='default', centres=True)
                 else:
-                    save_files(sub, folder, file, type='default')
+                    if IGNORE_CENTRE or not app.MULTI_INPUT:
+                        save_files(sub, folder, file, type='other')
+                    else:
+                        save_files(sub, folder, file, type='default')
 
 
 def save_centres(sub, file, ses, folders, centre_name='centres'):
@@ -177,7 +183,7 @@ def save_centres(sub, file, ses, folders, centre_name='centres'):
         folder = os.path.join(app.OUTPUT, 'coord')
 
         # save conversion results
-        save_files(sub, folder, file, type='coord', centres=True, desc=temp.centres['multi-same'])
+        save_files(sub, folder, file, type='other', centres=True, desc=temp.centres['multi-same'])
     else:
         # get description for centres depending on input files
         desc = temp.centres['multi-unique'] if app.MULTI_INPUT else temp.centres['single']
@@ -191,7 +197,10 @@ def save_centres(sub, file, ses, folders, centre_name='centres'):
             folder = os.path.join(app.OUTPUT, 'coord')
 
         # save conversion results
-        save_files(sub, folder, file, type='default', centres=True, desc=desc)
+        if IGNORE_CENTRE:
+            save_files(sub, folder, file, type='other', centres=True, desc=desc)
+        else:
+            save_files(sub, folder, file, type='default', centres=True, desc=desc)
 
 
 def save_h5(sub, folders, ses=None):
