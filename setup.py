@@ -17,7 +17,7 @@ test_requirements = ['pytest>=3']
 
 setup(
     name='sim2bids',
-    version='0.0.9',
+    version='0.0.12',
     description="App to preprocess and convert simulation data",
     author="Dinara Issagaliyeva",
     author_email='dinarissaa@gmail.com',

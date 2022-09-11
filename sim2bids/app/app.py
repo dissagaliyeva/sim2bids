@@ -89,6 +89,10 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if CODE is not None:
             save_code()
 
+        # add standard text to txt files in output folder's root level
+        with open(os.path.join(OUTPUT, 'CHANGES.txt'), 'w') as f:
+            f.write('None so far.')
+
     if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
         pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=os.path.join(OUTPUT, 'param'),
                                uid=H5_CONTENT['model'], app=True, suffix=DESC)
@@ -97,10 +101,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 
     # finally, remove all empty folders
     remove_empty()
-
-    # add standard text to txt files in output folder's root level
-    with open(os.path.join(OUTPUT, 'CHANGES.txt'), 'w') as f:
-        f.write('None so far.')
 
     # return subjects and possible layouts only if it's enabled
     if layout:
