@@ -470,7 +470,7 @@ def to_json(path, shape, desc, key, **kwargs):
     if key != 'wd':
         struct = temp.struct[key]
         out.update({x: '' for x in struct['required']})
-        out.update({x: '' for x in struct['recommend']})
+        # out.update({x: '' for x in struct['recommend']})
 
     with open(path, 'w') as file:
         json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=COORDS, **kwargs), file)

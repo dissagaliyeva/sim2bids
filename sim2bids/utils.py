@@ -7,7 +7,7 @@ import sim2bids.app as app
 import sim2bids.generate.subjects as subj
 import sim2bids.preprocess.preprocess as prep
 import sim2bids.templates.templates as temp
-from sim2bids import incf
+from sim2bids import sim2bids
 from sim2bids.convert import convert
 
 
@@ -58,7 +58,7 @@ def append_widgets(files):
 
 
 def get_settings(json_editor, selected):
-    incf.REQUIRED = []
+    sim2bids.REQUIRED = []
 
     widget = pn.WidgetBox()
 
@@ -69,13 +69,13 @@ def get_settings(json_editor, selected):
         req = k in specs[root]['required']
 
         if k in reqs or req:
-            incf.REQUIRED.append(k)
+            sim2bids.REQUIRED.append(k)
             name = f'Specify {k} (REQUIRED):'
         else:
             name = f'Specify {k} (RECOMMENDED):'
 
         if k == 'Units' and v == '' and name is not None:
-            widget.append(pn.widgets.Select(name=name, options=incf.UNITS, value=''))
+            widget.append(pn.widgets.Select(name=name, options=sim2bids.UNITS, value=''))
         elif k not in ['NumberOfColumns', 'NumberOfRows', 'Units']:
             if len(v) > 0 and k in ['CoordsColumns', 'CoordsRows']:
                 continue
@@ -89,6 +89,6 @@ def get_settings(json_editor, selected):
 def verify_complete(widgets):
     for widget in widgets:
         name = widget.name.split(' ')[-2]
-        if name in incf.REQUIRED and widget.value == '':
+        if name in sim2bids.REQUIRED and widget.value == '':
             return False
     return True
