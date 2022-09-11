@@ -44,8 +44,10 @@ class FolderStructure:
             self.save_centres(v, sid, ses=ses)
         elif k in ['map.txt']:
             self.save_map(v, sid, ses=ses)
-        elif k in ['nodes.txt', 'labels.txt', *app.TO_EXTRACT[3:]]:
+        elif k in ['nodes.txt', 'labels.txt', *app.TO_EXTRACT[3:], 'times.txt']:
             self.save_centres(v, sid, ses=ses, name=v['name'])
+        elif k.split('.')[0] in ['ts', 'emp', 'vars', 'stimuli', 'noise', 'spikes', 'raster', 'events']:
+            self.save_mat(v, sid, ses=ses)
         elif k.endswith('.mat'):
             if 'fc' in k.lower():
                 self.save_mat(v, sid, ses=ses, fc=True)
