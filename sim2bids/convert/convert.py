@@ -462,6 +462,8 @@ def to_json(path, shape, desc, key, **kwargs):
     -------
 
     """
+    global COORDS
+
     inp = temp.required
     out = OrderedDict({x: '' for x in inp})
 
