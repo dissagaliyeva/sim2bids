@@ -133,11 +133,11 @@ class FolderStructure:
                 #                                  coord_format.format(v['desc'], name, 'json')]
 
     def save_code(self, v):
-        self.components['code'] += [self.coord_format.format(app.DESC, 'code', 'json'),
-                                    self.coord_format.format(app.DESC, 'code', 'py')]
-        self.components['eq'] += [self.coord_format.format(app.DESC, 'eq', 'json'),
-                                  self.coord_format.format(app.DESC, 'eq', 'xml')]
-        self.components['param'] += [
+        self.components['code'] = [self.coord_format.format(app.DESC, 'code', 'json'),
+                                   self.coord_format.format(app.DESC, 'code', 'py')]
+        self.components['eq'] = [self.coord_format.format(app.DESC, 'eq', 'json'),
+                                 self.coord_format.format(app.DESC, 'eq', 'xml')]
+        self.components['param'] = [
             self.coord_format.format(app.DESC, 'param', 'json'),
             self.coord_format.format(app.DESC, 'param', 'xml'),
             f'model-{app.MODEL_NAME}.json',
