@@ -293,8 +293,6 @@ def supply_dict(ftype, path):
     if len(temp.struct[ftype]['required']) > 0:
         file.update(get_dict('required'))
 
-    # file.update(get_dict('recommend'))
-
     eq = f'..\\eq\\desc-{DESC}_eq.xml'
 
     # TODO: update when more models are added
