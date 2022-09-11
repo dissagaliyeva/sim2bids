@@ -1,3 +1,5 @@
+required = ['NumberOfRows', 'NumberOfColumns', 'CoordsRows', 'CoordsColumns', 'Description']
+
 weights = 'The Structural Connectivity (SC) that contains the connectome. Zeros in a matrix represent ' \
           '`unconnected` areas.'
 distances = 'The distances between areas.'
@@ -10,23 +12,23 @@ centres = {'multi-unique': ['These are the region labels which are unique for ea
                       'These are the 3d coordinate centres for a single subject.']
            }
 
-struct = {'coord': {'required': ['Units'],
-                    'recommend': ['AnatomicalLandmarkCoordinates', 'AnatomicalLandmarkCoordinateSystem',
-                                  'AnatomicalLandmarkCoordinateUnits',
-                                  'AnatomicalLandmarkCoordinateSystemDescription']},
-          'ts': {'required': ['ModelEq', 'ModelParam', 'SourceCode', 'SourceCodeVersion', 'SoftwareVersion',
-                              'SoftwareName', 'SoftwareRepository', 'Network'],
-                 'recommend': ['SamplingPeriod', 'SamplingFrequency']},
-          'spatial': {'required': ['ModelEq', 'ModelParam', 'SourceCode', 'SourceCodeVersion', 'SoftwareVersion',
-                                   'SoftwareName', 'SoftwareRepository', 'Network'], 'recommend': ['CoordSeries']},
-          'eq': {'required': [], 'recommend': ['SourceCode', 'SourceCodeVersion', 'SoftwareVersion',
-                                               'SoftwareName', 'SoftwareRepository']},
-          'param': {'required': ['ModelEq'], 'recommend': ['SourceCode', 'SourceCodeVersion',
-                                                           'SoftwareVersion', 'SoftwareName', 'SoftwareRepository']},
-          'code': {'required': [], 'recommend': ['ModelEq', 'SourceCode', 'SourceCodeVersion',
-                                                 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository']}, }
-
-required = ['NumberOfRows', 'NumberOfColumns', 'CoordsRows', 'CoordsColumns', 'Description']
+struct = {
+    'net': {'required': required, 'recommend': []},
+    'coord': {'required': ['Units'],
+              'recommend': ['AnatomicalLandmarkCoordinates', 'AnatomicalLandmarkCoordinateSystem',
+                            'AnatomicalLandmarkCoordinateUnits',
+                            'AnatomicalLandmarkCoordinateSystemDescription']},
+    'ts': {'required': ['ModelEq', 'ModelParam', 'SourceCode', 'SourceCodeVersion', 'SoftwareVersion',
+                        'SoftwareName', 'SoftwareRepository', 'Network'],
+           'recommend': ['SamplingPeriod', 'SamplingFrequency']},
+    'spatial': {'required': ['ModelEq', 'ModelParam', 'SourceCode', 'SourceCodeVersion', 'SoftwareVersion',
+                             'SoftwareName', 'SoftwareRepository', 'Network'], 'recommend': ['CoordSeries']},
+    'eq': {'required': [], 'recommend': ['SourceCode', 'SourceCodeVersion', 'SoftwareVersion',
+                                         'SoftwareName', 'SoftwareRepository']},
+    'param': {'required': ['ModelEq'], 'recommend': ['SourceCode', 'SourceCodeVersion',
+                                                     'SoftwareVersion', 'SoftwareName', 'SoftwareRepository']},
+    'code': {'required': [], 'recommend': ['ModelEq', 'SourceCode', 'SourceCodeVersion',
+                                           'SoftwareVersion', 'SoftwareName', 'SoftwareRepository']}, }
 
 
 def populate_dict(dict1, shape, desc, coords=None, **kwargs):

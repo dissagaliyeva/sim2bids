@@ -62,25 +62,22 @@ def get_settings(json_editor, selected):
 
     widget = pn.WidgetBox()
 
-    for k, v in json_editor.items():
-        specs = temp.struct
-        reqs = temp.required
-        root = os.path.basename(os.path.dirname(selected))
-        req = k in specs[root]['required']
+    root = os.path.basename(os.path.dirname(selected))
+    reqs, recommend = temp.struct[root]['required'], temp.struct[root]['recommend']
 
-        if k in reqs or req:
-            sim2bids.REQUIRED.append(k)
-            name = f'Specify {k} (REQUIRED):'
-        else:
-            name = f'Specify {k} (RECOMMENDED):'
+    # iterate over required fields
+    for k in reqs:
+        if k in json_editor and json_editor[k] == '':
+            if k == 'Units':
+                widget.append(pn.widgets.Select(name=name, options=sim2bids.UNITS, value=''))
+            else:
+                widget.append(pn.widgets.Select(name=f'Specify {k} (REQUIRED):', value=''))
+                sim2bids.REQUIRED.append(k)
 
-        if k == 'Units' and v == '' and name is not None:
-            widget.append(pn.widgets.Select(name=name, options=sim2bids.UNITS, value=''))
-        elif k not in ['NumberOfColumns', 'NumberOfRows', 'Units']:
-            if len(v) > 0 and k in ['CoordsColumns', 'CoordsRows']:
-                continue
-            if v == '' and name is not None:
-                widget.append(pn.widgets.TextInput(name=name))
+    # iterate over recommended fields
+    for k in recommend:
+        if k not in json_editor:
+            widget.append(pn.widgets.Select(name=f'Specify {k} (RECOMMENDED):', value=''))
 
     # append button
     return widget

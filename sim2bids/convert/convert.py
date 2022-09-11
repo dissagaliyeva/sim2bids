@@ -274,9 +274,13 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         to_json(nodes, shape=[content.shape[0], content.shape[1] - 1], key='coord', desc=desc[1])
         to_tsv(nodes.replace('json', 'tsv'), content.iloc[:, 1:])
     else:
-        # otherwise, save files as usual
-        to_json(json_file.lower(), shape=content.shape, key='coord', desc=desc)
-        to_tsv(tsv_file.lower(), content)
+        if ftype == 'coord':
+            to_json(json_file.lower(), shape=content.shape, key='coord', desc=desc)
+            to_tsv(tsv_file.lower(), content)
+        else:
+            # otherwise, save files as usual
+            to_json(json_file.lower(), shape=content.shape, key=ftype, desc=desc)
+            to_tsv(tsv_file.lower(), content)
 
 
 def check_centres(name='centres'):
