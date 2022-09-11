@@ -295,7 +295,7 @@ def supply_dict(ftype, path):
 
     file.update(get_dict('recommend'))
 
-    eq = f'../eq/desc-{DESC}_eq.xml'
+    eq = f'..\\eq\\desc-{DESC}_eq.xml'
 
     # TODO: update when more models are added
     if ftype == 'code':
@@ -308,7 +308,7 @@ def supply_dict(ftype, path):
     elif ftype == 'eq':
         if CODE is not None:
             code = os.path.basename(CODE)
-            file['SourceCode'] = f'../code/{code}'
+            file['SourceCode'] = f'..\\code\\{code}'
 
         file['Description'] = f'These are the equations to simulate the time series with the {MODEL_NAME} model.'
 
@@ -340,7 +340,7 @@ def duplicate_folder(path):
 
     # create folder if it doesn't exist
     root = os.path.join('..', 'data')
-    new_path = os.path.join(root, os.path.basename(os.path.dirname(path + '/')))
+    new_path = os.path.join(root, os.path.basename(os.path.dirname(path + '\\')))
 
     if not os.path.exists(root):
         os.mkdir(root)
