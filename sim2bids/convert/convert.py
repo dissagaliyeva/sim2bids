@@ -199,7 +199,7 @@ def save_h5(sub, folders, ses=None):
 
 
 def save_files(sub: dict, folder: str, content, type: str = 'default', centres: bool = False,
-               desc: [str, list, None] = None, ftype: str = 'centres'):
+               desc: [str, list, None] = None, ftype: str = 'coord'):
     """
     This function prepares the data to be stored in JSON/TSV formats. It first creates
     absolute paths where data is to be stored, deals with 'centres.txt' file and
@@ -474,7 +474,6 @@ def to_json(path, shape, desc, key, **kwargs):
     if key != 'wd':
         struct = temp.struct[key]
         out.update({x: '' for x in struct['required']})
-        # out.update({x: '' for x in struct['recommend']})
 
     with open(path, 'w') as file:
         json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=COORDS, **kwargs), file)

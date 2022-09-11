@@ -55,7 +55,8 @@ class Files:
         # if the whole folder is passed, open that folder
         path, files, changed = self.path, self.files, False
 
-        if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop', 'ses-postop']:
+        if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop',
+                                                                                                'ses-postop']:
             path = os.path.join(path, files[0])
             files = os.listdir(path)
 
@@ -176,6 +177,8 @@ def remove_id(file, ids):
 def prepare_subs(file_paths, sid):
     subs = {}
 
+    print('file_paths:', file_paths)
+
     for file_path in file_paths:
         name = get_filename(file_path)
 
@@ -225,7 +228,7 @@ def prepare_subs(file_paths, sid):
             file_path = new_path
 
         # check if separator is missing, if so remove the file entirely
-        if name in app.TO_EXTRACT:
+        if accepted(name):
             sep = find_separator(file_path)
 
             if sep == 'remove':
@@ -246,6 +249,13 @@ def prepare_subs(file_paths, sid):
                 app.CENTERS = True
 
     return subs
+
+
+def accepted(name):
+    for accept in app.ACCEPTED:
+        if name.startswith(accept):
+            return True
+    return False
 
 
 def get_filename(path):
@@ -272,7 +282,8 @@ def find_separator(path):
         return 'remove'
 
     # if cortical.txt, hemisphere.txt, or areas.txt are present, return '\n' delimiter
-    if path.endswith('hemisphere.txt') or path.endswith('cortical.txt') or path.endswith('areas.txt'):
+    if path.endswith('hemisphere.txt') or path.endswith('cortical.txt') or path.endswith('areas.txt') \
+            or path.endswith('times.txt'):
         file.to_csv(path, sep='\n', header=None, index=None)
         return '\n'
 
