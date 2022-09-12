@@ -63,6 +63,10 @@ def get_settings(json_editor, selected):
     widget = pn.WidgetBox()
 
     root = os.path.basename(os.path.dirname(selected))
+
+    if root == '.ipynb_checkpoints':
+        return
+
     reqs, recommend = temp.struct[root]['required'], temp.struct[root]['recommend']
 
     # iterate over required fields

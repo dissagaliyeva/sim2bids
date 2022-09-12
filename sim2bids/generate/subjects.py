@@ -7,6 +7,7 @@ import pandas as pd
 from sim2bids.app import app
 from collections import OrderedDict
 import sim2bids.preprocess.preprocess as prep
+from sim2bids.convert import convert
 from sim2bids.app import utils
 
 TO_RENAME = None
@@ -245,6 +246,20 @@ def prepare_subs(file_paths, sid):
 
             if subs[name]['name'] in ['centres', 'centers']:
                 app.CENTERS = True
+
+            # save network path
+            if len(convert.NETWORK) < 2:
+                desc, fname = app.DESC, name.split('.')[0]
+
+                if fname in ['weights', 'distances']:
+                    if 'ses-preop' in subs[name]['path'] in subs[name]['path']:
+                        convert.NETWORK.append(f'../{sid}/ses-preop/net/{sid}_desc-{desc}_{fname}.json')
+                    elif 'ses-postop' in subs[name]['path'] in subs[name]['path']:
+                        convert.NETWORK.append(f'../{sid}/ses-postop/net/{sid}_desc-{desc}_{fname}.json')
+                    else:
+                        convert.NETWORK.append(f'../{sid}/net/{sid}_desc-{desc}_{fname}.json')
+
+                    convert.NETWORK = list(set(convert.NETWORK))
 
     return subs
 

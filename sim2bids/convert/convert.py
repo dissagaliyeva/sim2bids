@@ -22,6 +22,8 @@ IGNORE_CENTRE = False
 # sidecars, specifically `CoordsRows` and `CoordsColumns`
 COORDS = None
 
+NETWORK = []
+
 
 def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     """Main engine to save all conversions. Several functionalities to understand:
@@ -275,11 +277,11 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         nodes = json_file.replace(sub['name'], 'nodes')
 
         if COORDS is None:
-            if IGNORE_CENTRE:
-                COORDS = [f'../../coord/desc-{app.DESC}_labels.json', f'../../coord/desc-{app.DESC}_nodes.json']
+            if IGNORE_CENTRE or not app.MULTI_INPUT:
+                COORDS = [f'../coord/desc-{app.DESC}_labels.json', f'../coord/desc-{app.DESC}_nodes.json']
             else:
-                COORDS = [labels.replace(app.OUTPUT, '..').replace('\\', '/'),
-                          nodes.replace(app.OUTPUT, '..').replace('\\', '/')]
+                COORDS = [labels.replace(app.OUTPUT, '../..').replace('\\', '/'),
+                          nodes.replace(app.OUTPUT, '../..').replace('\\', '/')]
 
         # save labels to json and tsv
         to_json(labels, shape=[content.shape[0], 1], key='coord', desc=desc[0])
@@ -485,9 +487,24 @@ def to_json(path, shape, desc, key, **kwargs):
     inp = temp.required
     out = OrderedDict({x: '' for x in inp})
 
+    params = {'ModelEq': f'../eq/desc-{app.DESC}_eq.xml',
+              'ModelParam': f'../param/desc-{app.DESC}_param.xml',
+              'SourceCode': f'../code/desc-{app.DESC}_code.py',
+              'SoftwareVersion': app.SoftwareVersion,
+              'SoftwareRepository': app.SoftwareRepository,
+              'SourceCodeVersion': app.SoftwareVersion,
+              'SoftwareName': app.SoftwareName,
+              'Network': NETWORK
+              }
+
     if key != 'wd':
         struct = temp.struct[key]
         out.update({x: '' for x in struct['required']})
+
+    for k in ['ModelEq', 'ModelParam', 'SourceCode', 'SoftwareVersion', 'SourceCodeVersion',
+              'SoftwareRepository', 'SoftwareName', 'Network']:
+        if k in out.keys():
+            out[k] = params[k]
 
     if 'Units' in out.keys():
         out['Units'] = 'ms'
