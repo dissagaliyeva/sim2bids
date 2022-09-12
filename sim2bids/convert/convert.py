@@ -275,7 +275,7 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         nodes = json_file.replace(sub['name'], 'nodes')
 
         if COORDS is None:
-            if IGNORE_CENTRE:
+            if IGNORE_CENTRE or not app.MULTI_INPUT:
                 COORDS = [f'../../coord/desc-{app.DESC}_labels.json', f'../../coord/desc-{app.DESC}_nodes.json']
             else:
                 COORDS = [labels.replace(app.OUTPUT, '..').replace('\\', '/'),

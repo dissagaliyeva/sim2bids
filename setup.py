@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 """The setup script."""
-
+from os import path
 from setuptools import setup, find_packages
 
-with open('README.md') as readme_file:
-    readme = readme_file.read()
+# here = path.abspath(path.dirname(__file__))
+
+# with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+#     long_description = f.read()
 
 # with open('HISTORY.rst') as history_file:
 #     history = history_file.read()
@@ -17,9 +19,9 @@ test_requirements = ['pytest>=3']
 
 setup(
     name='sim2bids',
-    version='0.0.15',
+    version='0.0.16',
     description="App to preprocess and convert simulation data",
-    long_description=readme,
+    read_me=open("README.md").read(),
     author="Dinara Issagaliyeva",
     author_email='dinarissaa@gmail.com',
     python_requires='>=3.6',
