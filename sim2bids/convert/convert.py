@@ -276,10 +276,10 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
 
         if COORDS is None:
             if IGNORE_CENTRE or not app.MULTI_INPUT:
-                COORDS = [f'../../coord/desc-{app.DESC}_labels.json', f'../../coord/desc-{app.DESC}_nodes.json']
+                COORDS = [f'../coord/desc-{app.DESC}_labels.json', f'../coord/desc-{app.DESC}_nodes.json']
             else:
-                COORDS = [labels.replace(app.OUTPUT, '..').replace('\\', '/'),
-                          nodes.replace(app.OUTPUT, '..').replace('\\', '/')]
+                COORDS = [labels.replace(app.OUTPUT, '../..').replace('\\', '/'),
+                          nodes.replace(app.OUTPUT, '../..').replace('\\', '/')]
 
         # save labels to json and tsv
         to_json(labels, shape=[content.shape[0], 1], key='coord', desc=desc[0])
