@@ -303,6 +303,7 @@ def supply_dict(ftype, path):
     eq = f'../eq/desc-{DESC}_eq.xml'
     file['CoordsRows'] = convert.COORDS
     file['CoordsColumns'] = convert.COORDS
+    file['SourceCode'] = f'../code/desc-{DESC}_code.py'
 
     # TODO: update when more models are added
     if ftype == 'code':
@@ -313,10 +314,6 @@ def supply_dict(ftype, path):
         file['Description'] = f'These are the parameters for the {MODEL_NAME} model.'
 
     elif ftype == 'eq':
-        if CODE is not None:
-            code = os.path.basename(CODE)
-            file['SourceCode'] = f'../code/desc-{DESC}_code.py'
-
         file['Description'] = f'These are the equations to simulate the time series with the {MODEL_NAME} model.'
 
     save()
