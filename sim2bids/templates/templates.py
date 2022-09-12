@@ -1,8 +1,11 @@
 required = ['NumberOfRows', 'NumberOfColumns', 'CoordsRows', 'CoordsColumns', 'Description']
 
-weights = 'The Structural Connectivity (SC) that contains the connectome. Zeros in a matrix represent ' \
-          '`unconnected` areas.'
-distances = 'The distances between areas.'
+file_desc = {
+    'weights': 'The Structural Connectivity (SC) that contains the connectome.',
+    'distances': 'The distances between areas.',
+    'times': 'Time series of the simulated time series.',
+    'ts': 'Time series of the simulated time series.',
+}
 
 centres = {'multi-unique': ['These are the region labels which are unique for each individual.',
                             'These are the 3d coordinate centres which are unique for each individual.'],
