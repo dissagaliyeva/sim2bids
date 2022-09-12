@@ -188,7 +188,8 @@ class MainArea(param.Parameterized):
             sidebar=sidebar,
             site='INCF',
             main=main,
-            header_background='#4488c4'
+            header_background='#4488c4',
+
         )
 
 
@@ -227,7 +228,7 @@ class ViewResults(param.Parameterized):
                 if len(self.je_widget) > 0:
                     self.je_widget = pn.WidgetBox()
 
-                je = pn.widgets.JSONEditor(value=file, height=350, mode='view')
+                je = pn.widgets.JSONEditor(value=file, height=500, mode='view')
                 je_widget = utils.get_settings(OrderedDict(je.value), self.select_options.value)
                 self.je_widget.append(pn.Row(je, pn.Column(je_widget,
                                                            pn.Param(self, parameters=['je_btn'], show_name=False,
@@ -297,9 +298,9 @@ def get_files(path=app.OUTPUT, ftype='.json'):
     f = []
 
     for root, dirs, files in os.walk(path, topdown=False):
-        for name in files:
-            if ftype in name:
-                f.append(os.path.join(root, name))
+        for file in files:
+            if ftype in file and '.ipynb_checkpoints' not in file:
+                f.append(os.path.join(root, file))
     return f
 
 
