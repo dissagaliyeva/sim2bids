@@ -4,6 +4,8 @@ import re
 import shutil
 from collections import OrderedDict
 
+import numpy as np
+import pandas as pd
 import panel as pn
 import pylems_py2xml
 import pylems_py2xml as py2xml
@@ -16,31 +18,32 @@ from sim2bids.convert import convert
 from sim2bids.templates import templates as temp
 from sim2bids.app import utils
 
-
 # define global variables
 SID = None
-DESC = 'default'                            # short description that identifies input data
-OUTPUT = 'output'                           # output folder to store conversions
-CENTRES = False                             # whether centres.txt|nodes.txt|labels.txt were found
-MULTI_INPUT = False                         # whether input files include single- or multi-subjects
-ALL_FILES = None                            # list of all file paths (gets supplemented in subjects.py)
-CODE = None                                 # path to python code if exists
+DESC = 'default'  # short description that identifies input data
+OUTPUT = 'output'  # output folder to store conversions
+CENTRES = False  # whether centres.txt|nodes.txt|labels.txt were found
+MULTI_INPUT = False  # whether input files include single- or multi-subjects
+ALL_FILES = None  # list of all file paths (gets supplemented in subjects.py)
+CODE = None  # path to python code if exists
 H5_CONTENT = dict()
 MODEL_NAME = None
+SoftwareVersion = None
+SoftwareRepository = None
+SoftwareName = None
 
 # define all accepted files
-ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',                 # Network (net)
-            'nodes', 'labels', 'centres', 'area', 'hemisphere', 'cortical',         # Coordinates (coord)
-            'orientation', 'average_orientation', 'normal', 'times', 'vertices',    # Coordinates (coord)
-            'faces', 'vnormal', 'fnormal', 'sensor', 'map', 'volume',               # Coordinates (coord)
-            'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',                     # Coordinates (coord)
-            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'emp'     # Timeseries (ts)
-            'fc']                                                                   # Spatial (spatial)
+ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',  # Network (net)
+            'nodes', 'labels', 'centres', 'area', 'hemisphere', 'cortical',  # Coordinates (coord)
+            'orientation', 'average_orientation', 'normal', 'times', 'vertices',  # Coordinates (coord)
+            'faces', 'vnormal', 'fnormal', 'sensor', 'map', 'volume',  # Coordinates (coord)
+            'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',  # Coordinates (coord)
+            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'emp'  # Timeseries (ts)
+                                                                          'fc']  # Spatial (spatial)
 
-TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',                        # folder "net"
-              'areas.txt', 'average_orientations.txt', 'cortical.txt',              # folder "coord"
-              'hemisphere.txt', 'normals.txt']                                      # folder "coord"
-
+TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',  # folder "net"
+              'areas.txt', 'average_orientations.txt', 'cortical.txt',  # folder "coord"
+              'hemisphere.txt', 'normals.txt']  # folder "coord"
 
 # define accepted extensions
 ACCEPTED_EXT = ['txt', 'csv', 'dat', 'h5', 'mat', 'zip', 'py']
@@ -93,6 +96,15 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         # add standard text to txt files in output folder's root level
         with open(os.path.join(OUTPUT, 'CHANGES.txt'), 'w') as f:
             f.write('None so far.')
+
+        with open(os.path.join(OUTPUT, 'README.txt'), 'w') as f:
+            f.write(f'Simulation output for {MODEL_NAME} model.')
+
+        with open(os.path.join(OUTPUT, 'dataset_description.json'), 'w') as f:
+            json.dump({'Name': f'Simulation output for {MODEL_NAME} model.',
+                       'BIDSVersion': '1.7.0'}, f)
+
+        supply_participants()
 
         check_output()
 
@@ -166,8 +178,8 @@ def save_output(subs):
             elif 'fc' in k_lower:
                 name = 'spatial'
             elif 'vars' in k_lower or 'stimuli' in k_lower or 'noise' in k_lower \
-                 or 'spike' in k_lower or 'raster' in k_lower or 'ts' in k_lower \
-                 or 'event' in k_lower or 'emp' in k_lower:
+                    or 'spike' in k_lower or 'raster' in k_lower or 'ts' in k_lower \
+                    or 'event' in k_lower or 'emp' in k_lower:
                 name = 'ts'
             elif k_lower.endswith('.h5'):
                 convert.save_h5(sub[k], folders, ses=None)
@@ -365,3 +377,16 @@ def check_output():
                 if file.startswith('sub-'):
                     match = re.match('sub-[0-9]+', file)[0]
                     os.replace(os.path.join(path, file), os.path.join(path, file.replace(match, '').strip('_')))
+
+
+def supply_participants():
+    df = pd.DataFrame(columns=['participant_id', 'species', 'age', 'sex', 'handedness', 'strain', 'strain_rrid'],
+                      index=None)
+    files = os.listdir(OUTPUT)
+
+    for file in files:
+        if file.startswith('sub-'):
+            df = df.append({'participant_id': file}, ignore_index=True)
+            df.replace(np.NaN, 'n/a', inplace=True)
+
+    df.to_csv(os.path.join(OUTPUT, 'participants.tsv'), index=None, sep='\t')

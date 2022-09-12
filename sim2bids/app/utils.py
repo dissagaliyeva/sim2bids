@@ -36,6 +36,10 @@ def recursive_walk(path: str, basename: bool = False) -> list:
     # recursively walk the directory
     for root, _, files in os.walk(path):
         for file in files:
+            # ignore checkpoints
+            if '.ipynb_checkpoints' in file:
+                continue
+
             # extract files from zip folder
             if file.endswith('.zip'):
                 # add zip content to the files
@@ -112,6 +116,9 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 
     # traverse files
     for file in files:
+        if '.ipynb_checkpoints' in file:
+            continue
+
         # combine path
         file_path = os.path.join(path, file)
 

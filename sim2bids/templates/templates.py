@@ -31,7 +31,14 @@ struct = {
     'param': {'required': ['ModelEq'], 'recommend': ['SourceCode', 'SourceCodeVersion',
                                                      'SoftwareVersion', 'SoftwareName', 'SoftwareRepository']},
     'code': {'required': [], 'recommend': ['ModelEq', 'SourceCode', 'SourceCodeVersion',
-                                           'SoftwareVersion', 'SoftwareName', 'SoftwareRepository']}, }
+                                           'SoftwareVersion', 'SoftwareName', 'SoftwareRepository']},
+    'dataset_description': {'required': ['Name', 'BIDSVersion'], 'recommend':
+        ['HEDVersion', 'DatasetType', 'License', 'Authors', 'Acknowledgements', 'HowToAcknowledge',
+         'Funding', 'EthicsApprovals', 'ReferencesAndLinks', 'DatasetDOI', 'GeneratedBy', 'SourceDatasets']},
+    'participants': {'required': ['participant_id'], 'recommend': ['species', 'age', 'sex', 'handedness', 'strain',
+                                                                   'strain_rrid']}
+
+}
 
 
 def populate_dict(dict1, shape, desc, coords=None, **kwargs):

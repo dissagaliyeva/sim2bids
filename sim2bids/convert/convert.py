@@ -22,6 +22,8 @@ IGNORE_CENTRE = False
 # sidecars, specifically `CoordsRows` and `CoordsColumns`
 COORDS = None
 
+NETWORK = []
+
 
 def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     """Main engine to save all conversions. Several functionalities to understand:
@@ -485,9 +487,24 @@ def to_json(path, shape, desc, key, **kwargs):
     inp = temp.required
     out = OrderedDict({x: '' for x in inp})
 
+    params = {'ModelEq': f'../eq/desc-{app.DESC}_eq.xml',
+              'ModelParam': f'../param/desc-{app.DESC}_param.xml',
+              'SourceCode': f'../code/desc-{app.DESC}_code.py',
+              'SoftwareVersion': app.SoftwareVersion,
+              'SoftwareRepository': app.SoftwareRepository,
+              'SourceCodeVersion': app.SoftwareVersion,
+              'SoftwareName': app.SoftwareName,
+              'Network': NETWORK
+              }
+
     if key != 'wd':
         struct = temp.struct[key]
         out.update({x: '' for x in struct['required']})
+
+    for k in ['ModelEq', 'ModelParam', 'SourceCode', 'SoftwareVersion', 'SourceCodeVersion',
+              'SoftwareRepository', 'SoftwareName', 'Network']:
+        if k in out.keys():
+            out[k] = params[k]
 
     if 'Units' in out.keys():
         out['Units'] = 'ms'
