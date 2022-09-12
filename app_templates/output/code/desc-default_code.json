@@ -1,1 +1,1 @@
-{"ModelEq": "..\\eq\\desc-default_eq.xml", "Description": "The source code to reproduce results."}
+{"CoordsRows": ["../coord/sub-01_desc-default_labels.json", "../coord/sub-01_desc-default_nodes.json"], "CoordsColumns": ["../coord/sub-01_desc-default_labels.json", "../coord/sub-01_desc-default_nodes.json"], "ModelEq": "../eq/desc-default_eq.xml", "Description": "The source code to reproduce results."}

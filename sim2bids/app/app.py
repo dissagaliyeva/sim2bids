@@ -280,7 +280,11 @@ def transfer_xml():
     supply_dict('param', os.path.join(OUTPUT, 'param', f'desc-{DESC}_param.json'))
 
     # add json sidecar for model
-    supply_dict('param', os.path.join(OUTPUT, 'param', f'model-{MODEL_NAME}_param.json'))
+    # supply_dict('param', os.path.join(OUTPUT, 'param', f'model-{MODEL_NAME}_param.json'))
+    # delete model
+    path = os.path.join(OUTPUT, 'param', f'model-{MODEL_NAME}_param.xml')
+    if os.path.exists(path):
+        os.remove(path)
 
 
 def supply_dict(ftype, path):
@@ -296,7 +300,9 @@ def supply_dict(ftype, path):
     if len(temp.struct[ftype]['required']) > 0:
         file.update(get_dict('required'))
 
-    eq = f'..\\eq\\desc-{DESC}_eq.xml'
+    eq = f'../eq/desc-{DESC}_eq.xml'
+    file['CoordsRows'] = convert.COORDS
+    file['CoordsColumns'] = convert.COORDS
 
     # TODO: update when more models are added
     if ftype == 'code':
@@ -309,7 +315,7 @@ def supply_dict(ftype, path):
     elif ftype == 'eq':
         if CODE is not None:
             code = os.path.basename(CODE)
-            file['SourceCode'] = f'..\\code\\{code}'
+            file['SourceCode'] = f'../code/{code}'
 
         file['Description'] = f'These are the equations to simulate the time series with the {MODEL_NAME} model.'
 

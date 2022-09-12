@@ -1,1 +1,1 @@
-{"ModelEq": "..\\eq\\desc-default_eq.xml", "Description": "These are the parameters for the G2DOS model."}
+{"ModelEq": "../eq/desc-default_eq.xml", "CoordsRows": ["../coord/sub-01_desc-default_labels.json", "../coord/sub-01_desc-default_nodes.json"], "CoordsColumns": ["../coord/sub-01_desc-default_labels.json", "../coord/sub-01_desc-default_nodes.json"], "Description": "These are the parameters for the G2DOS model."}

@@ -273,7 +273,11 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         nodes = json_file.replace(sub['name'], 'nodes')
 
         if COORDS is None:
-            COORDS = [labels, nodes]
+            if IGNORE_CENTRE:
+                COORDS = [f'../../coord/desc-{app.DESC}_labels.json', f'../../coord/desc-{app.DESC}_nodes.json']
+            else:
+                COORDS = [labels.replace(app.OUTPUT, '..').replace('\\', '/'),
+                          nodes.replace(app.OUTPUT, '..').replace('\\', '/')]
 
         # save labels to json and tsv
         to_json(labels, shape=[content.shape[0], 1], key='coord', desc=desc[0])
@@ -475,7 +479,6 @@ def to_json(path, shape, desc, key, **kwargs):
     -------
 
     """
-    global COORDS
 
     inp = temp.required
     out = OrderedDict({x: '' for x in inp})
@@ -483,6 +486,9 @@ def to_json(path, shape, desc, key, **kwargs):
     if key != 'wd':
         struct = temp.struct[key]
         out.update({x: '' for x in struct['required']})
+
+    if 'Units' in out.keys():
+        out['Units'] = 'ms'
 
     with open(path, 'w') as file:
         json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=COORDS, **kwargs), file)
