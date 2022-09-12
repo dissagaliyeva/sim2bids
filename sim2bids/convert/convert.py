@@ -109,7 +109,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             folder = folders[2]
 
         # get description for weights or distances
-        desc = temp.weights if 'weights' in sub['name'] else temp.distances
+        desc = temp.file_desc['weights'] if 'weights' in sub['name'] else temp.file_desc['distances']
 
         if 'content' in sub.keys():
             save_files(sub, folder, sub['content'], ftype='wd')
@@ -123,20 +123,22 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
     # get folder location for spatial
     elif name == 'spatial':
+        desc = temp.file_desc['spatial']
+
         if ses is None:
             folder = folders[2]
         else:
             folder = folders[3]
 
         if 'content' in sub.keys():
-            save_files(sub, folder, sub['content'], type='default', ftype='spatial')
+            save_files(sub, folder, sub['content'], type='default', ftype='spatial', desc=desc)
         else:
             # save conversion results
-            save_files(sub, folder, file, type='default', ftype='spatial')
+            save_files(sub, folder, file, type='default', ftype='spatial', desc=desc)
 
     # get folder location for time series
     elif name == 'ts':
-        save_files(sub, folders[-1], file, type='default', ftype='ts')
+        save_files(sub, folders[-1], file, type='default', ftype='ts', desc=temp.file_desc['ts'])
 
     # get folder location for coordinates
     elif name == 'coord':
@@ -161,14 +163,14 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
                 # save conversion results
                 if 'centres' in sub['fname']:
                     if IGNORE_CENTRE or not app.MULTI_INPUT:
-                        save_files(sub, folder, file, type='other', centres=True)
+                        save_files(sub, folder, file, type='other', centres=True, desc=temp.centres['single'])
                     else:
-                        save_files(sub, folder, file, type='default', centres=True)
+                        save_files(sub, folder, file, type='default', centres=True, desc=temp.centres['multi-unique'])
                 else:
                     if IGNORE_CENTRE or not app.MULTI_INPUT:
-                        save_files(sub, folder, file, type='other')
+                        save_files(sub, folder, file, type='other', desc=temp.file_desc[sub['name']])
                     else:
-                        save_files(sub, folder, file, type='default')
+                        save_files(sub, folder, file, type='default', desc=temp.file_desc[sub['name']])
 
 
 def save_centres(sub, file, ses, folders, centre_name='centres'):
