@@ -4,9 +4,9 @@
 
 from setuptools import setup, find_packages
 
-# with open('README.rst') as readme_file:
-#     readme = readme_file.read()
-#
+with open('README.md') as readme_file:
+    readme = readme_file.read()
+
 # with open('HISTORY.rst') as history_file:
 #     history = history_file.read()
 
@@ -17,8 +17,9 @@ test_requirements = ['pytest>=3']
 
 setup(
     name='sim2bids',
-    version='0.0.14',
+    version='0.0.15',
     description="App to preprocess and convert simulation data",
+    long_description=readme,
     author="Dinara Issagaliyeva",
     author_email='dinarissaa@gmail.com',
     python_requires='>=3.6',
