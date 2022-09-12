@@ -315,7 +315,7 @@ def supply_dict(ftype, path):
     elif ftype == 'eq':
         if CODE is not None:
             code = os.path.basename(CODE)
-            file['SourceCode'] = f'../code/{code}'
+            file['SourceCode'] = f'../code/desc-{DESC}_code.py'
 
         file['Description'] = f'These are the equations to simulate the time series with the {MODEL_NAME} model.'
 
