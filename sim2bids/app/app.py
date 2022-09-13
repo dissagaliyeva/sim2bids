@@ -105,7 +105,7 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
                        'BIDSVersion': '1.7.0'}, f)
 
         supply_participants()
-
+        check_json()
         check_output()
 
     if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
@@ -395,3 +395,15 @@ def supply_participants():
             df.replace(np.NaN, 'n/a', inplace=True)
 
     df.to_csv(os.path.join(OUTPUT, 'participants.tsv'), index=None, sep='\t')
+
+
+def check_json():
+    for file in utils.get_content(OUTPUT, os.listdir(OUTPUT)):
+        if file.endswith('json'):
+            f = json.load(open(file))
+            if 'CoordRows' in f.keys() and f['CoordRows'] == '':
+                f['CoordRows'] = convert.COORDS
+                f['CoordColumns'] = convert.COORDS
+
+            with open(file, 'w') as f2:
+                json.dump(f, f2)
