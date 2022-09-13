@@ -313,11 +313,16 @@ def supply_dict(ftype, path):
         file.update(get_dict('required'))
 
     eq = f'../eq/desc-{DESC}_eq.xml'
-    file['CoordsRows'] = convert.COORDS
-    file['CoordsColumns'] = convert.COORDS
     file['SourceCode'] = f'../code/desc-{DESC}_code.py'
 
-    # TODO: update when more models are added
+    for key, val in zip(['SoftwareVersion', 'SoftwareRepository', 'SoftwareName'],
+                        [SoftwareVersion, SoftwareRepository, SoftwareName]):
+        if val is not None:
+            if key == 'SoftwareVersion':
+                file['SourceCodeVersion'] = val
+
+            file[key] = val
+
     if ftype == 'code':
         file['ModelEq'] = eq
         file['Description'] = 'The source code to reproduce results.'
