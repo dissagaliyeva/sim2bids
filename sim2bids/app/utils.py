@@ -163,7 +163,7 @@ def get_files():
                   'cortical', 'nodes', 'labels', 'vertices', 'faces', 'vnormals',
                   'fnormals', 'sensors', 'app', 'map', 'volumes',
                   'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d'],
-        'ts': ['ts', 'emp', 'vars', 'stimuli', 'noise', 'spikes', 'raster', 'events'],
+        'ts': ['ts', 'emp', 'vars', 'stimuli', 'noise', 'spikes', 'raster', 'events', 'bold'],
         'spatial': ['fc']
     }
 

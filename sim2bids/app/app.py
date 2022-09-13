@@ -84,8 +84,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
-    print(subs)
-
     # only save conversions if 'save' is True
     if save and subs is not None:
         # save conversions
@@ -181,7 +179,7 @@ def save_output(subs):
                 name = 'spatial'
             elif 'vars' in k_lower or 'stimuli' in k_lower or 'noise' in k_lower \
                     or 'spike' in k_lower or 'raster' in k_lower or 'ts' in k_lower \
-                    or 'event' in k_lower or 'emp' in k_lower:
+                    or 'event' in k_lower or 'emp' in k_lower or 'bold' in k_lower:
                 name = 'ts'
             elif k_lower.endswith('.h5'):
                 convert.save_h5(sub[k], folders, ses=None)

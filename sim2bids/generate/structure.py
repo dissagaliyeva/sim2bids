@@ -38,7 +38,6 @@ class FolderStructure:
 
     def iterate_dict(self, k, v, sid, ses=None):
         k = k.split('_')[-1] if '_' in k else k
-        files = utils.get_files()
 
         if k in ['weights.txt', 'distances.txt', 'tract_lengths.txt']:
             self.save_wd(v, sid, ses=ses)
@@ -50,12 +49,11 @@ class FolderStructure:
             self.save_centres(v, sid, ses=ses, name=v['name'])
         elif k.split('.')[0] in ['ts', 'emp', 'vars', 'stimuli', 'noise', 'spikes', 'raster', 'events']:
             self.save_mat(v, sid, ses=ses)
-        elif k.endswith('.mat'):
+        elif k.endswith('.mat') or k.split('.')[0] in ['fc', 'bold']:
             if 'fc' in k.lower():
                 self.save_mat(v, sid, ses=ses, fc=True)
             else:
-                if k.replace('.mat', '') in files['ts']:
-                    self.save_mat(v, sid, ses=ses)
+                self.save_mat(v, sid, ses=ses)
         elif k.endswith('.h5'):
             self.save_h5(v, ses=ses)
 
@@ -96,14 +94,13 @@ class FolderStructure:
                 self.components['subjects'][sid][ses]['coord'] += structure
 
     def save_mat(self, v, sid, ses=None, fc=False):
-        name, desc = v["name"].lower(), v["desc"]
+        name, desc = v['name'].lower(), v['desc']
 
         if ses is None:
             if fc:
-                self.components['subjects'][sid]['spatial'] += [coord_format.format(desc, 'times', 'tsv'),
-                                                                coord_format.format(desc, 'times', 'json')]
+                self.components['subjects'][sid]['spatial'] += common_structure(v, name)
             else:
-                self.components['subjects'][sid]['ts'] += common_structure(v)
+                self.components['subjects'][sid]['ts'] += common_structure(v, name)
         else:
             if fc:
                 self.components['subjects'][sid][ses]['spatial'] += [
@@ -143,9 +140,7 @@ class FolderStructure:
                                  self.coord_format.format(app.DESC, 'eq', 'xml')]
         self.components['param'] = [
             self.coord_format.format(app.DESC, 'param', 'json'),
-            self.coord_format.format(app.DESC, 'param', 'xml'),
-            f'model-{app.MODEL_NAME}.json',
-            f'model-{app.MODEL_NAME}.xml'
+            self.coord_format.format(app.DESC, 'param', 'xml')
         ]
 
     def populate(self):
@@ -311,7 +306,6 @@ def check_folders(path):
 
     for p in [path, eq, code, coord, param]:
         if not os.path.exists(p):
-            print(f'Creating folder `{os.path.basename(p)}`...')
             os.mkdir(p)
 
     read = os.path.join(path, 'README.txt')
@@ -321,5 +315,4 @@ def check_folders(path):
 
     for p in [read, part, desc, chgs]:
         if not os.path.exists(p):
-            print(f'Creating file `{os.path.basename(p)}`...')
             Path(p).touch()

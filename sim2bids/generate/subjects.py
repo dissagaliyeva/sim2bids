@@ -265,7 +265,6 @@ def prepare_subs(file_paths, sid):
 
 
 def accepted(name):
-    print('name:', name)
     for accept in app.ACCEPTED:
         if accept in name:
             return True

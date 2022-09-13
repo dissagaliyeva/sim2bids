@@ -1,16 +1,7 @@
 #!/usr/bin/env python
 
 """The setup script."""
-from os import path
-from setuptools import setup, find_packages
-
-# here = path.abspath(path.dirname(__file__))
-
-# with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-#     long_description = f.read()
-
-# with open('HISTORY.rst') as history_file:
-#     history = history_file.read()
+from setuptools import setup
 
 requirements = ['numpy', 'pandas', 'h5py', 'panel~=0.13.1', 'holoviews', 'param~=1.12.0',
                 'graphviz', 'mat73', 'pylems_py2xml']
@@ -19,9 +10,10 @@ test_requirements = ['pytest>=3']
 
 setup(
     name='sim2bids',
-    version='0.0.22',
+    version='0.0.23',
     description="App to preprocess and convert simulation data",
-    read_me=open("README.md").read(),
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     author="Dinara Issagaliyeva",
     author_email='dinarissaa@gmail.com',
     python_requires='>=3.6',
