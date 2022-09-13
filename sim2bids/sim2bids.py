@@ -306,9 +306,9 @@ Here you can select the folder(s) that you want to transform. Beware that we are
 content available in the specified folder. That means if the folder contains a sub-folder, we will transform the content
 if it falls into the accepted file formats.
 
-You can get a preliminary look into the to-be-generated structure by clicking on `Show Structure` button. If you're 
-happy with the results, you can click on `Generate Files` button to physically save the results. After that, please 
-**make sure to give user-specific input** by clicking on `View Results` tab and selecting JSON files. You'll see a lot
+You can get a preliminary look into the to-be-generated structure by clicking on **Show Structure** button. If you're 
+happy with the results, you can click on **Generate Files** button to physically save the results. After that, please 
+**make sure to give user-specific input** by clicking on **View Results** tab and selecting JSON files. You'll see a lot
 of required and recommended fields that can be updated. By default, all required fields are already provided. However,
-you have all the rights to change them. See further details in `User Guide`. 
+you have all the rights to change them. See further details in **User Guide**. 
 """
