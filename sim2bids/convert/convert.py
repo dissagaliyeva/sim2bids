@@ -124,7 +124,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
         save_centres(sub, file, ses, folders)
 
     # get folder location for spatial
-    elif name == 'spatial':
+    elif name in ['spatial', 'fc']:
         desc = temp.file_desc['spatial']
 
         if ses is None:
@@ -139,8 +139,9 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             save_files(sub, folder, file, type='default', ftype='spatial', desc=desc)
 
     # get folder location for time series
-    elif name == 'ts':
-        save_files(sub, folders[-1], file, type='default', ftype='ts', desc=temp.file_desc['ts'])
+    elif name in ['ts', 'bold']:
+        desc = temp.file_desc['ts'] if name == 'ts' else temp.file_desc['bold'].format(sub['sid'].replace('sub-', ''))
+        save_files(sub, folders[-1], file, type='default', ftype='ts', desc=desc)
 
     # get folder location for coordinates
     elif name == 'coord':

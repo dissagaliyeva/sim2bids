@@ -4,15 +4,14 @@
 # In[1]:
 
 
-get_ipython().system('pip install tvb-data --quiet')
-get_ipython().system('pip install -U tvb-library --quiet')
-get_ipython().system('pip install sim2bids==0.0.14 --quiet')
+get_ipython().run_line_magic('pylab', 'nbagg')
+get_ipython().system('pip install tvb-data')
+get_ipython().system('pip install -U tvb-library')
 
 
 # In[2]:
 
 
-get_ipython().run_line_magic('pylab', 'nbagg')
 get_ipython().run_line_magic('matplotlib', 'inline')
 
 
@@ -46,14 +45,6 @@ get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 from tvb.simulator.lab import *
-from tvb.basic.readers import FileReader, try_get_absolute_path
-
-import os 
-import shutil
-import pandas as pd
-import numpy as np
-
-import zipfile
 
 
 # *Model*
@@ -77,26 +68,7 @@ oscilator = models.Generic2dOscillator()
 # In[5]:
 
 
-source_file="connectivity_76.zip"
-source_full_path = try_get_absolute_path("tvb_data.connectivity", source_file)
-
-path = 'connectivity_76'
-if not os.path.exists(path):
-    os.mkdir(path)
-
-archieve = zipfile.ZipFile(source_full_path)
-
-for to_extract in ['weights.txt', 'tract_lengths.txt', 'centres.txt']:
-    if to_extract in archieve.namelist():
-        archieve.extract(to_extract, path=path)
-rl = np.loadtxt(os.path.join(path, "centres.txt"), dtype="str", usecols=(0,))
-w = np.loadtxt(os.path.join(path, "weights.txt"))
-c = np.loadtxt(os.path.join(path, "centres.txt"), usecols=range(1,4))
-t = np.loadtxt(os.path.join(path, "tract_lengths.txt"))
-
-white_matter=connectivity.Connectivity(region_labels=rl, weights=w, centres=c, tract_lengths=t)
-white_matter.configure()
-
+white_matter = connectivity.Connectivity.from_file()
 white_matter.speed = numpy.array([4.0])
 
 
@@ -224,68 +196,27 @@ show()
 
 # The transient large amplitude oscillatory activity at the beginning of the simulation is a result of the imperfectly set initial conditions -- they are merely set by default to be random walks within the general range of state-variable values expected from the model. As the current simulation is configured with fixed point dynamics, if we were to set the initial conditions exactly to the values corresponding to that fixed point there would be no such initial transient.  
 
-# # Save time series
+# # save your simulated data for reproducibility
 
-# In[14]:
-
-
-# save times
-pd.DataFrame(tavg_time, index=None).to_csv(os.path.join(path, 'times.txt'), sep='\t', header=None, index=None)
-
-# save time series (ts)
-pd.DataFrame(TAVG[:, 0, :, 0], index=None).to_csv(os.path.join(path, 'ts.txt'), sep='\t', header=None, index=None)
+# In[20]:
 
 
-# # Save your simulated data for reproducibility
+get_ipython().system('pip install sim2bids==0.0.8')
 
-# In[3]:
-
-
-# save jupyter notebook as a PY file
-get_ipython().system('jupyter nbconvert tutorial_s1_region_simulation_bids_dinara1209.ipynb.ipynb --to=python')
-
-
-# In[4]:
-
-
-# move python code to data folder
-if not os.path.exists(os.path.join(path, 'tutorial_s1_region_simulation_bids_dinara1209.ipynb.py')):
-    shutil.copy('tutorial_s1_region_simulation_bids_dinara1209.py', os.path.join(path, 'tutorial_s1_region_simulation_bids_dinara1209.py'))
-
-
-# In[17]:
-
-
-# # unzip connectivity_76.zip folder 
-# # verify path exists
-# path = 'data'
-# if not os.path.exists(path):
-#     os.mkdir(path)
-
-# # save txt files 
-# for file in ['weights', 'centres', 'tract_lengths']:
-#     temp = white_matter.__getattribute__(file)
-#     if file == 'centres':
-#         temp = np.column_stack([white_matter.__getattribute__('region_labels'), temp])        
-#     pd.DataFrame(temp).to_csv(f'data/{file}.txt', header=None, index=None, sep='\t')
-    
-# # move python code to data folder
-# if not os.path.exists(os.path.join(path, 'tutorial_s1_region_simulation_bids.py')):
-#     shutil.copy('tutorial_s1_region_simulation_bids.py', os.path.join(path, 'tutorial_s1_region_simulation_bids.py'))
-
-
-# In[18]:
-
-
-# # gather oscillator's parameters
-# params = dict(I=oscilator.I, a=oscilator.a, alpha=oscilator.alpha, b=oscilator.b, beta=oscilator.beta, c=oscilator.c, 
-#               d=oscilator.d, e=oscilator.e, f=oscilator.f, g=oscilator.g, gamma=oscilator.gamma, tau=oscilator.tau, 
-#               model='generic2doscillator')
-
-
-# ### Start conversions
 
 # In[1]:
+
+
+import sys
+import os
+import warnings
+
+# DO NOT remove this line below, otherwise the app won't be found
+sys.path.append('..')
+warnings.filterwarnings('ignore')
+
+
+# In[2]:
 
 
 import param
@@ -296,18 +227,38 @@ import numpy as np
 import pandas as pd
 
 import sim2bids
-from sim2bids.sim2bids import MainArea
+from sim2bids.incf import MainArea
 
-import warnings
-
-warnings.filterwarnings('ignore')
 pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets', sizing_mode='stretch_width', notifications=True)
 
 
-# In[2]:
+# In[3]:
 
 
-MainArea().view().servable()
+# import zipfile
+# with zipfile.ZipFile('files/1.zip', 'r') as zip_ref:
+#     zip_ref.extractall('files')
+
+
+# In[5]:
+
+
+pn.config.comms = 'ipywidgets'
+
+
+# In[6]:
+
+
+path = 'files/1'
+
+app = MainArea()
+app.view()
+
+
+# In[13]:
+
+
+
 
 
 # In[ ]:
@@ -319,7 +270,7 @@ MainArea().view().servable()
 # In[17]:
 
 
-# save connectivity weights and tract lengths
+#save connectivity weights and tract lengths
 
 # save labels, center coordinates and times
 
@@ -338,5 +289,5 @@ MainArea().view().servable()
 # In[ ]:
 
 
-# add zipped results ready for download 
+
 
