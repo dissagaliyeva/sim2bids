@@ -5,6 +5,8 @@ file_desc = {
     'distances': 'The distances between areas.',
     'times': 'Time series of the simulated time series.',
     'ts': 'Time series of the simulated time series.',
+    'bold': 'This is the time series for subject {} with BOLD monitor.',
+    'spatial': 'This is the time series.'
 }
 
 centres = {'multi-unique': ['These are the region labels which are unique for each individual.',
