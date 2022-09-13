@@ -10,7 +10,7 @@ test_requirements = ['pytest>=3']
 
 setup(
     name='sim2bids',
-    version='0.0.23',
+    version='0.0.24',
     description="App to preprocess and convert simulation data",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",

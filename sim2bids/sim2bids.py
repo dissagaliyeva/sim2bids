@@ -27,7 +27,7 @@ class MainArea(param.Parameterized):
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
 
     # generate structure button
-    gen_struct = param.Action(lambda self: self._generate_struct(), label='Show Folder Structure')
+    gen_struct = param.Action(lambda self: self._generate_struct(), label='Show Structure')
 
     # rename files button
     rename_btn = param.Action(lambda self: self._rename(), label='Rename Files')
@@ -300,27 +300,15 @@ def get_files(path=app.OUTPUT, ftype='.json'):
     return f
 
 
-SELECT_FILES = """
-### Select file(s)
-
-This widgets lets you select multiple files without specifying the folder. There's no limit on the file numbers. However,
-note that the accepted file types are `.mat`, `.txt`, `.zip`, `.h5`. If you select other files, they will be simply ignored
-without errors.
-"""
-
-SELECT_FOLDERS = """
-### Select folder(s)
-
-This widgets lets you select multiple folders. Unfortunately, the input with current path doesn't get updated if specified.
-However, you can use the arrows to find the folders.
-"""
-
 GET_STARTED = """
 ## Welcome!
 Here you can select the folder(s) that you want to transform. Beware that we are using recursive walk to select all the
 content available in the specified folder. That means if the folder contains a sub-folder, we will transform the content
 if it falls into the accepted file formats.
-Below you will see the generated folder with content as specified at [BIDS Computational Model Specification](https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit?usp=sharing){:target="_blank"}.
-If you are happy with the results, press `Transform Files` button at the bottom of the screen. We will not start
-generation until you press the button below.
+
+You can get a preliminary look into the to-be-generated structure by clicking on **Show Structure** button. If you're 
+happy with the results, you can click on **Generate Files** button to physically save the results. After that, please 
+**make sure to give user-specific input** by clicking on **View Results** tab and selecting JSON files. You'll see a lot
+of required and recommended fields that can be updated. By default, all required fields are already provided. However,
+you have all the rights to change them. See further details in **User Guide**. 
 """
