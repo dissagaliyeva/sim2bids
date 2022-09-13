@@ -1,11 +1,1 @@
-{
-	"ModelEq": "../eq/desc-default_eq.xml", 
-	"CoordsRows": ["../coord/desc-default_labels.json", "../coord/desc-default_nodes.json"], 
-	"CoordsColumns": ["../coord/desc-default_labels.json", "../coord/desc-default_nodes.json"], 
-	"SourceCode": "../code/desc-default_code.py", 
-	"Description": "These are the parameters for the G2DOS model."
-}
-
-
-
-
+{"ModelEq": "../eq/desc-default_eq.xml", "SourceCode": "../code/desc-default_code.py", "SourceCodeVersion": 2.6, "SoftwareVersion": 2.6, "SoftwareRepository": "https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6", "SoftwareName": "TVB", "Description": "These are the parameters for the G2DOS model."}
