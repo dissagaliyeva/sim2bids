@@ -22,3 +22,40 @@ cd sim2bids
 
 python setup.py install
 ```
+
+Then, open up your notebook and import the following packages:
+
+```
+import param
+
+import io
+import panel as pn
+import numpy as np
+import pandas as pd
+
+import sim2bids
+from sim2bids.sim2bids import MainArea
+
+import warnings
+
+warnings.filterwarnings('ignore')
+pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets', sizing_mode='stretch_width', notifications=True)
+```
+
+There are two options to proceed:
+
+1. Run the app locally (yields the best user experience) by calling `pn.serve(MainArea().view())`. This will take you to 
+a localhost page where you'll see the app. 
+
+2. Run the app inline (might have small differences in layout) by calling `MainArea().view().servable()`. 
+
+### Important
+
+Since there is a huge number of descriptions, parameters, and other variables, the app gives you the right to provide additional description.
+By default, all the parameters are linked to [TheVirtualBrain]() 
+
+
+### Resources
+
+We want to ensure you have the best user experience. Therefore, on top of documentation page, we have included a presentation
+that covers the main functionality; it also includes a step-by-step image/video walk-through with different datasets. [The link is right here](https://docs.google.com/presentation/d/12sUkOP7iv3CEn1pecu3ABiBBhPIFromMwfJXmnjbebQ/edit?usp=sharing).

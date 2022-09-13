@@ -253,11 +253,11 @@ def prepare_subs(file_paths, sid):
 
                 if fname in ['weights', 'distances']:
                     if 'ses-preop' in subs[name]['path'] in subs[name]['path']:
-                        convert.NETWORK.append(f'../{sid}/ses-preop/net/{sid}_desc-{desc}_{fname}.json')
+                        convert.NETWORK.append(f'../{sid}/ses-preop/net/{sid}_desc-{app.DESC}_{fname}.json')
                     elif 'ses-postop' in subs[name]['path'] in subs[name]['path']:
-                        convert.NETWORK.append(f'../{sid}/ses-postop/net/{sid}_desc-{desc}_{fname}.json')
+                        convert.NETWORK.append(f'../{sid}/ses-postop/net/{sid}_desc-{app.DESC}_{fname}.json')
                     else:
-                        convert.NETWORK.append(f'../{sid}/net/{sid}_desc-{desc}_{fname}.json')
+                        convert.NETWORK.append(f'../{sid}/net/{sid}_desc-{app.DESC}_{fname}.json')
 
                     convert.NETWORK = list(set(convert.NETWORK))
 

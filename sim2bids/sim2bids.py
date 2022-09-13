@@ -147,11 +147,7 @@ class MainArea(param.Parameterized):
 
     @pn.depends('desc.value', watch=True)
     def _change_desc(self):
-        old, new = app.DESC, self.desc.value
-
-        if old != new:
-            app.DESC = new
-            pn.state.notifications.success(f'Changed description from `{old}` to `{new}`.')
+        app.DESC = self.desc.value
 
     def view(self):
         main = pn.Tabs(
