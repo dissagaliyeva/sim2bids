@@ -51,8 +51,23 @@ a localhost page where you'll see the app.
 
 ### Important
 
+- **Provide SoftwareVersion, SoftwareRepository, and SoftwareName** 
+
+The final conversion includes JSON sidecars for each file that is created. Some folders (*param, eq, code, ts*) require 
+additional information on the software you're using to produce simulations. 
+
+
+- **Give your project a meaningful short description**
+
+All simulations are unique, that is why it will be much easier for everyone if you give a meaningful name to your work. 
+There is an input field on the left-hand side in the `Settings` where you can supplement that information. **NOTE**: make sure
+to give the description **before** picking the folder you need to convert.  
+
+- **Provide additional information**
+
 Since there is a huge number of descriptions, parameters, and other variables, the app gives you the right to provide additional description.
-By default, all the parameters are linked to [TheVirtualBrain]() 
+After the conversion, you can click on `View Results` tab to supplement user-specific input. Make sure to click on `Update JSON`
+button to update default values. 
 
 
 ### Resources

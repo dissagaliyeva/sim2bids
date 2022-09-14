@@ -1,0 +1,1 @@
+{"NumberOfRows": 4096, "NumberOfColumns": 1, "CoordsRows": ["../coord/desc-incf_edu_case_labels.tsv", "../coord/desc-incf_edu_case_nodes.tsv"], "CoordsColumns": ["../coord/desc-incf_edu_case_labels.tsv", "../coord/desc-incf_edu_case_nodes.tsv"], "Description": "Time series of the simulated time series.", "Units": ""}
