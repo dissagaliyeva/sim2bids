@@ -81,7 +81,7 @@ There is an input field on the left-hand side in the `Settings` where you can su
 
 Example:
 
-![img_2.png](img_2.png)
+![img_2.png](static/readme/change_desc.png)
 
 
 - **Provide additional information**
@@ -93,7 +93,7 @@ Since there is a huge number of descriptions, parameters, and other variables, t
 
 Example:
 
-![img_3.png](img_3.png)
+![img_3.png](static/readme/add_input.png)
 
 
 ### Resources
