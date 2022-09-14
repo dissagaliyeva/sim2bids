@@ -291,10 +291,9 @@ def transfer_xml():
     supply_dict('eq', os.path.join(OUTPUT, 'eq', f'desc-{DESC}_eq.json'))
     supply_dict('param', os.path.join(OUTPUT, 'param', f'desc-{DESC}_param.json'))
 
-    # add json sidecar for model
-    # supply_dict('param', os.path.join(OUTPUT, 'param', f'model-{MODEL_NAME}_param.json'))
-    # delete model
+    # remove model
     path = os.path.join(OUTPUT, 'param', f'model-{MODEL_NAME}_param.xml')
+
     if os.path.exists(path):
         os.remove(path)
 
@@ -329,7 +328,6 @@ def supply_dict(ftype, path):
     elif ftype == 'param':
         file['ModelEq'] = eq
         file['Description'] = f'These are the parameters for the {MODEL_NAME} model.'
-
     elif ftype == 'eq':
         file['Description'] = f'These are the equations to simulate the time series with the {MODEL_NAME} model.'
 
