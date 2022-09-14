@@ -60,9 +60,13 @@ In case you're using [TVB (The Virtual Brain)](https://github.com/the-virtual-br
 and paste before calling `pn.serve(MainArea().view())` or `MainArea().view().servable()`:
 
 ```
+# set required fields
 sim2bids.app.app.SoftwareVersion = 2.6
 sim2bids.app.app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6'
 sim2bids.app.app.SoftwareName = 'TVB'
+
+# start the app
+pn.serve(MainArea().view())
 ```
 
 Alternatively, customize the above cells. 
@@ -71,20 +75,35 @@ Alternatively, customize the above cells.
 - **Give your project a meaningful short description**
 
 All simulations are unique, that is why it will be much easier for everyone if you give a meaningful name to your work. 
-There is an input field on the left-hand side in the `Settings` where you can supplement that information. **NOTE**: make sure
-to give the description **before** picking the folder you need to convert.  
+There is an input field on the left-hand side in the `Settings` where you can supplement that information. 
 
+**NOTE**: make sure to give the description **before** picking the folder you need to convert.  
 
+Example:
+
+![img_2.png](img_2.png)
 
 
 - **Provide additional information**
 
 Since there is a huge number of descriptions, parameters, and other variables, the app gives you the right to provide additional description.
-After the conversion, you can click on `View Results` tab to supplement user-specific input. Make sure to click on `Update JSON`
-button to update default values. 
+**After the conversion**, you can click on `View Results` and then `JSON files` tab to supplement user-specific input. 
+
+**NOTE**: Make sure to click on `Update JSON` button to update default values. 
+
+Example:
+
+![img_3.png](img_3.png)
 
 
 ### Resources
 
 We want to ensure you have the best user experience. Therefore, on top of documentation page, we have included a presentation
 that covers the main functionality; it also includes a step-by-step image/video walk-through with different datasets. [The link is right here](https://docs.google.com/presentation/d/12sUkOP7iv3CEn1pecu3ABiBBhPIFromMwfJXmnjbebQ/edit?usp=sharing).
+
+
+### Getting help
+
+The app is still under active development, if you don't see the information you're looking for, please open a new issue or [email me directly](mailto:dinarissaa@gmail.com). I'll be happy to answer your questions! :)
+
+
