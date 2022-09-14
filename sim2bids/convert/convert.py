@@ -507,8 +507,12 @@ def to_json(path, shape, desc, key, **kwargs):
         if k in out.keys():
             out[k] = params[k]
 
-    if 'Units' in out.keys():
+    if 'Units' in out.keys() and key != 'coord':
         out['Units'] = 'ms'
 
+    # point coord files to nodes/labels TSV files instead
+    coord = COORDS if key != 'coord' else [COORDS[0].replace('json', 'tsv'), COORDS[1].replace('json', 'tsv')] \
+        if COORDS is not None else COORDS
+
     with open(path, 'w') as file:
-        json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=COORDS, **kwargs), file)
+        json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coord, **kwargs), file)

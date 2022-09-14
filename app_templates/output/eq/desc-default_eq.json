@@ -1,12 +1,1 @@
-{
-  "CoordsRows": ["../coord/desc-default_labels.json", "../coord/desc-default_nodes.json"],
-  "CoordsColumns": ["../coord/desc-default_labels.json", "../coord/desc-default_nodes.json"],
-  "SourceCode": "../code/desc-default_code.py",
-  "Description": "These are the equations to simulate the time series with the G2DOS model."
-}
-
-
-
-
-
-
+{"SourceCode": "../code/desc-default_code.py", "SourceCodeVersion": 2.6, "SoftwareVersion": 2.6, "SoftwareRepository": "https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6", "SoftwareName": "TVB", "Description": "These are the equations to simulate the time series with the G2DOS model."}
