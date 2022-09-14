@@ -293,8 +293,6 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         to_tsv(nodes.replace('json', 'tsv'), content.iloc[:, 1:])
     else:
         if ftype == 'coord':
-            if sub['name'] == 'bold_times':
-                desc = temp.file_desc['bold_times'].format(sub['sid'])
             to_json(json_file.lower(), shape=content.shape, key='coord', desc=desc)
             to_tsv(tsv_file.lower(), content)
         else:

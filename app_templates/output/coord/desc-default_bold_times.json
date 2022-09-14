@@ -1,0 +1,1 @@
+{"NumberOfRows": 10, "NumberOfColumns": 1, "CoordsRows": ["../coord/desc-default_labels.tsv", "../coord/desc-default_nodes.tsv"], "CoordsColumns": ["../coord/desc-default_labels.tsv", "../coord/desc-default_nodes.tsv"], "Description": "This is the functional connectivity matrix based on BOLD time series.", "Units": ""}

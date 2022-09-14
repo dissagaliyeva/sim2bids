@@ -126,9 +126,10 @@ class MainArea(param.Parameterized):
         # whether to autofill all files
         AUTOFILL = True if self.checkbox_options[1] in self.checkbox_group.value else False
 
+        # TODO: add copy folder functionality
         # whether to not alter original input folder
-        if self.checkbox_options[2] in self.checkbox_group.value:
-            self.text_input.value = app.duplicate_folder(self.text_input.value)
+        # if self.checkbox_options[2] in self.checkbox_group.value:
+        #     self.text_input.value = app.duplicate_folder(self.text_input.value)
 
     @pn.depends('output_path.value', watch=True)
     def _store_output(self):
@@ -148,6 +149,7 @@ class MainArea(param.Parameterized):
     @pn.depends('desc.value', watch=True)
     def _change_desc(self):
         app.DESC = self.desc.value
+        pn.state.notifications.success(f'Description {app.DESC} has been saved...')
 
     def view(self):
         main = pn.Tabs(
@@ -184,8 +186,7 @@ class MainArea(param.Parameterized):
             sidebar=sidebar,
             site='INCF',
             main=main,
-            header_background='#4488c4',
-
+            header_background='#4488c4'
         )
 
 
@@ -257,7 +258,7 @@ class ViewResults(param.Parameterized):
                 json.dump(content, f)
 
             # update layout
-            je = pn.widgets.JSONEditor(value=json.load(self.file), height=350, mode='view')
+            je = pn.widgets.JSONEditor(value=json.load(open(self.file)), height=350, mode='view')
             je_widget = utils.get_settings(OrderedDict(je.value), self.select_options.value)
             self.widget[-1] = pn.Row(je, pn.Column(je_widget, pn.Param(self, parameters=['je_btn'], show_name=False,
                                                                        widgets={'je_btn': {'button_type': 'primary'}})))
