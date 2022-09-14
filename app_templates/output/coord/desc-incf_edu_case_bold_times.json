@@ -1,0 +1,1 @@
+{"NumberOfRows": 10, "NumberOfColumns": 1, "CoordsRows": ["../coord/desc-incf_edu_case_labels.tsv", "../coord/desc-incf_edu_case_nodes.tsv"], "CoordsColumns": ["../coord/desc-incf_edu_case_labels.tsv", "../coord/desc-incf_edu_case_nodes.tsv"], "Description": "This is the time series for subject sub-01 with BOLD monitor.", "Units": ""}

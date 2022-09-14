@@ -49,12 +49,23 @@ a localhost page where you'll see the app.
 
 2. Run the app inline (might have small differences in layout) by calling `MainArea().view().servable()`. 
 
-### Important
+### Important ❗
 
 - **Provide SoftwareVersion, SoftwareRepository, and SoftwareName** 
 
 The final conversion includes JSON sidecars for each file that is created. Some folders (*param, eq, code, ts*) require 
 additional information on the software you're using to produce simulations. 
+
+In case you're using [TVB (The Virtual Brain)](https://github.com/the-virtual-brain) workspaces, you can copy this snippet
+and paste before calling `pn.serve(MainArea().view())` or `MainArea().view().servable()`:
+
+```
+sim2bids.app.app.SoftwareVersion = 2.6
+sim2bids.app.app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6'
+sim2bids.app.app.SoftwareName = 'TVB'
+```
+
+Alternatively, customize the above cells. 
 
 
 - **Give your project a meaningful short description**
@@ -62,6 +73,9 @@ additional information on the software you're using to produce simulations.
 All simulations are unique, that is why it will be much easier for everyone if you give a meaningful name to your work. 
 There is an input field on the left-hand side in the `Settings` where you can supplement that information. **NOTE**: make sure
 to give the description **before** picking the folder you need to convert.  
+
+
+
 
 - **Provide additional information**
 
