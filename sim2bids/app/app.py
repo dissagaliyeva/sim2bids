@@ -84,6 +84,9 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
+    print(subs)
+    print(ALL_FILES)
+
     # only save conversions if 'save' is True
     if save and subs is not None:
         # save conversions
@@ -177,6 +180,8 @@ def save_output(subs):
                 name = 'coord'
             elif 'fc' in k_lower:
                 name = 'spatial'
+            elif 'bold_times' in k_lower:
+                name = 'coord'
             elif 'vars' in k_lower or 'stimuli' in k_lower or 'noise' in k_lower \
                     or 'spike' in k_lower or 'raster' in k_lower or 'ts' in k_lower \
                     or 'event' in k_lower or 'emp' in k_lower or 'bold' in k_lower:
@@ -399,9 +404,14 @@ def check_json():
     for file in utils.get_content(OUTPUT, os.listdir(OUTPUT)):
         if file.endswith('json'):
             f = json.load(open(file))
-            if 'CoordRows' in f.keys() and f['CoordRows'] == '':
-                f['CoordRows'] = convert.COORDS
-                f['CoordColumns'] = convert.COORDS
+            if convert.COORDS is not None and 'CoordsRows' in f.keys() and f['CoordsRows'] == '':
+                if 'coord' in file:
+                    coords = [convert.COORDS[0].replace('json', 'tsv'), convert.COORDS[1].replace('json', 'tsv')]
+                    f['CoordsRows'] = coords
+                    f['CoordsColumns'] = coords
+                else:
+                    f['CoordsRows'] = convert.COORDS
+                    f['CoordsColumns'] = convert.COORDS
 
             with open(file, 'w') as f2:
                 json.dump(f, f2)

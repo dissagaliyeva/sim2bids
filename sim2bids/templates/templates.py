@@ -6,7 +6,8 @@ file_desc = {
     'times': 'Time series of the simulated time series.',
     'ts': 'Time series of the simulated time series.',
     'bold': 'This is the time series for subject {} with BOLD monitor.',
-    'spatial': 'This is the time series.'
+    'spatial': 'This is the time series.',
+    'bold_times': 'This is the time series for subject {} with BOLD monitor.'
 }
 
 centres = {'multi-unique': ['These are the region labels which are unique for each individual.',

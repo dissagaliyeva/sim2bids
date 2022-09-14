@@ -66,6 +66,7 @@ class Files:
             # traverse multi-subject in one folder structure
             if len(self.match) > 0:
                 TO_RENAME = get_extensions(self.basename, self.match)
+
                 for k, v in get_unique_subs(self.match, self.content).items():
                     # create a new ID
                     sid = self.create_sid_sub()
@@ -89,6 +90,7 @@ class Files:
 
                     if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
                         if os.path.basename(path) == file:
+                            print('utils.get_content:', utils.get_content(path.replace(file, ''), file))
                             self.subs[sid] = prepare_subs(utils.get_content(path.replace(file, ''), file), sid)
                         else:
                             self.subs[sid] = prepare_subs(utils.get_content(path, file), sid)
@@ -184,7 +186,8 @@ def prepare_subs(file_paths, sid):
         if file_path.endswith('.h5'):
             name = name.split('_')[0] + '.h5'
         else:
-            name = name.split('_')[-1] if '_' in name else name
+            if 'bold' not in name:
+                name = name.split('_')[-1] if '_' in name else name
         desc = app.DESC
 
         # get extensions
@@ -228,6 +231,8 @@ def prepare_subs(file_paths, sid):
 
         # check if separator is missing, if so remove the file entirely
         if accepted(name):
+            print('accepted name:', name)
+
             sep = find_separator(file_path)
 
             if sep == 'remove':
@@ -244,7 +249,7 @@ def prepare_subs(file_paths, sid):
                 'ext': get_file_ext(file_path),
             }
 
-            if subs[name]['name'] in ['centres', 'centers']:
+            if subs[name]['name'] in ['centres', 'centre']:
                 app.CENTERS = True
 
             # save network path
