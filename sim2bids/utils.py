@@ -77,7 +77,7 @@ def get_settings(json_editor, selected):
         else:
             if k not in ['NumberOfRows', 'NumberOfColumns', 'CoordsRows', 'CoordsColumns']:
                 widget.append(pn.widgets.TextInput(name=f'Specify {k} (REQUIRED):'))
-                sim2bids.REQUIRED.append(k)
+                # sim2bids.REQUIRED.append(k)
 
     # iterate over recommended fields
     for k in recommend:

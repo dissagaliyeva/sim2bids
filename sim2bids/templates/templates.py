@@ -7,7 +7,7 @@ file_desc = {
     'ts': 'Time series of the simulated time series.',
     'bold': 'This is the time series for subject {} with BOLD monitor.',
     'spatial': 'This is the time series.',
-    'bold_times': 'This is the time series for subject {} with BOLD monitor.'
+    'bold_times': 'This is the functional connectivity matrix based on BOLD time series.'
 }
 
 centres = {'multi-unique': ['These are the region labels which are unique for each individual.',

@@ -90,7 +90,6 @@ class Files:
 
                     if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
                         if os.path.basename(path) == file:
-                            print('utils.get_content:', utils.get_content(path.replace(file, ''), file))
                             self.subs[sid] = prepare_subs(utils.get_content(path.replace(file, ''), file), sid)
                         else:
                             self.subs[sid] = prepare_subs(utils.get_content(path, file), sid)
@@ -231,8 +230,6 @@ def prepare_subs(file_paths, sid):
 
         # check if separator is missing, if so remove the file entirely
         if accepted(name):
-            print('accepted name:', name)
-
             sep = find_separator(file_path)
 
             if sep == 'remove':
