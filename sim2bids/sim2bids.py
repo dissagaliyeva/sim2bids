@@ -74,15 +74,9 @@ class MainArea(param.Parameterized):
             utils.reset_values()
             app.CODE = None
 
-            for _ in self.rename_files:
-                self.rename_files.pop(-1)
-
         if self.length != len(self.cross_select.value):
             utils.reset_values()
             app.CODE = None
-
-            for _ in self.rename_files:
-                self.rename_files.pop(-1)
 
         if len(self.cross_select.value) > 0:
             # Step 1: traverse files and check for problems
@@ -110,9 +104,10 @@ class MainArea(param.Parameterized):
                 self.rename_files.append(pn.Param(self, parameters=['rename_btn'],
                                                   show_name=False,
                                                   widgets={'rename_btn': {'button_type': 'primary'}}))
-        else:
-            for _ in self.rename_files:
-                self.rename_files.pop(-1)
+        # else:
+        #     for _ in self.rename_files:
+        #
+        #         self.rename_files.pop(-1)
 
         self.structure.value = self.struct
 
