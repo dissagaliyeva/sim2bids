@@ -26,17 +26,11 @@ python setup.py install
 Then, open up your notebook and import the following packages:
 
 ```
-import param
-
-import io
-import panel as pn
-import numpy as np
-import pandas as pd
-
 import sim2bids
 from sim2bids.sim2bids import MainArea
 
 import warnings
+import panel as pn
 
 warnings.filterwarnings('ignore')
 pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets', sizing_mode='stretch_width', notifications=True)
