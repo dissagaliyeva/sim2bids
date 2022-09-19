@@ -49,8 +49,6 @@ class Files:
         return False
 
     def traverse_files(self):
-        global TO_RENAME
-
         # if the whole folder is passed, open that folder
         path, files, changed = self.path, self.files, False
 

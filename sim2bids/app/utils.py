@@ -12,7 +12,6 @@ import pylems_py2xml
 
 from sim2bids.app import app
 from sim2bids.generate import subjects as subj, zip_traversal as z
-from sim2bids import sim2bids
 
 
 def recursive_walk(path: str, basename: bool = False) -> list:
@@ -105,7 +104,7 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
         return recursive_walk(os.path.join(path, files))
 
     for file in files:
-        if os.path.isdir(os.path.join(path, file)) and file.startswith('.'):
+        if os.path.isdir(os.path.join(path, file)) and file.startswith('.ipy'):
             shutil.rmtree(os.path.join(path, file))
 
     # preprocess folder and remove all folders/files starting with '.'
@@ -123,12 +122,12 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
         # combine path
         file_path = os.path.join(path, file)
 
-        # check whether the selection is a directory
+        # # check whether the selection is a directory
         if os.path.isdir(file_path):
-            # disregard folders that start with '.'
-            if file_path.startswith('.'):
-                shutil.rmtree(file_path)
-                continue
+        #     # disregard folders that start with '.'
+        #     if file_path.startswith('.'):
+        #         shutil.rmtree(file_path)
+        #         continue
 
             # if true, traverse its content and append results
             contents += recursive_walk(file_path, basename)
@@ -153,8 +152,6 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
         # if code is found, save its location
         elif ext == 'py':
             app.CODE = os.path.join(path, file)
-        else:
-            sim2bids.TO_RENAME.append(file_path)
 
     # return contents
     return contents

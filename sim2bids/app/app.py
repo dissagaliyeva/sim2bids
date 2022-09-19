@@ -84,7 +84,7 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
-    print(subjects.TO_RENAME)
+    # print(subjects.TO_RENAME)
 
     # only save conversions if 'save' is True
     if save and subs is not None:
