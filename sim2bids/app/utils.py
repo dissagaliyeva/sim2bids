@@ -13,6 +13,8 @@ import pylems_py2xml
 from sim2bids.app import app
 from sim2bids.generate import subjects as subj, zip_traversal as z
 
+TO_RENAME = []
+
 
 def recursive_walk(path: str, basename: bool = False) -> list:
     """
@@ -29,6 +31,7 @@ def recursive_walk(path: str, basename: bool = False) -> list:
     Returns
     -------
     """
+    global TO_RENAME
 
     # create empty list to store paths
     content = []
@@ -65,11 +68,17 @@ def recursive_walk(path: str, basename: bool = False) -> list:
 
             # save file name
             if basename:
-                content.append(file)
+                if file.split('.')[0] in app.ACCEPTED or file.endswith('.py'):
+                    content.append(file)
+                else:
+                    TO_RENAME.append(file)
 
             # save absolute path
             else:
-                content.append(os.path.join(root, file))
+                if file.split('.')[0] in app.ACCEPTED or file.endswith('.py'):
+                    content.append(os.path.join(root, file))
+                else:
+                    TO_RENAME.append(os.path.join(root, file))
 
     # return contents
     return content
@@ -97,6 +106,7 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
     -------
 
     """
+    global TO_RENAME
 
     # if provided path contains only one sub-folder, and it's needed to traverse that,
     # return the whole content of the specified location.
@@ -124,11 +134,6 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 
         # # check whether the selection is a directory
         if os.path.isdir(file_path):
-        #     # disregard folders that start with '.'
-        #     if file_path.startswith('.'):
-        #         shutil.rmtree(file_path)
-        #         continue
-
             # if true, traverse its content and append results
             contents += recursive_walk(file_path, basename)
 
@@ -146,9 +151,15 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 
             if basename:
                 # rename `tract_lengths` to `distances`
-                contents.append(os.path.basename(file))
+                if file.split('.')[0] in app.ACCEPTED:
+                    contents.append(os.path.basename(file))
+                else:
+                    TO_RENAME.append(os.path.basename(file))
             else:
-                contents.append(file)
+                if file.split('.')[0] in app.ACCEPTED:
+                    contents.append(file)
+                else:
+                    TO_RENAME.append(file)
         # if code is found, save its location
         elif ext == 'py':
             app.CODE = os.path.join(path, file)
