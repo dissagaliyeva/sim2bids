@@ -14,7 +14,7 @@ import pylems_py2xml as py2xml
 import sim2bids.utils
 from sim2bids.generate import structure, subjects
 from sim2bids.preprocess import preprocess as prep
-from sim2bids.convert import convert
+from sim2bids.convert import convert, mat
 from sim2bids.templates import templates as temp
 from sim2bids.app import utils
 
@@ -188,6 +188,8 @@ def save_output(subs):
             elif k_lower.endswith('.h5'):
                 convert.save_h5(sub[k], folders, ses=None)
                 continue
+            elif k_lower.endswith('.mat'):
+                mat.save_mat(sub[k], folders, ses)
             elif k_lower.endswith('txt') or k_lower.endswith('csv') or k_lower.endswith('dat'):
                 name = 'coord'
 
