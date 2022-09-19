@@ -47,6 +47,7 @@ def validate(unique_files, all_files, paths):
     if len(to_rename) == len(RENAMED):
         pn.state.notifications.success('Renamed all files!')
 
+
 def verify_weights(name):
     ext = get_ext(name)
 
