@@ -26,12 +26,12 @@ def validate(unique_files, all_files, paths):
                 if verify_weights(name):
                     rename_files(name, value, paths)
             elif value == 'weights & nodes':
-                result = verify_weights_nodes(name, all_files)
+                result = verify_weights_nodes(name, paths)
 
                 if isinstance(result, bool):
                     pass
                 elif isinstance(result, list):
-                    extract_files(name, result[1], result[-1], all_files)
+                    extract_files(name, result[1], result[-1], paths)
 
             # if the selection's value is "skip", remove the file from input folder
             elif value == 'skip':
@@ -43,6 +43,7 @@ def validate(unique_files, all_files, paths):
                 if ext in ['csv', 'dat', 'txt']:
                     rename_files(name, 'ts', paths)
 
+    # let users know that files were successfully renamed
     if len(to_rename) == len(RENAMED):
         pn.state.notifications.success('Renamed all files!')
 

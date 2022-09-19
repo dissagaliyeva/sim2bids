@@ -68,26 +68,36 @@ class MainArea(param.Parameterized):
     @pn.depends('cross_select.value', watch=True)
     def _generate_path(self):
         self.structure.value = ''
+        selected = self.cross_select.value
 
-        if len(self.cross_select.value) == 0 or self.length != len(self.cross_select.value):
+        if len(selected) == 0:
             utils.reset_values()
             app.CODE = None
+            self.to_rename = []
+            self.to_rename_path = []
+            self.structure.value = []
+            self.rename_files = pn.WidgetBox()
 
-        if len(self.cross_select.value) > 0:
+        if len(selected) > 0:
             # check files for preprocessing step
             path = self.text_input.value
 
-            self.to_rename = app_utils.get_content(path, self.cross_select.value, basename=True)
-            self.to_rename_path = app_utils.get_content(path, self.cross_select.value)
+            app_utils.get_content(path, selected, basename=True)
+            self.to_rename = app_utils.TO_RENAME
+
+            # reset TO_RENAME
+            app_utils.TO_RENAME = []
+            app_utils.get_content(path, selected)
+            self.to_rename_path = app_utils.TO_RENAME
 
             if len(self.to_rename) > len(self.rename_files) + 1:
                 self.rename_files += [*utils.append_widgets(self.to_rename)]
                 self.rename_files.append(pn.Param(self, parameters=['rename_btn'], show_name=False,
                                                   widgets={'rename_btn': {'button_type': 'primary'}}))
             else:
-                [self.rename_files.pop(-1) for _ in range(len(self.rename_files) - 1)]
+                self.rename_files = pn.WidgetBox()
 
-            self.length = len(self.cross_select.value)
+            self.length = len(selected)
 
     def _generate_files(self, event=None):
         _ = app.main(path=self.text_input.value, files=self.cross_select.value,
@@ -99,18 +109,6 @@ class MainArea(param.Parameterized):
         self.subjects, self.struct = app.main(path=self.text_input.value,
                                               files=self.cross_select.value,
                                               save=False, layout=True)
-
-        # if subj.TO_RENAME is not None:
-        #     if len(subj.TO_RENAME) > len(self.rename_files):
-        #         self.rename_files += [*utils.append_widgets(subj.TO_RENAME)]
-        #         self.rename_files.append(pn.Param(self, parameters=['rename_btn'],
-        #                                           show_name=False,
-        #                                           widgets={'rename_btn': {'button_type': 'primary'}}))
-        # else:
-        #     for _ in self.rename_files:
-        #
-        #         self.rename_files.pop(-1)
-
         self.structure.value = self.struct
 
     @pn.depends('checkbox_group.value', watch=True)
