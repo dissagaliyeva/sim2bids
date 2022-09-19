@@ -9,14 +9,20 @@ import scipy
 import sim2bids.generate.subjects as subj
 from sim2bids.app import app
 
+RENAMED = []
+
 
 def validate(unique_files, all_files, paths):
+    to_rename = []
+
     for idx, file in enumerate(unique_files):
         if type(file) == pn.widgets.select.Select:
             name, value = file.name.replace('Specify ', ''), file.value
             ext = name.split('.')[-1]
 
             if value in ['weights', 'distances', *app.ACCEPTED[3:]]:
+                to_rename.append(value)
+
                 if verify_weights(name):
                     rename_files(name, value, paths)
             elif value == 'weights & nodes':
@@ -37,6 +43,8 @@ def validate(unique_files, all_files, paths):
                 if ext in ['csv', 'dat', 'txt']:
                     rename_files(name, 'ts', paths)
 
+    if len(to_rename) == len(RENAMED):
+        pn.state.notifications.success('Renamed all files!')
 
 def verify_weights(name):
     ext = get_ext(name)
@@ -91,12 +99,14 @@ def get_nodes(arr: list) -> list:
 
 
 def rename_files(name, new_ext, paths):
+    global RENAMED
     new_ext = new_ext.replace('.', '').lower()
 
     for file in paths:
         if file.endswith(name):
             if file.endswith('txt') or file.endswith('csv') or file.endswith('dat'):
                 os.rename(file, file.replace(name, new_ext + '.txt'))
+                RENAMED.append(file)
             elif file.endswith('mat'):
                 pass
 
