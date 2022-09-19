@@ -8,7 +8,7 @@ import param
 
 import sim2bids.generate.subjects as subj
 from sim2bids import utils
-from sim2bids.app import app
+from sim2bids.app import app, utils as app_utils
 from sim2bids.templates import user_guide as ug
 from sim2bids.validate import validate
 
@@ -16,11 +16,8 @@ JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', '
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
 UNITS = ['s', 'm', 'ms', 'degrees', 'radians']
 OPTIONS = ['App 101', 'Preprocess data', 'Supported files', 'Functionality', 'BEP034']
-
 REQUIRED = None
-
 AUTOFILL = True
-TO_RENAME = []
 
 
 class MainArea(param.Parameterized):
@@ -54,6 +51,7 @@ class MainArea(param.Parameterized):
         self.subjects = None
         self.length = 0
         self.struct = ''
+        self.to_rename = []
 
     @pn.depends('text_input.value', watch=True)
     def _select_path(self):
@@ -71,25 +69,23 @@ class MainArea(param.Parameterized):
     def _generate_path(self):
         self.structure.value = ''
 
-        if len(self.cross_select.value) == 0:
-            utils.reset_values()
-            app.CODE = None
-
-        if self.length != len(self.cross_select.value):
+        if len(self.cross_select.value) == 0 or self.length != len(self.cross_select.value):
             utils.reset_values()
             app.CODE = None
 
         if len(self.cross_select.value) > 0:
             # check files for preprocessing step
+            path = self.text_input.value
 
+            self.to_rename = app_utils.get_content(path, self.cross_select.value, basename=True)
+            self.to_rename_path = app_utils.get_content(path, self.cross_select.value)
 
-
-
-            # Step 1: traverse files and check for problems
-            # appert.check_input(path=self.text_input.value, files=self.cross_select.value)
-            # self.subjects, self.struct = app.main(path=self.text_input.value,
-            #                                       files=self.cross_select.value,
-            #                                       save=False, layout=False)
+            if len(self.to_rename) > len(self.rename_files) + 1:
+                self.rename_files += [*utils.append_widgets(self.to_rename)]
+                self.rename_files.append(pn.Param(self, parameters=['rename_btn'], show_name=False,
+                                                  widgets={'rename_btn': {'button_type': 'primary'}}))
+            else:
+                [self.rename_files.pop(-1) for _ in range(len(self.rename_files) - 1)]
 
             self.length = len(self.cross_select.value)
 
@@ -145,7 +141,8 @@ class MainArea(param.Parameterized):
             app.OUTPUT = output
 
     def _rename(self, event=None):
-        validate.validate(self.rename_files, app.ALL_FILES)
+
+        validate.validate(self.rename_files, self.to_rename, self.to_rename_path)
 
     @pn.depends('desc.value', watch=True)
     def _change_desc(self):

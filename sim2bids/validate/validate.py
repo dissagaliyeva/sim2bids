@@ -10,15 +10,15 @@ import sim2bids.generate.subjects as subj
 from sim2bids.app import app
 
 
-def validate(unique_files, all_files):
+def validate(unique_files, all_files, paths):
     for idx, file in enumerate(unique_files):
         if type(file) == pn.widgets.select.Select:
             name, value = file.name.replace('Specify ', ''), file.value
             ext = name.split('.')[-1]
 
-            if value == 'weights':
+            if value in ['weights', 'distances', *app.ACCEPTED[3:]]:
                 if verify_weights(name):
-                    rename_files(name, 'weights', all_files)
+                    rename_files(name, value, paths)
             elif value == 'weights & nodes':
                 result = verify_weights_nodes(name, all_files)
 
@@ -28,14 +28,14 @@ def validate(unique_files, all_files):
                     extract_files(name, result[1], result[-1], all_files)
 
             # if the selection's value is "skip", remove the file from input folder
-            # elif value == 'skip':
-                # remove_files(name, all_files)
+            elif value == 'skip':
+                remove_files(name, paths)
             elif value == 'map':
                 if ext in ['csv', 'dat', 'txt']:
-                    rename_files(name, 'map', all_files)
+                    rename_files(name, 'map', paths)
             elif value == 'ts':
                 if ext in ['csv', 'dat', 'txt']:
-                    rename_files(name, 'ts', all_files)
+                    rename_files(name, 'ts', paths)
 
 
 def verify_weights(name):
@@ -90,10 +90,10 @@ def get_nodes(arr: list) -> list:
     return all_nodes
 
 
-def rename_files(name, new_ext, all_files):
+def rename_files(name, new_ext, paths):
     new_ext = new_ext.replace('.', '').lower()
 
-    for file in all_files:
+    for file in paths:
         if file.endswith(name):
             if file.endswith('txt') or file.endswith('csv') or file.endswith('dat'):
                 os.rename(file, file.replace(name, new_ext + '.txt'))
