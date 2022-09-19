@@ -20,6 +20,7 @@ OPTIONS = ['App 101', 'Preprocess data', 'Supported files', 'Functionality', 'BE
 REQUIRED = None
 
 AUTOFILL = True
+TO_RENAME = []
 
 
 class MainArea(param.Parameterized):
@@ -79,18 +80,23 @@ class MainArea(param.Parameterized):
             app.CODE = None
 
         if len(self.cross_select.value) > 0:
+            # check files for preprocessing step
+
+
+
+
             # Step 1: traverse files and check for problems
             # appert.check_input(path=self.text_input.value, files=self.cross_select.value)
-            self.subjects, self.struct = app.main(path=self.text_input.value,
-                                                  files=self.cross_select.value,
-                                                  save=False, layout=False)
+            # self.subjects, self.struct = app.main(path=self.text_input.value,
+            #                                       files=self.cross_select.value,
+            #                                       save=False, layout=False)
 
             self.length = len(self.cross_select.value)
 
     def _generate_files(self, event=None):
         _ = app.main(path=self.text_input.value, files=self.cross_select.value,
                      subs=self.subjects, save=True, layout=True)
-        subj.TO_RENAME = None
+        # subj.TO_RENAME = None
         app.ALL_FILES = None
 
     def _generate_struct(self, event=None):
@@ -98,12 +104,12 @@ class MainArea(param.Parameterized):
                                               files=self.cross_select.value,
                                               save=False, layout=True)
 
-        if subj.TO_RENAME is not None:
-            if len(subj.TO_RENAME) > len(self.rename_files):
-                self.rename_files += [*utils.append_widgets(subj.TO_RENAME)]
-                self.rename_files.append(pn.Param(self, parameters=['rename_btn'],
-                                                  show_name=False,
-                                                  widgets={'rename_btn': {'button_type': 'primary'}}))
+        # if subj.TO_RENAME is not None:
+        #     if len(subj.TO_RENAME) > len(self.rename_files):
+        #         self.rename_files += [*utils.append_widgets(subj.TO_RENAME)]
+        #         self.rename_files.append(pn.Param(self, parameters=['rename_btn'],
+        #                                           show_name=False,
+        #                                           widgets={'rename_btn': {'button_type': 'primary'}}))
         # else:
         #     for _ in self.rename_files:
         #

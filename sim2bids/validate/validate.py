@@ -7,6 +7,7 @@ import mat73
 import scipy
 
 import sim2bids.generate.subjects as subj
+from sim2bids.app import app
 
 
 def validate(unique_files, all_files):
@@ -27,8 +28,8 @@ def validate(unique_files, all_files):
                     extract_files(name, result[1], result[-1], all_files)
 
             # if the selection's value is "skip", remove the file from input folder
-            elif value == 'skip':
-                remove_files(name, all_files)
+            # elif value == 'skip':
+                # remove_files(name, all_files)
             elif value == 'map':
                 if ext in ['csv', 'dat', 'txt']:
                     rename_files(name, 'map', all_files)
@@ -136,3 +137,25 @@ def remove_files(name, all_files):
         if file.endswith(name):
             os.remove(file)
 
+def get_extensions(files, ids=None):
+    to_rename = []
+
+    if ids is not None:
+        files = [x for x in list(set([remove_id(x, ids) for x in files])) if x is not None]
+
+    for file in files:
+        found = False
+        for acc in app.ACCEPTED:
+            if file.lower().startswith(acc.lower()):
+                found = True
+
+        if not found:
+            to_rename.append(file)
+
+    return list(set(to_rename))
+
+
+def remove_id(file, ids):
+    for id_ in ids:
+        if file.startswith(id_):
+            return file.replace(id_, '').strip(',.\\/_;!?-')

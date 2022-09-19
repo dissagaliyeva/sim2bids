@@ -10,8 +10,6 @@ import sim2bids.preprocess.preprocess as prep
 from sim2bids.convert import convert
 from sim2bids.app import utils
 
-TO_RENAME = None
-
 
 class Files:
     def __init__(self, path, files):
@@ -65,15 +63,11 @@ class Files:
         if app.MULTI_INPUT:
             # traverse multi-subject in one folder structure
             if len(self.match) > 0:
-                TO_RENAME = get_extensions(self.basename, self.match)
-
                 for k, v in get_unique_subs(self.match, self.content).items():
                     # create a new ID
                     sid = self.create_sid_sub()
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
             else:
-                TO_RENAME = get_extensions(self.basename)
-
                 for file in files:
                     sid = self.create_sid_sub()
 
@@ -95,7 +89,6 @@ class Files:
                             self.subs[sid] = prepare_subs(utils.get_content(path, file), sid)
 
         else:
-            TO_RENAME = get_extensions(self.basename)
             # check if there are no folders inside
             sid = self.create_sid_sub()
             self.save_sessions('ses-preop', files, sid, os.path.join(path, 'ses-preop'))
@@ -150,30 +143,6 @@ def get_unique_subs(match, contents):
         subs[match[idx]] = [x for x in contents if match[idx] in x]
 
     return subs
-
-
-def get_extensions(files, ids=None):
-    to_rename = []
-
-    if ids is not None:
-        files = [x for x in list(set([remove_id(x, ids) for x in files])) if x is not None]
-
-    for file in files:
-        found = False
-        for acc in app.ACCEPTED:
-            if file.lower().startswith(acc.lower()):
-                found = True
-
-        if not found:
-            to_rename.append(file)
-
-    return list(set(to_rename))
-
-
-def remove_id(file, ids):
-    for id_ in ids:
-        if file.startswith(id_):
-            return file.replace(id_, '').strip(',.\\/_;!?-')
 
 
 def prepare_subs(file_paths, sid):

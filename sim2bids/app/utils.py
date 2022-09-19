@@ -12,6 +12,7 @@ import pylems_py2xml
 
 from sim2bids.app import app
 from sim2bids.generate import subjects as subj, zip_traversal as z
+from sim2bids import sim2bids
 
 
 def recursive_walk(path: str, basename: bool = False) -> list:
@@ -142,11 +143,18 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 
         # check if it's among the accepted extensions
         if ext in app.ACCEPTED_EXT:
-            # rename `tract_lengths` to `distances`
-            contents.append(rename_tract_lengths(file_path))
+            file = rename_tract_lengths(file_path)
+
+            if basename:
+                # rename `tract_lengths` to `distances`
+                contents.append(os.path.basename(file))
+            else:
+                contents.append(file)
         # if code is found, save its location
         elif ext == 'py':
             app.CODE = os.path.join(path, file)
+        else:
+            sim2bids.TO_RENAME.append(file_path)
 
     # return contents
     return contents
