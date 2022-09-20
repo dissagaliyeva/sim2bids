@@ -12,7 +12,7 @@ from sim2bids.app import app
 RENAMED = []
 
 
-def validate(unique_files, all_files, paths):
+def validate(unique_files, paths):
     to_rename = []
 
     for idx, file in enumerate(unique_files):
