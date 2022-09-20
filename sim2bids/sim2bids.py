@@ -81,14 +81,8 @@ class MainArea(param.Parameterized):
         if len(selected) > 0:
             # check files for preprocessing step
             path = self.text_input.value
-
-            app_utils.get_content(path, selected, basename=True)
-            self.to_rename = app_utils.TO_RENAME
-
-            # reset TO_RENAME
-            app_utils.TO_RENAME = []
-            app_utils.get_content(path, selected)
-            self.to_rename_path = app_utils.TO_RENAME
+            self.to_rename = validate.filter(app_utils.get_content(path, selected, basename=True))
+            self.to_rename_path = validate.filter(app_utils.get_content(path, selected), self.to_rename)
 
             if len(self.to_rename) > len(self.rename_files) + 1:
                 self.rename_files += [*utils.append_widgets(self.to_rename)]
@@ -140,7 +134,7 @@ class MainArea(param.Parameterized):
 
     def _rename(self, event=None):
 
-        validate.validate(self.rename_files, self.to_rename, self.to_rename_path)
+        validate.validate(self.rename_files, self.to_rename_path)
 
     @pn.depends('desc.value', watch=True)
     def _change_desc(self):
