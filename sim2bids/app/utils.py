@@ -73,17 +73,19 @@ def recursive_walk(path: str, basename: bool = False) -> list:
 
             # save file name
             if basename:
-                if file.split('.')[0] in app.ACCEPTED or file.endswith('.py'):
-                    content.append(file)
-                else:
-                    TO_RENAME.append(file)
+                content.append(file)
+                # if file.split('.')[0] in app.ACCEPTED or file.endswith('.py'):
+                #     content.append(file)
+                # else:
+                #     TO_RENAME.append(file)
 
             # save absolute path
             else:
-                if file.split('.')[0] in app.ACCEPTED or file.endswith('.py'):
-                    content.append(os.path.join(root, file))
-                else:
-                    TO_RENAME.append(os.path.join(root, file))
+                content.append(os.path.join(root, file))
+                # if file.split('.')[0] in app.ACCEPTED or file.endswith('.py'):
+                #     content.append(os.path.join(root, file))
+                # else:
+                #     TO_RENAME.append(os.path.join(root, file))
 
     # return contents
     return content
@@ -160,15 +162,17 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 
             if basename:
                 # rename `tract_lengths` to `distances`
-                if subj.accepted(file):
-                    contents.append(os.path.basename(file))
-                else:
-                    TO_RENAME.append(os.path.basename(file))
+                contents.append(os.path.basename(file))
+                # if subj.accepted(file):
+                #     contents.append(os.path.basename(file))
+                # else:
+                #     TO_RENAME.append(os.path.basename(file))
             else:
-                if subj.accepted(file):
-                    contents.append(file)
-                else:
-                    TO_RENAME.append(file)
+                contents.append(file)
+                # if subj.accepted(file):
+                #     contents.append(file)
+                # else:
+                #     TO_RENAME.append(file)
         # if code is found, save its location
         elif ext == 'py':
             app.CODE = os.path.join(path, file)

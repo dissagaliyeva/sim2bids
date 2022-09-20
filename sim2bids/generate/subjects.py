@@ -26,6 +26,8 @@ class Files:
         # get all files' unique names
         self.basename = set(utils.get_content(path, files, basename=True))
 
+        print(self.basename)
+
         # check for multi-subject in one folder
         self.match = find_matches(self.basename)
 
@@ -60,6 +62,8 @@ class Files:
         if app.MULTI_INPUT:
             # traverse multi-subject in one folder structure
             if len(self.match) > 0:
+                print('match found')
+                print(self.match)
                 for k, v in get_unique_subs(self.match, self.content).items():
                     # create a new ID
                     sid = self.create_sid_sub()
@@ -92,10 +96,8 @@ class Files:
             self.save_sessions('ses-postop', files, sid, os.path.join(path, 'ses-postop'))
 
             if not self.ses_found:
-                print('ses not found')
                 self.create_sid_sub(sid)
                 self.subs[sid] = prepare_subs(utils.get_content(path, files), sid)
-                print('all files:', app.ALL_FILES)
 
     def save_sessions(self, ses, files, sid, path):
         if ses in files:
@@ -129,6 +131,7 @@ def find_matches(paths):
 
     for path in paths:
         match = re.findall('^[A-Za-z]{2,3}_[0-9]{2,}', path)
+        print('match:', match)
         if len(match) > 0 and not path.endswith('.h5'):
             unique_ids.append(match[0])
 
