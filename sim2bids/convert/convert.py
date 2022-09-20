@@ -72,7 +72,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     ----------
     sub (dict):
         Dictionary containing information of one file only. For example,
-        {'name': 'centres', 'fname': 'centres.txt', 'sid': 'sub-01', 'desc': 'default',
+        {'name': 'centres', 'fname': 'centres.txt', 'sid': '1', 'desc': 'default',
         'sep': '\t', 'path': PATH_TO_FILE, 'ext': 'txt'}
     folders (list):
         List of folders corresponding to whether input files have single- or
@@ -224,7 +224,7 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
     ----------
     sub (dict):
         Dictionary containing information of one file only. For example,
-        {'name': 'centres', 'fname': 'centres.txt', 'sid': 'sub-01', 'desc': 'default',
+        {'name': 'centres', 'fname': 'centres.txt', 'sid': '1', 'desc': 'default',
         'sep': '\t', 'path': PATH_TO_FILE, 'ext': 'txt'}
     folder (str):
         Folder where to store output conversions for the specific file. For example,
