@@ -12,6 +12,8 @@ import pylems_py2xml
 
 from sim2bids.app import app
 from sim2bids.generate import subjects as subj, zip_traversal as z
+from sim2bids.convert import mat
+from sim2bids.preprocess import preprocess
 
 TO_RENAME = []
 
@@ -51,6 +53,9 @@ def recursive_walk(path: str, basename: bool = False) -> list:
 
             if file.endswith('.h5'):
                 content += extract_h5(os.path.join(root, file))
+
+            if file.endswith('.mat'):
+                content += extract_mat(os.path.join(root, file), root)
 
             # if code is found, save its location
             if file.endswith('.py'):
@@ -145,18 +150,22 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
             extract_h5(file_path)
             continue
 
+        if file.endswith('.mat'):
+            contents += extract_mat(os.path.join(path, file), path)
+            continue
+
         # check if it's among the accepted extensions
         if ext in app.ACCEPTED_EXT:
             file = rename_tract_lengths(file_path)
 
             if basename:
                 # rename `tract_lengths` to `distances`
-                if file.split('.')[0] in app.ACCEPTED:
+                if subj.accepted(file):
                     contents.append(os.path.basename(file))
                 else:
                     TO_RENAME.append(os.path.basename(file))
             else:
-                if file.split('.')[0] in app.ACCEPTED:
+                if subj.accepted(file):
                     contents.append(file)
                 else:
                     TO_RENAME.append(file)
@@ -218,6 +227,11 @@ def extract_h5(path) -> list:
                     app.H5_CONTENT[k] = [file[k][:][0]]
 
     return contents
+
+
+def extract_mat(path, root) -> list:
+    mat.save_mat({'path': path, 'sid': preprocess.create_uuid()})
+    return os.listdir(root)
 
 
 def get_model():

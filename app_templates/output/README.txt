@@ -1,1 +1,0 @@
-Simulation output for G2DOS model.

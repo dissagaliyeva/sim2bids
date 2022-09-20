@@ -84,7 +84,8 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
-    # print(subjects.TO_RENAME)
+    prep.reset_index()
+    print(subs)
 
     # only save conversions if 'save' is True
     if save and subs is not None:
@@ -170,6 +171,7 @@ def save_output(subs):
             # create folders according to session and subject count types
             folders = create_sub_struct(OUTPUT, v, ses_name=ses)
             k_lower = k.lower()
+            print(k_lower)
 
             if 'weight' in k_lower or 'distance' in k_lower:
                 name = 'wd'
@@ -189,7 +191,7 @@ def save_output(subs):
                 convert.save_h5(sub[k], folders, ses=None)
                 continue
             elif k_lower.endswith('.mat'):
-                mat.save_mat(sub[k], folders, ses)
+                mat.save_mat(sub[k])
             elif k_lower.endswith('txt') or k_lower.endswith('csv') or k_lower.endswith('dat'):
                 name = 'coord'
 

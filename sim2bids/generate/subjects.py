@@ -52,8 +52,7 @@ class Files:
         # if the whole folder is passed, open that folder
         path, files, changed = self.path, self.files, False
 
-        if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop',
-                                                                                                'ses-postop']:
+        if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop', 'ses-postop']:
             path = os.path.join(path, files[0])
             files = os.listdir(path)
 
@@ -93,8 +92,10 @@ class Files:
             self.save_sessions('ses-postop', files, sid, os.path.join(path, 'ses-postop'))
 
             if not self.ses_found:
+                print('ses not found')
                 self.create_sid_sub(sid)
                 self.subs[sid] = prepare_subs(utils.get_content(path, files), sid)
+                print('all files:', app.ALL_FILES)
 
     def save_sessions(self, ses, files, sid, path):
         if ses in files:
@@ -237,6 +238,7 @@ def accepted(name):
     for accept in app.ACCEPTED:
         if accept in name:
             return True
+
     return False
 
 

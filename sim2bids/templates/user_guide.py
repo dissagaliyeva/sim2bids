@@ -42,7 +42,7 @@ There are several settings on the left-hand side that you might consider crucial
     Here you can give the description to your files that will distinguish each simulation; it will be used in all of
     the files! For example, if you leave the description as "default", the files are going to look like this:
     <pre><code>
-    |__ sub-01/
+    |__ 1/
         |__ coord/
             |__ sub-01_desc-default_areas.json
             |__ sub-01_desc-default_areas.tsv
