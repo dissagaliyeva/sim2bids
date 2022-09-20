@@ -1,6 +1,7 @@
 import os
 import csv
 import re
+from pathlib import Path
 
 import pandas as pd
 
@@ -25,8 +26,6 @@ class Files:
 
         # get all files' unique names
         self.basename = set(utils.get_content(path, files, basename=True))
-
-        print(self.basename)
 
         # check for multi-subject in one folder
         self.match = find_matches(self.basename)
@@ -62,8 +61,6 @@ class Files:
         if app.MULTI_INPUT:
             # traverse multi-subject in one folder structure
             if len(self.match) > 0:
-                print('match found')
-                print(self.match)
                 for k, v in get_unique_subs(self.match, self.content).items():
                     # create a new ID
                     sid = self.create_sid_sub()
@@ -131,7 +128,6 @@ def find_matches(paths):
 
     for path in paths:
         match = re.findall('^[A-Za-z]{2,3}_[0-9]{2,}', path)
-        print('match:', match)
         if len(match) > 0 and not path.endswith('.h5'):
             unique_ids.append(match[0])
 
@@ -151,6 +147,7 @@ def prepare_subs(file_paths, sid):
     subs = {}
 
     for file_path in file_paths:
+        print(file_path)
         name = get_filename(file_path)
 
         if file_path.endswith('.h5'):
@@ -170,11 +167,12 @@ def prepare_subs(file_paths, sid):
             # instantiate a new path
             new_path = file_path.replace(ext, 'txt')
 
-            # replace the existing path with the new path
-            os.replace(file_path, new_path)
+            if os.path.exists(file_path):
+                p = Path(file_path)
+                p.rename(p.with_suffix('.txt'))
 
-            # set the new path
-            file_path = new_path
+                # set the new path
+                file_path = new_path
 
         # rename tract_lengths to distances
         if name == 'tract_lengths.txt':
@@ -240,7 +238,10 @@ def prepare_subs(file_paths, sid):
 def accepted(name):
     for accept in app.ACCEPTED:
         if accept in name:
-            return True
+            if accept == 'ts' and len(name) == 2:
+                return True
+            elif accept != 'ts':
+                return True
 
     return False
 
@@ -264,9 +265,12 @@ def find_separator(path):
         return
 
     try:
-        file = pd.read_csv(path, index_col=None, header=None, sep='\s')
+        file = pd.read_csv(path, index_col=None, header=None, sep=' ')
     except pd.errors.EmptyDataError:
         return 'remove'
+    except pd.errors.ParserError:
+        print(path)
+
 
     # if cortical.txt, hemisphere.txt, or areas.txt are present, return '\n' delimiter
     if path.endswith('hemisphere.txt') or path.endswith('cortical.txt') or path.endswith('areas.txt') \

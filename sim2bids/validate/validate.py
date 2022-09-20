@@ -12,6 +12,31 @@ from sim2bids.app import app
 RENAMED = []
 
 
+def filter(contents, files=None):
+    if files is None:
+        files = []
+
+        for content in contents:
+            if not subj.accepted(content):
+                match = subj.find_matches([content])
+                if len(match) > 0:
+                    files.append(content.replace(match[0], '').replace('_', ''))
+                else:
+                    files.append(content)
+
+        return list(set(files))
+
+    # else get paths to files
+    paths = []
+
+    for content in contents:
+        for file in files:
+            if file in content:
+                paths.append(content)
+
+    return paths
+
+
 def validate(unique_files, paths):
     to_rename = []
 

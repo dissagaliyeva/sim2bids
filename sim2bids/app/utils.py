@@ -15,8 +15,6 @@ from sim2bids.generate import subjects as subj, zip_traversal as z
 from sim2bids.convert import mat
 from sim2bids.preprocess import preprocess
 
-TO_RENAME = []
-
 
 def recursive_walk(path: str, basename: bool = False) -> list:
     """
@@ -33,8 +31,6 @@ def recursive_walk(path: str, basename: bool = False) -> list:
     Returns
     -------
     """
-    global TO_RENAME
-
     # create empty list to store paths
     content = []
 
@@ -113,8 +109,6 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
     -------
 
     """
-    global TO_RENAME
-
     # if provided path contains only one sub-folder, and it's needed to traverse that,
     # return the whole content of the specified location.
     if isinstance(files, str):
