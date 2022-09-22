@@ -42,10 +42,11 @@ Then, open up your notebook and import the following packages to set up the note
 
 .. sourcecode:: python
 
-import sim2bids
-import panel as pn
-from sim2bids.sim2bids import MainArea
-pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets', sizing_mode='stretch_width', notifications=True)
+   import sim2bids
+   import panel as pn
+   from sim2bids.sim2bids import MainArea
+   pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets',
+                sizing_mode='stretch_width', notifications=True)
 
 
 
