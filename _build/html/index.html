@@ -4,9 +4,10 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to sim2bids’s documentation! &mdash; sim2bids 1.1.2 documentation</title>
+  <title>Welcome to sim2bids documentation! &mdash; sim2bids 1.1.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -38,8 +39,11 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Welcome to sim2bids’s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#">Welcome to sim2bids documentation!</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
 </ul>
 </div>
         </div>
@@ -56,7 +60,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>Welcome to sim2bids’s documentation!</li>
+      <li>Welcome to sim2bids documentation!</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -66,13 +70,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="welcome-to-sim2bids-s-documentation">
-<h1>Welcome to sim2bids’s documentation!<a class="headerlink" href="#welcome-to-sim2bids-s-documentation" title="Permalink to this heading"></a></h1>
+  <section id="welcome-to-sim2bids-documentation">
+<h1>Welcome to sim2bids documentation!<a class="headerlink" href="#welcome-to-sim2bids-documentation" title="Permalink to this heading"></a></h1>
+<p>sim2bids is a Python package to created to convert computational data to BIDS standard as proposed by <a class="reference external" href="https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit?usp=sharing">Michael Schirner and Petra Ritter.</a></p>
+<p>The specification proposes a data structure schema for neural network computer models that aims to be generically applicable to all kinds of neural network simulation software, mathematical models, computational models, and data models, but with a focus on dynamic circuit models of brain activity.</p>
+<p>Importantly, they not only propose suggestions for a BIDS schema for computer models, but they also propose extensions to the entire BIDS standard that solve several other problems.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This project is under active development.</p>
+</div>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<p>Simply run the following command to get the app up and running:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install sim2bids
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip3 install sim2bids
+</pre></div>
+</div>
+<p>Alternatively, either fork or obtain the latest sim2bids version by running the following:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git clone https://github.com/dissagaliyeva/sim2bids
+<span class="gp">$ </span><span class="nb">cd</span> sim2bids
+<span class="gp">$ </span>python setup.py install
+</pre></div>
+</div>
+<p>Then, open up your notebook and import the following packages to set up the notebook:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<p>import sim2bids
+import panel as pn
+from sim2bids.sim2bids import MainArea
+pn.extension(‘tabulator’, ‘ace’, ‘jsoneditor’, ‘ipywidgets’, sizing_mode=’stretch_width’, notifications=True)</p>
 <div class="toctree-wrapper compound">
 </div>
 </section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
+</section>
+<section id="table-of-contents">
+<h1>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this heading"></a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
