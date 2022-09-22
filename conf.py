@@ -18,7 +18,8 @@ release = '1.1.2'
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo',
               'sphinx.ext.autosummary', 'sphinx.ext.extlinks',
               'sphinx.ext.intersphinx',
-              'sphinx.ext.viewcode', 'sphinx.ext.inheritance_diagram']
+              'sphinx.ext.viewcode', 'sphinx.ext.inheritance_diagram'
+              ]
 
 intersphinx_mapping = {
     "rtd": ("https://docs.readthedocs.io/en/stable/", None),
