@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sim2bids.sim2bids &mdash; sim2bids 1.1.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> sim2bids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">sim2bids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>sim2bids.sim2bids</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sim2bids.sim2bids</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">panel</span> <span class="k">as</span> <span class="nn">pn</span>
+<span class="kn">import</span> <span class="nn">param</span>
+
+<span class="kn">import</span> <span class="nn">sim2bids.generate.subjects</span> <span class="k">as</span> <span class="nn">subj</span>
+<span class="kn">from</span> <span class="nn">sim2bids</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">sim2bids.app</span> <span class="kn">import</span> <span class="n">app</span>
+<span class="kn">from</span> <span class="nn">sim2bids.templates</span> <span class="kn">import</span> <span class="n">user_guide</span> <span class="k">as</span> <span class="n">ug</span>
+<span class="kn">from</span> <span class="nn">sim2bids.validate</span> <span class="kn">import</span> <span class="n">validate</span>
+
+<span class="n">JE_FIELDS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Units&#39;</span><span class="p">,</span> <span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="s1">&#39;CoordsRows&#39;</span><span class="p">,</span> <span class="s1">&#39;CoordsColumns&#39;</span><span class="p">,</span> <span class="s1">&#39;ModelEq&#39;</span><span class="p">,</span> <span class="s1">&#39;ModelParam&#39;</span><span class="p">,</span> <span class="s1">&#39;SourceCode&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;SourceCodeVersion&#39;</span><span class="p">,</span> <span class="s1">&#39;SoftwareVersion&#39;</span><span class="p">,</span> <span class="s1">&#39;SoftwareName&#39;</span><span class="p">,</span> <span class="s1">&#39;SoftwareRepository&#39;</span><span class="p">,</span> <span class="s1">&#39;Network&#39;</span><span class="p">]</span>
+<span class="n">UNITS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;degrees&#39;</span><span class="p">,</span> <span class="s1">&#39;radians&#39;</span><span class="p">]</span>
+<span class="n">OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;App 101&#39;</span><span class="p">,</span> <span class="s1">&#39;Preprocess data&#39;</span><span class="p">,</span> <span class="s1">&#39;Supported files&#39;</span><span class="p">,</span> <span class="s1">&#39;Functionality&#39;</span><span class="p">,</span> <span class="s1">&#39;BEP034&#39;</span><span class="p">]</span>
+
+<span class="n">REQUIRED</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">AUTOFILL</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<div class="viewcode-block" id="MainArea"><a class="viewcode-back" href="../../docs/sim2bids.html#sim2bids.sim2bids.MainArea">[docs]</a><span class="k">class</span> <span class="nc">MainArea</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">Parameterized</span><span class="p">):</span>
+    <span class="c1"># generate files button</span>
+    <span class="n">gen_btn</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">Action</span><span class="p">(</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_files</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Generate Files&#39;</span><span class="p">)</span>
+
+    <span class="c1"># generate structure button</span>
+    <span class="n">gen_struct</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">Action</span><span class="p">(</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_struct</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Show Structure&#39;</span><span class="p">)</span>
+
+    <span class="c1"># rename files button</span>
+    <span class="n">rename_btn</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">Action</span><span class="p">(</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rename</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Rename Files&#39;</span><span class="p">)</span>
+
+    <span class="c1"># sidebar components</span>
+    <span class="n">output_path</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">TextInput</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">OUTPUT</span> <span class="o">=</span> <span class="n">output_path</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">TextInput</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">DESC</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="n">checkbox_options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Traverse subfolders&#39;</span><span class="p">,</span> <span class="s1">&#39;Autocomplete columns&#39;</span><span class="p">,</span> <span class="s1">&#39;Copy input folder&#39;</span><span class="p">]</span>
+    <span class="n">checkbox_group</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">CheckBoxGroup</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Traverse subfolders&#39;</span><span class="p">,</span> <span class="s1">&#39;Autocomplete columns&#39;</span><span class="p">],</span>
+                                              <span class="n">options</span><span class="o">=</span><span class="n">checkbox_options</span><span class="p">,</span>
+                                              <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">rename_files</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">WidgetBox</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">text_input</span><span class="o">=</span><span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">TextInput</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Insert Path&#39;</span><span class="p">),</span>
+                         <span class="n">cross_select</span><span class="o">=</span><span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">CrossSelector</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">()),</span>
+                         <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">structure</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">StaticText</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="nd">@pn</span><span class="o">.</span><span class="n">depends</span><span class="p">(</span><span class="s1">&#39;text_input.value&#39;</span><span class="p">,</span> <span class="n">watch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_select_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_input</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+            <span class="c1"># whether to not alter original input folder</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkbox_options</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkbox_group</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">text_input</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">duplicate_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_input</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">cross_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_input</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cross_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">reset_values</span><span class="p">()</span>
+
+    <span class="nd">@pn</span><span class="o">.</span><span class="n">depends</span><span class="p">(</span><span class="s1">&#39;cross_select.value&#39;</span><span class="p">,</span> <span class="n">watch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_generate_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_select</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">reset_values</span><span class="p">()</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">CODE</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_files</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rename_files</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_select</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">reset_values</span><span class="p">()</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">CODE</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_files</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rename_files</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_select</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Step 1: traverse files and check for problems</span>
+            <span class="c1"># appert.check_input(path=self.text_input.value, files=self.cross_select.value)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_input</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                                  <span class="n">files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_select</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                                  <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_select</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_generate_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_input</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_select</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                     <span class="n">subs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">subj</span><span class="o">.</span><span class="n">TO_RENAME</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">ALL_FILES</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_generate_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_input</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                              <span class="n">files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_select</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                              <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">subj</span><span class="o">.</span><span class="n">TO_RENAME</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subj</span><span class="o">.</span><span class="n">TO_RENAME</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rename_files</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rename_files</span> <span class="o">+=</span> <span class="p">[</span><span class="o">*</span><span class="n">utils</span><span class="o">.</span><span class="n">append_widgets</span><span class="p">(</span><span class="n">subj</span><span class="o">.</span><span class="n">TO_RENAME</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rename_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pn</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rename_btn&#39;</span><span class="p">],</span>
+                                                  <span class="n">show_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                  <span class="n">widgets</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;rename_btn&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;button_type&#39;</span><span class="p">:</span> <span class="s1">&#39;primary&#39;</span><span class="p">}}))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_files</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rename_files</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span>
+
+    <span class="nd">@pn</span><span class="o">.</span><span class="n">depends</span><span class="p">(</span><span class="s1">&#39;checkbox_group.value&#39;</span><span class="p">,</span> <span class="n">watch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_change_checkbox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">AUTOFILL</span>
+
+        <span class="c1"># whether to traverse sub-folders</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">TRAVERSE_FOLDERS</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkbox_options</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkbox_group</span><span class="o">.</span><span class="n">value</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="c1"># whether to autofill all files</span>
+        <span class="n">AUTOFILL</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkbox_options</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkbox_group</span><span class="o">.</span><span class="n">value</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="c1"># TODO: add copy folder functionality</span>
+        <span class="c1"># whether to not alter original input folder</span>
+        <span class="c1"># if self.checkbox_options[2] in self.checkbox_group.value:</span>
+        <span class="c1">#     self.text_input.value = app.duplicate_folder(self.text_input.value)</span>
+
+    <span class="nd">@pn</span><span class="o">.</span><span class="n">depends</span><span class="p">(</span><span class="s1">&#39;output_path.value&#39;</span><span class="p">,</span> <span class="n">watch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_store_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output</span><span class="p">):</span>
+                <span class="n">pn</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">notifications</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Folder </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s1"> is created...&#39;</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+            <span class="n">pn</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">notifications</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Folder `</span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s1">` is selected as output folder...&#39;</span><span class="p">)</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">OUTPUT</span> <span class="o">=</span> <span class="n">output</span>
+
+    <span class="k">def</span> <span class="nf">_rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">validate</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rename_files</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">ALL_FILES</span><span class="p">)</span>
+
+    <span class="nd">@pn</span><span class="o">.</span><span class="n">depends</span><span class="p">(</span><span class="s1">&#39;desc.value&#39;</span><span class="p">,</span> <span class="n">watch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_change_desc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">DESC</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">desc</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">notifications</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Description </span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">DESC</span><span class="si">}</span><span class="s1"> has been saved...&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MainArea.view"><a class="viewcode-back" href="../../docs/sim2bids.html#sim2bids.sim2bids.MainArea.view">[docs]</a>    <span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">main</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Tabs</span><span class="p">(</span>
+            <span class="p">(</span><span class="s1">&#39;Select Files&#39;</span><span class="p">,</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="n">GET_STARTED</span><span class="p">),</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">text_input</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">cross_select</span><span class="p">,</span>
+                                       <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                           <span class="n">pn</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gen_struct&#39;</span><span class="p">],</span>
+                                                    <span class="n">show_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                    <span class="n">widgets</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gen_struct&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;button_type&#39;</span><span class="p">:</span> <span class="s1">&#39;primary&#39;</span><span class="p">}}),</span>
+                                           <span class="n">pn</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gen_btn&#39;</span><span class="p">],</span>
+                                                    <span class="n">show_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">widgets</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gen_btn&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;button_type&#39;</span><span class="p">:</span> <span class="s1">&#39;primary&#39;</span><span class="p">}}),</span>
+                                           <span class="n">sizing_mode</span><span class="o">=</span><span class="s1">&#39;stretch_width&#39;</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                                       <span class="p">),</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="p">)),</span>
+            <span class="p">(</span><span class="s1">&#39;Preprocess Data&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_files</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;View Results&#39;</span><span class="p">,</span> <span class="n">ViewResults</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">()),</span>
+            <span class="p">(</span><span class="s1">&#39;User Guide&#39;</span><span class="p">,</span> <span class="n">UserGuide</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">()),</span>
+            <span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">active</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+
+        <span class="n">sidebar</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+            <span class="s1">&#39;## Settings&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;#### Provide output path&#39;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span>
+            <span class="s1">&#39;#### Provide short description (max 30 chars)&#39;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">desc</span><span class="p">,</span>
+            <span class="s1">&#39;#### Select additional settings&#39;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkbox_group</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">MaterialTemplate</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Preprocess | Transform | Download&#39;</span><span class="p">,</span>
+            <span class="n">sidebar</span><span class="o">=</span><span class="n">sidebar</span><span class="p">,</span>
+            <span class="n">site</span><span class="o">=</span><span class="s1">&#39;INCF&#39;</span><span class="p">,</span>
+            <span class="n">main</span><span class="o">=</span><span class="n">main</span><span class="p">,</span>
+            <span class="n">header_background</span><span class="o">=</span><span class="s1">&#39;#4488c4&#39;</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ViewResults"><a class="viewcode-back" href="../../docs/sim2bids.html#sim2bids.sim2bids.ViewResults">[docs]</a><span class="k">class</span> <span class="nc">ViewResults</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">Parameterized</span><span class="p">):</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;JSON files&#39;</span><span class="p">,</span> <span class="s1">&#39;TSV files&#39;</span><span class="p">]</span>
+    <span class="n">file_selection</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">RadioButtonGroup</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s1">&#39;primary&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">select_options</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">()</span>
+    <span class="n">je_btn</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">Action</span><span class="p">(</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_je</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Update JSON file&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">OUTPUT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">WidgetBox</span><span class="p">(</span><span class="s1">&#39;### Select File&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">je_widget</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">WidgetBox</span><span class="p">()</span>
+
+    <span class="nd">@pn</span><span class="o">.</span><span class="n">depends</span><span class="p">(</span><span class="s1">&#39;file_selection.value&#39;</span><span class="p">,</span> <span class="n">watch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_change_filetype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;JSON files&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">get_files</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;TSV files&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">get_files</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="s1">&#39;.tsv&#39;</span><span class="p">)</span>
+
+    <span class="nd">@pn</span><span class="o">.</span><span class="n">depends</span><span class="p">(</span><span class="s1">&#39;select_options.value&#39;</span><span class="p">,</span> <span class="n">watch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_change_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;JSON files&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">pn</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">notifications</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;File `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s1">` is empty!&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">je_widget</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">je_widget</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">WidgetBox</span><span class="p">()</span>
+
+                <span class="n">je</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">JSONEditor</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;view&#39;</span><span class="p">)</span>
+                <span class="n">je_widget</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">je</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">je_widget</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">je</span><span class="p">,</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">je_widget</span><span class="p">,</span>
+                                                           <span class="n">pn</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;je_btn&#39;</span><span class="p">],</span> <span class="n">show_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                                    <span class="n">widgets</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;je_btn&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;button_type&#39;</span><span class="p">:</span> <span class="s1">&#39;primary&#39;</span><span class="p">}}))))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">je_widget</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;TSV files&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">pn</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">notifications</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;File `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s1">` is empty!&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Tabulator</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_update_je</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">txt_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">je_widget</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">verify_complete</span><span class="p">(</span><span class="n">txt_inputs</span><span class="p">):</span>
+            <span class="c1"># instantiate a new dictionary</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+            <span class="c1"># iterate over inputs and add new values if supplemented</span>
+            <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">txt_inputs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">inp</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">content</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="c1"># save values</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+            <span class="c1"># update layout</span>
+            <span class="n">je</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">JSONEditor</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">)),</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;view&#39;</span><span class="p">)</span>
+            <span class="n">je_widget</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">je</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">je</span><span class="p">,</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">je_widget</span><span class="p">,</span> <span class="n">pn</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;je_btn&#39;</span><span class="p">],</span> <span class="n">show_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                                       <span class="n">widgets</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;je_btn&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;button_type&#39;</span><span class="p">:</span> <span class="s1">&#39;primary&#39;</span><span class="p">}})))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pn</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">notifications</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Please fill in ALL required fields.&#39;</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ViewResults.view"><a class="viewcode-back" href="../../docs/sim2bids.html#sim2bids.sim2bids.ViewResults.view">[docs]</a>    <span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_selection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="UserGuide"><a class="viewcode-back" href="../../docs/sim2bids.html#sim2bids.sim2bids.UserGuide">[docs]</a><span class="k">class</span> <span class="nc">UserGuide</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">Parameterized</span><span class="p">):</span>
+    <span class="n">user_guide</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">ToggleGroup</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;User Guide&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;App 101&#39;</span><span class="p">,</span> <span class="n">behavior</span><span class="o">=</span><span class="s1">&#39;radio&#39;</span><span class="p">,</span>
+                                        <span class="n">options</span><span class="o">=</span><span class="n">OPTIONS</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map</span> <span class="o">=</span> <span class="p">{</span><span class="n">OPTIONS</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">ug</span><span class="o">.</span><span class="n">how_to_use</span><span class="p">,</span>
+                    <span class="n">OPTIONS</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">ug</span><span class="o">.</span><span class="n">preprocess</span><span class="p">,</span>
+                    <span class="n">OPTIONS</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">ug</span><span class="o">.</span><span class="n">supported</span><span class="p">,</span>
+                    <span class="n">OPTIONS</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">ug</span><span class="o">.</span><span class="n">functionality</span><span class="p">,</span>
+                    <span class="n">OPTIONS</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">ug</span><span class="o">.</span><span class="n">bep034</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">StaticText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">[</span><span class="n">OPTIONS</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+
+    <span class="nd">@pn</span><span class="o">.</span><span class="n">depends</span><span class="p">(</span><span class="s1">&#39;user_guide.value&#39;</span><span class="p">,</span> <span class="n">watch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_change_sel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">user_guide</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+
+<div class="viewcode-block" id="UserGuide.view"><a class="viewcode-back" href="../../docs/sim2bids.html#sim2bids.sim2bids.UserGuide.view">[docs]</a>    <span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_guide</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">scroll</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="get_files"><a class="viewcode-back" href="../../docs/sim2bids.html#sim2bids.sim2bids.get_files">[docs]</a><span class="k">def</span> <span class="nf">get_files</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="s1">&#39;.json&#39;</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">topdown</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ftype</span> <span class="ow">in</span> <span class="n">file</span> <span class="ow">and</span> <span class="s1">&#39;.ipynb_checkpoints&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<span class="n">GET_STARTED</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">## Welcome!</span>
+<span class="s2">Here you can select the folder(s) that you want to transform. Beware that we are using recursive walk to select all the</span>
+<span class="s2">content available in the specified folder. That means if the folder contains a sub-folder, we will transform the content</span>
+<span class="s2">if it falls into the accepted file formats.</span>
+
+<span class="s2">You can get a preliminary look into the to-be-generated structure by clicking on **Show Structure** button. If you&#39;re </span>
+<span class="s2">happy with the results, you can click on **Generate Files** button to physically save the results. After that, please </span>
+<span class="s2">**make sure to give user-specific input** by clicking on **View Results** tab and selecting JSON files. You&#39;ll see a lot</span>
+<span class="s2">of required and recommended fields that can be updated. By default, all required fields are already provided. However,</span>
+<span class="s2">you have all the rights to change them. See further details in **User Guide**. </span>
+<span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dinara Issagaliyeva.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

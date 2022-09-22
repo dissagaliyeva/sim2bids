@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sim2bids package &mdash; sim2bids 1.1.2 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> sim2bids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">sim2bids package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-sim2bids.cli">sim2bids.cli module</a></li>
+<li><a class="reference internal" href="#module-sim2bids.sim2bids">sim2bids.sim2bids module</a></li>
+<li><a class="reference internal" href="#module-sim2bids.utils">sim2bids.utils module</a></li>
+<li><a class="reference internal" href="#module-sim2bids">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">sim2bids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>sim2bids package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/sim2bids.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sim2bids-package">
+<h1>sim2bids package<a class="headerlink" href="#sim2bids-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sim2bids.app.html">sim2bids.app package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.app.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.app.html#module-sim2bids.app.app">sim2bids.app.app module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.app.html#module-sim2bids.app.utils">sim2bids.app.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.app.html#module-sim2bids.app">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sim2bids.convert.html">sim2bids.convert package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.convert.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.convert.html#module-sim2bids.convert.convert">sim2bids.convert.convert module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.convert.html#sim2bids-convert-mat-module">sim2bids.convert.mat module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.convert.html#module-sim2bids.convert">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sim2bids.generate.html">sim2bids.generate package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.generate.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.generate.html#module-sim2bids.generate.structure">sim2bids.generate.structure module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.generate.html#module-sim2bids.generate.subjects">sim2bids.generate.subjects module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.generate.html#module-sim2bids.generate.zip_traversal">sim2bids.generate.zip_traversal module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.generate.html#module-sim2bids.generate">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sim2bids.preprocess.html">sim2bids.preprocess package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.preprocess.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.preprocess.html#module-sim2bids.preprocess.preprocess">sim2bids.preprocess.preprocess module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.preprocess.html#module-sim2bids.preprocess">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sim2bids.templates.html">sim2bids.templates package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.templates.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.templates.html#module-sim2bids.templates.templates">sim2bids.templates.templates module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.templates.html#module-sim2bids.templates.user_guide">sim2bids.templates.user_guide module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.templates.html#module-sim2bids.templates">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sim2bids.validate.html">sim2bids.validate package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.validate.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.validate.html#module-sim2bids.validate.validate">sim2bids.validate.validate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim2bids.validate.html#module-sim2bids.validate">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-sim2bids.cli">
+<span id="sim2bids-cli-module"></span><h2>sim2bids.cli module<a class="headerlink" href="#module-sim2bids.cli" title="Permalink to this heading"></a></h2>
+<p>Console script for app.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="sim2bids.cli.main">
+<span class="sig-prename descclassname"><span class="pre">sim2bids.cli.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/cli.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.cli.main" title="Permalink to this definition"></a></dt>
+<dd><p>Console script for app.</p>
+</dd></dl>
+
+</section>
+<section id="module-sim2bids.sim2bids">
+<span id="sim2bids-sim2bids-module"></span><h2>sim2bids.sim2bids module<a class="headerlink" href="#module-sim2bids.sim2bids" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.MainArea">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sim2bids.sim2bids.</span></span><span class="sig-name descname"><span class="pre">MainArea</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/sim2bids.html#MainArea"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.sim2bids.MainArea" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameterized</span></code></p>
+<p>params(gen_btn=Action, gen_struct=Action, rename_btn=Action, name=String)
+[1;32mParameters of ‘MainArea’
+========================
+[0m
+[1;31mParameters changed from their default values are marked in red.[0m
+[1;36mSoft bound values are marked in cyan.[0m
+C/V= Constant/Variable, RO/RW = ReadOnly/ReadWrite, AN=Allow None</p>
+<p>[1;34mName                          Value                     Type   Mode [0m</p>
+<p>gen_btn      &lt;function MainArea.&lt;lambda&gt; at 0x0000…  Action  V RW
+gen_struct   &lt;function MainArea.&lt;lambda&gt; at 0x0000…  Action  V RW
+rename_btn   &lt;function MainArea.&lt;lambda&gt; at 0x0000…  Action  V RW</p>
+<p>[1;32mParameter docstrings:
+=====================[0m</p>
+<p>[1;34mgen_btn:    &lt; No docstring available &gt;[0m
+[1;31mgen_struct: &lt; No docstring available &gt;[0m
+[1;34mrename_btn: &lt; No docstring available &gt;[0m</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.MainArea.checkbox_group">
+<span class="sig-name descname"><span class="pre">checkbox_group</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">CheckBoxGroup(margin=(-20,</span> <span class="pre">10,</span> <span class="pre">0,</span> <span class="pre">10),</span> <span class="pre">options=['Traverse</span> <span class="pre">subfolders',</span> <span class="pre">...],</span> <span class="pre">value=['Traverse</span> <span class="pre">subfolders',</span> <span class="pre">...])</span></em><a class="headerlink" href="#sim2bids.sim2bids.MainArea.checkbox_group" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.MainArea.checkbox_options">
+<span class="sig-name descname"><span class="pre">checkbox_options</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['Traverse</span> <span class="pre">subfolders',</span> <span class="pre">'Autocomplete</span> <span class="pre">columns',</span> <span class="pre">'Copy</span> <span class="pre">input</span> <span class="pre">folder']</span></em><a class="headerlink" href="#sim2bids.sim2bids.MainArea.checkbox_options" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.MainArea.desc">
+<span class="sig-name descname"><span class="pre">desc</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TextInput(margin=(-20,</span> <span class="pre">10,</span> <span class="pre">0,</span> <span class="pre">10),</span> <span class="pre">max_length=30,</span> <span class="pre">value='default')</span></em><a class="headerlink" href="#sim2bids.sim2bids.MainArea.desc" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.MainArea.gen_btn">
+<span class="sig-name descname"><span class="pre">gen_btn</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sim2bids.sim2bids.MainArea.gen_btn" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.MainArea.gen_struct">
+<span class="sig-name descname"><span class="pre">gen_struct</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sim2bids.sim2bids.MainArea.gen_struct" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.MainArea.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MainArea'</span></em><a class="headerlink" href="#sim2bids.sim2bids.MainArea.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.MainArea.output_path">
+<span class="sig-name descname"><span class="pre">output_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TextInput(margin=(-20,</span> <span class="pre">10,</span> <span class="pre">0,</span> <span class="pre">10),</span> <span class="pre">value='output')</span></em><a class="headerlink" href="#sim2bids.sim2bids.MainArea.output_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.MainArea.rename_btn">
+<span class="sig-name descname"><span class="pre">rename_btn</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sim2bids.sim2bids.MainArea.rename_btn" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.MainArea.rename_files">
+<span class="sig-name descname"><span class="pre">rename_files</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">WidgetBox()</span></em><a class="headerlink" href="#sim2bids.sim2bids.MainArea.rename_files" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.MainArea.view">
+<span class="sig-name descname"><span class="pre">view</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/sim2bids.html#MainArea.view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.sim2bids.MainArea.view" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.UserGuide">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sim2bids.sim2bids.</span></span><span class="sig-name descname"><span class="pre">UserGuide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/sim2bids.html#UserGuide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.sim2bids.UserGuide" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameterized</span></code></p>
+<p>params(name=String)
+[1;32mParameters of ‘UserGuide’
+=========================
+[0m
+Object has no parameters.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.UserGuide.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'UserGuide'</span></em><a class="headerlink" href="#sim2bids.sim2bids.UserGuide.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.UserGuide.user_guide">
+<span class="sig-name descname"><span class="pre">user_guide</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">RadioButtonGroup(name='User</span> <span class="pre">Guide',</span> <span class="pre">options=['App</span> <span class="pre">101',</span> <span class="pre">'Preprocess</span> <span class="pre">da...],</span> <span class="pre">value='App</span> <span class="pre">101')</span></em><a class="headerlink" href="#sim2bids.sim2bids.UserGuide.user_guide" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.UserGuide.view">
+<span class="sig-name descname"><span class="pre">view</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/sim2bids.html#UserGuide.view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.sim2bids.UserGuide.view" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.ViewResults">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sim2bids.sim2bids.</span></span><span class="sig-name descname"><span class="pre">ViewResults</span></span><a class="reference internal" href="../_modules/sim2bids/sim2bids.html#ViewResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.sim2bids.ViewResults" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameterized</span></code></p>
+<p>params(je_btn=Action, name=String)
+[1;32mParameters of ‘ViewResults’
+===========================
+[0m
+[1;31mParameters changed from their default values are marked in red.[0m
+[1;36mSoft bound values are marked in cyan.[0m
+C/V= Constant/Variable, RO/RW = ReadOnly/ReadWrite, AN=Allow None</p>
+<p>[1;34mName                      Value                     Type   Mode [0m</p>
+<p>je_btn   &lt;function ViewResults.&lt;lambda&gt; at 0x0…  Action  V RW</p>
+<p>[1;32mParameter docstrings:
+=====================[0m</p>
+<p>[1;34mje_btn: &lt; No docstring available &gt;[0m</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.ViewResults.file_selection">
+<span class="sig-name descname"><span class="pre">file_selection</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">RadioButtonGroup(button_type='primary',</span> <span class="pre">options=['JSON</span> <span class="pre">files',</span> <span class="pre">...])</span></em><a class="headerlink" href="#sim2bids.sim2bids.ViewResults.file_selection" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.ViewResults.je_btn">
+<span class="sig-name descname"><span class="pre">je_btn</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sim2bids.sim2bids.ViewResults.je_btn" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.ViewResults.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ViewResults'</span></em><a class="headerlink" href="#sim2bids.sim2bids.ViewResults.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.ViewResults.options">
+<span class="sig-name descname"><span class="pre">options</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['JSON</span> <span class="pre">files',</span> <span class="pre">'TSV</span> <span class="pre">files']</span></em><a class="headerlink" href="#sim2bids.sim2bids.ViewResults.options" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.ViewResults.select_options">
+<span class="sig-name descname"><span class="pre">select_options</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Select()</span></em><a class="headerlink" href="#sim2bids.sim2bids.ViewResults.select_options" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.ViewResults.view">
+<span class="sig-name descname"><span class="pre">view</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/sim2bids.html#ViewResults.view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.sim2bids.ViewResults.view" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sim2bids.sim2bids.get_files">
+<span class="sig-prename descclassname"><span class="pre">sim2bids.sim2bids.</span></span><span class="sig-name descname"><span class="pre">get_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'output'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.json'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/sim2bids.html#get_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.sim2bids.get_files" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-sim2bids.utils">
+<span id="sim2bids-utils-module"></span><h2>sim2bids.utils module<a class="headerlink" href="#module-sim2bids.utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="sim2bids.utils.append_widgets">
+<span class="sig-prename descclassname"><span class="pre">sim2bids.utils.</span></span><span class="sig-name descname"><span class="pre">append_widgets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/utils.html#append_widgets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.utils.append_widgets" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sim2bids.utils.get_selector">
+<span class="sig-prename descclassname"><span class="pre">sim2bids.utils.</span></span><span class="sig-name descname"><span class="pre">get_selector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/utils.html#get_selector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.utils.get_selector" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sim2bids.utils.get_settings">
+<span class="sig-prename descclassname"><span class="pre">sim2bids.utils.</span></span><span class="sig-name descname"><span class="pre">get_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_editor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/utils.html#get_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.utils.get_settings" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sim2bids.utils.reset_values">
+<span class="sig-prename descclassname"><span class="pre">sim2bids.utils.</span></span><span class="sig-name descname"><span class="pre">reset_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/utils.html#reset_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.utils.reset_values" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sim2bids.utils.rm_tree">
+<span class="sig-prename descclassname"><span class="pre">sim2bids.utils.</span></span><span class="sig-name descname"><span class="pre">rm_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'../output'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/utils.html#rm_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.utils.rm_tree" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sim2bids.utils.verify_complete">
+<span class="sig-prename descclassname"><span class="pre">sim2bids.utils.</span></span><span class="sig-name descname"><span class="pre">verify_complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widgets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/utils.html#verify_complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.utils.verify_complete" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-sim2bids">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sim2bids" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dinara Issagaliyeva.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
