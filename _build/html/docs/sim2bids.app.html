@@ -7,6 +7,7 @@
   <title>sim2bids.app package &mdash; sim2bids 1.1.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -96,13 +97,10 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.app.app.create_sub_struct">
 <span class="sig-prename descclassname"><span class="pre">sim2bids.app.app.</span></span><span class="sig-name descname"><span class="pre">create_sub_struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ses_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/app/app.html#create_sub_struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.app.create_sub_struct" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> – </p></li>
-<li><p><strong>subs</strong> – </p></li>
-<li><p><strong>ses_name</strong> – (Default value = None)</p></li>
-</ul>
+<dd><p>path :</p>
+<p>subs :</p>
+<dl class="simple">
+<dt>ses_name :</dt><dd><p>(Default value = None)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -110,30 +108,30 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.app.app.duplicate_folder">
 <span class="sig-prename descclassname"><span class="pre">sim2bids.app.app.</span></span><span class="sig-name descname"><span class="pre">duplicate_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/app/app.html#duplicate_folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.app.duplicate_folder" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> – </p>
-</dd>
-</dl>
+<dd><p>path :</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.app.app.main">
-<span class="sig-prename descclassname"><span class="pre">sim2bids.app.app.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/app/app.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.app.main" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sim2bids.app.app.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">subs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/app/app.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.app.main" title="Permalink to this definition"></a></dt>
 <dd><p>Main brain function that creates subjects, auto-generated structure,
 and saves apperted files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<em>str :</em>) – param files:</p></li>
-<li><p><strong>subs</strong> (<em>dict :</em>) – param save:</p></li>
-<li><p><strong>layout</strong> (<em>bool :</em>) – return:</p></li>
-<li><p><strong>path</strong> – </p></li>
-<li><p><strong>files</strong> (<em>list :</em>) – </p></li>
-<li><p><strong>subs</strong> – (Default value = None)</p></li>
-<li><p><strong>save</strong> (<em>bool :</em>) – (Default value = False)</p></li>
-<li><p><strong>layout</strong> – (Default value = False)</p></li>
-</ul>
+<dl class="simple">
+<dt>path :</dt><dd><p>param files:</p>
+</dd>
+<dt>subs :</dt><dd><p>param save:</p>
+</dd>
+<dt>layout :</dt><dd><p>return:</p>
+</dd>
+</dl>
+<p>path: str :</p>
+<p>files: list :</p>
+<dl class="simple">
+<dt>subs: dict :</dt><dd><p>(Default value = None)</p>
+</dd>
+<dt>save: bool :</dt><dd><p>(Default value = False)</p>
+</dd>
+<dt>layout: bool :</dt><dd><p>(Default value = False)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -147,19 +145,14 @@ and saves apperted files.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.app.app.save_code">
 <span class="sig-prename descclassname"><span class="pre">sim2bids.app.app.</span></span><span class="sig-name descname"><span class="pre">save_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/app/app.html#save_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.app.save_code" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>subs</strong> – </p>
-</dd>
-</dl>
+<dd><p>subs :</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.app.app.save_output">
 <span class="sig-prename descclassname"><span class="pre">sim2bids.app.app.</span></span><span class="sig-name descname"><span class="pre">save_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/app/app.html#save_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.app.save_output" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>subs</strong> – return:</p>
+<dd><dl class="simple">
+<dt>subs :</dt><dd><p>return:</p>
 </dd>
 </dl>
 </dd></dl>
@@ -185,22 +178,23 @@ and saves apperted files.</p>
 <p>Helper functions for app.py</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.app.utils.extract_h5">
-<span class="sig-prename descclassname"><span class="pre">sim2bids.app.utils.</span></span><span class="sig-name descname"><span class="pre">extract_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="../_modules/sim2bids/app/utils.html#extract_h5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.utils.extract_h5" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sim2bids.app.utils.</span></span><span class="sig-name descname"><span class="pre">extract_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a></span></span><a class="reference internal" href="../_modules/sim2bids/app/utils.html#extract_h5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.utils.extract_h5" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.app.utils.get_content">
-<span class="sig-prename descclassname"><span class="pre">sim2bids.app.utils.</span></span><span class="sig-name descname"><span class="pre">get_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">path:</span> <span class="pre">str,</span> <span class="pre">files:</span> <span class="pre">[&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'list'&gt;],</span> <span class="pre">basename:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="../_modules/sim2bids/app/utils.html#get_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.utils.get_content" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<em>str :</em>) – param files:</p></li>
-<li><p><strong>basename</strong> (<em>bool :</em>) – return:</p></li>
-<li><p><strong>path</strong> – </p></li>
-<li><p><strong>files</strong> (<em>[</em><em>str :</em>) – </p></li>
-<li><p><strong>list</strong><strong>]</strong> – </p></li>
-<li><p><strong>basename</strong> – (Default value = False)</p></li>
-</ul>
+<span class="sig-prename descclassname"><span class="pre">sim2bids.app.utils.</span></span><span class="sig-name descname"><span class="pre">get_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">path:</span> <span class="pre">str,</span> <span class="pre">files:</span> <span class="pre">[&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'list'&gt;],</span> <span class="pre">basename:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a></span></span><a class="reference internal" href="../_modules/sim2bids/app/utils.html#get_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.utils.get_content" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>path :</dt><dd><p>param files:</p>
+</dd>
+<dt>basename :</dt><dd><p>return:</p>
+</dd>
+</dl>
+<p>path: str :</p>
+<p>files: [str :</p>
+<p>list] :</p>
+<dl class="simple">
+<dt>basename: bool :</dt><dd><p>(Default value = False)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -217,22 +211,20 @@ and saves apperted files.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.app.utils.recursive_walk">
-<span class="sig-prename descclassname"><span class="pre">sim2bids.app.utils.</span></span><span class="sig-name descname"><span class="pre">recursive_walk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="../_modules/sim2bids/app/utils.html#recursive_walk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.utils.recursive_walk" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sim2bids.app.utils.</span></span><span class="sig-name descname"><span class="pre">recursive_walk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">basename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a></span></span><a class="reference internal" href="../_modules/sim2bids/app/utils.html#recursive_walk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.utils.recursive_walk" title="Permalink to this definition"></a></dt>
 <dd><p>Recursively collect file paths using os.walk. If <cite>basename</cite> is True,
 get only file names. Otherwise, get all absolute paths.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<em>str</em>) – Path to a folder</p></li>
-<li><p><strong>basename</strong> (<em>bool</em>) – Whether to store file names only. (Default value = False)</p></li>
-</ul>
+<dl class="simple">
+<dt>path<span class="classifier">str</span></dt><dd><p>Path to a folder</p>
+</dd>
+<dt>basename<span class="classifier">bool</span></dt><dd><p>Whether to store file names only. (Default value = False)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.app.utils.rename_tract_lengths">
-<span class="sig-prename descclassname"><span class="pre">sim2bids.app.utils.</span></span><span class="sig-name descname"><span class="pre">rename_tract_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/sim2bids/app/utils.html#rename_tract_lengths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.utils.rename_tract_lengths" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sim2bids.app.utils.</span></span><span class="sig-name descname"><span class="pre">rename_tract_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/sim2bids/app/utils.html#rename_tract_lengths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.app.utils.rename_tract_lengths" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>

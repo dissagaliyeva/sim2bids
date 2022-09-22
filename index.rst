@@ -20,31 +20,31 @@ Installation
 
 Simply run the following command to get the app up and running:
 
-.. code-block:: console
-   pip install sim2bids
+.. sourcecode:: console
+
+   $ pip install sim2bids
 
 or
 
-.. code-block:: console
-   pip3 install sim2bids
+.. sourcecode:: console
+
+   $ pip3 install sim2bids
 
 Alternatively, either fork or obtain the latest sim2bids version by running the following:
 
-.. code-block:: console
-   git clone https://github.com/dissagaliyeva/sim2bids
+.. sourcecode:: console
 
-   cd sim2bids
-
-   python setup.py install
+   $ git clone https://github.com/dissagaliyeva/sim2bids
+   $ cd sim2bids
+   $ python setup.py install
 
 Then, open up your notebook and import the following packages to set up the notebook:
 
-.. code-block:: python
+.. sourcecode:: python
 
 import sim2bids
-from sim2bids.sim2bids import MainArea
-
 import panel as pn
+from sim2bids.sim2bids import MainArea
 pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets', sizing_mode='stretch_width', notifications=True)
 
 

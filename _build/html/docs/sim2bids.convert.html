@@ -7,6 +7,7 @@
   <title>sim2bids.convert package &mdash; sim2bids 1.1.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -93,14 +94,13 @@ one contains centres.txt, the ‘coord’ folder is created for one subject only
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.convert.convert.get_specific">
-<span class="sig-prename descclassname"><span class="pre">sim2bids.convert.convert.</span></span><span class="sig-name descname"><span class="pre">get_specific</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filetype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="../_modules/sim2bids/convert/convert.html#get_specific"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.convert.convert.get_specific" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sim2bids.convert.convert.</span></span><span class="sig-name descname"><span class="pre">get_specific</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filetype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a></span></span><a class="reference internal" href="../_modules/sim2bids/convert/convert.html#get_specific"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.convert.convert.get_specific" title="Permalink to this definition"></a></dt>
 <dd><p>Get all files that correspond to the filetype. For example,
 if filetype is equal to “areas”, this function will return
 all files containing that keyword.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filetype</strong> (<em>str</em>) – <dl class="simple">
-<dt>Type of the file to search for. Accepted types:</dt><dd><p>’weight’, ‘distance’, ‘tract_length’, ‘delay’, ‘speed’,                 # Network (net)
+<dl class="simple">
+<dt>filetype: str</dt><dd><dl class="simple">
+<dt>Type of the file to search for. Accepted types:</dt><dd><p>‘weight’, ‘distance’, ‘tract_length’, ‘delay’, ‘speed’,                 # Network (net)
 ‘nodes’, ‘labels’, ‘centres’, ‘area’, ‘hemisphere’, ‘cortical’,         # Coordinates (coord)
 ‘orientation’, ‘average_orientation’, ‘normal’, ‘times’, ‘vertices’,    # Coordinates (coord)
 ‘faces’, ‘vnormal’, ‘fnormal’, ‘sensor’, ‘map’, ‘volume’,               # Coordinates (coord)
@@ -109,44 +109,37 @@ all files containing that keyword.</p>
 ‘fc’                                                                    # Spatial (spatial)</p>
 </dd>
 </dl>
-</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Returns a list of all files that end with the specified filetype.</p>
 </dd>
 </dl>
+<blockquote>
+<div><p>Returns a list of all files that end with the specified filetype.</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.convert.convert.open_file">
-<span class="sig-prename descclassname"><span class="pre">sim2bids.convert.convert.</span></span><span class="sig-name descname"><span class="pre">open_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/convert/convert.html#open_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.convert.convert.open_file" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<em>str :</em>) – param sep:</p></li>
-<li><p><strong>path</strong> – </p></li>
-<li><p><strong>sep</strong> (<em>str :</em>) – </p></li>
-</ul>
+<span class="sig-prename descclassname"><span class="pre">sim2bids.convert.convert.</span></span><span class="sig-name descname"><span class="pre">open_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/convert/convert.html#open_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.convert.convert.open_file" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>path :</dt><dd><p>param sep:</p>
 </dd>
 </dl>
+<p>path: str :</p>
+<p>sep: str :</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.convert.convert.open_text">
 <span class="sig-prename descclassname"><span class="pre">sim2bids.convert.convert.</span></span><span class="sig-name descname"><span class="pre">open_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/convert/convert.html#open_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.convert.convert.open_text" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> – param sep:</p></li>
-<li><p><strong>sep</strong> – </p></li>
-</ul>
+<dd><dl class="simple">
+<dt>path :</dt><dd><p>param sep:</p>
 </dd>
 </dl>
+<p>sep :</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.convert.convert.save">
-<span class="sig-prename descclassname"><span class="pre">sim2bids.convert.convert.</span></span><span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folders</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/sim2bids/convert/convert.html#save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.convert.convert.save" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sim2bids.convert.convert.</span></span><span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">folders</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/sim2bids/convert/convert.html#save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.convert.convert.save" title="Permalink to this definition"></a></dt>
 <dd><p>Main engine to save all conversions. Several functionalities to understand:</p>
 <ol class="arabic">
 <li><p>Check all centres files to see if they have identical content. If so,
@@ -203,20 +196,21 @@ can safely ignore this information.</p></li>
 <li><p>Get folder locations. Depending on the passed file, get its respective folder location.</p></li>
 <li><p>Save files.</p></li>
 </ol>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>(</strong><strong>dict</strong><strong>)</strong> (<em>sub</em>) – Dictionary containing information of one file only. For example,
+<dl class="simple">
+<dt>sub (dict):</dt><dd><p>Dictionary containing information of one file only. For example,
 {‘name’: ‘centres’, ‘fname’: ‘centres.txt’, ‘sid’: ‘sub-01’, ‘desc’: ‘default’,
-‘sep’: ‘        ‘, ‘path’: PATH_TO_FILE, ‘ext’: ‘txt’}</p></li>
-<li><p><strong>(</strong><strong>list</strong><strong>)</strong> (<em>folders</em>) – List of folders corresponding to whether input files have single- or
+‘sep’: ‘        ‘, ‘path’: PATH_TO_FILE, ‘ext’: ‘txt’}</p>
+</dd>
+<dt>folders (list):</dt><dd><p>List of folders corresponding to whether input files have single- or
 multi-subject, or session-based structure. Each structure contains a
-different sequence of folders created in ‘app.py’ in ‘create_sub_struct’ function.</p></li>
-<li><p><strong>(</strong><strong>str</strong><strong>)</strong> (<em>name</em>) – Session type (ses-preop, ses-postop, None). If sessions are present,
+different sequence of folders created in ‘app.py’ in ‘create_sub_struct’ function.</p>
+</dd>
+<dt>ses (str):</dt><dd><p>Session type (ses-preop, ses-postop, None). If sessions are present,
 appropriate files are stored in their appropriate session folders.
-Otherwise, the structure follows the standard layout.</p></li>
-<li><p><strong>(</strong><strong>str</strong><strong>)</strong> – <dl class="simple">
-<dt>Name of the file. Accepted names:</dt><dd><p>’weight’, ‘distance’, ‘tract_length’, ‘delay’, ‘speed’,                 # Network (net)
+Otherwise, the structure follows the standard layout.</p>
+</dd>
+<dt>name (str):</dt><dd><dl class="simple">
+<dt>Name of the file. Accepted names:</dt><dd><p>‘weight’, ‘distance’, ‘tract_length’, ‘delay’, ‘speed’,                 # Network (net)
 ‘nodes’, ‘labels’, ‘centres’, ‘area’, ‘hemisphere’, ‘cortical’,         # Coordinates (coord)
 ‘orientation’, ‘average_orientation’, ‘normal’, ‘times’, ‘vertices’,    # Coordinates (coord)
 ‘faces’, ‘vnormal’, ‘fnormal’, ‘sensor’, ‘map’, ‘volume’,               # Coordinates (coord)
@@ -225,8 +219,6 @@ Otherwise, the structure follows the standard layout.</p></li>
 ‘fc’                                                                    # Spatial (spatial)</p>
 </dd>
 </dl>
-</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -243,13 +235,12 @@ Otherwise, the structure follows the standard layout.</p></li>
 absolute paths where data is to be stored, deals with ‘centres.txt’ file and
 preprocesses it. Then, sends the finalized versions to the function that
 saves JSON and TSV files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>(</strong><strong>dict</strong><strong>)</strong> (<em>sub</em>) – Dictionary containing information of one file only. For example,
+<dl>
+<dt>sub (dict):</dt><dd><p>Dictionary containing information of one file only. For example,
 {‘name’: ‘centres’, ‘fname’: ‘centres.txt’, ‘sid’: ‘sub-01’, ‘desc’: ‘default’,
-‘sep’: ‘        ‘, ‘path’: PATH_TO_FILE, ‘ext’: ‘txt’}</p></li>
-<li><p><strong>(</strong><strong>str</strong><strong>)</strong> (<em>ftype</em>) – <p>Folder where to store output conversions for the specific file. For example,
+‘sep’: ‘        ‘, ‘path’: PATH_TO_FILE, ‘ext’: ‘txt’}</p>
+</dd>
+<dt>folder (str):</dt><dd><p>Folder where to store output conversions for the specific file. For example,
 if the passed file is ‘weights.txt’ and the input files have both sessions and
 multi-subject structure, then ‘weights.txt’ will be stored like:</p>
 <blockquote>
@@ -268,11 +259,10 @@ multi-subject structure, then ‘weights.txt’ will be stored like:</p>
 </dd>
 </dl>
 </div></blockquote>
-</p></li>
-<li><p><strong>(</strong><strong>pd.DataFrame</strong> (<em>content</em>) – Content of the specific file.</p></li>
-<li><p><strong>np.array</strong> – Content of the specific file.</p></li>
-<li><p><strong>...</strong><strong>)</strong> – Content of the specific file.</p></li>
-<li><p><strong>(</strong><strong>str</strong><strong>)</strong> – <p>Type of default name to use. There are two options: default and coordinate.
+</dd>
+<dt>content (pd.DataFrame, np.array, …)</dt><dd><p>Content of the specific file.</p>
+</dd>
+<dt>type (str):</dt><dd><p>Type of default name to use. There are two options: default and coordinate.
 The first creates the following file name:</p>
 <blockquote>
 <div><p>sub-&lt;ID&gt;_desc-&lt;label&gt;_&lt;suffix&gt;.json|.tsv</p>
@@ -281,18 +271,18 @@ The first creates the following file name:</p>
 <dt>The other creates the following file name (basically, omitting the ID):</dt><dd><p>desc-&lt;label&gt;_&lt;suffix&gt;.json|.tsv</p>
 </dd>
 </dl>
-</p></li>
-<li><p><strong>(</strong><strong>bool</strong><strong>)</strong> (<em>centres</em>) – Whether the file is ‘centres.txt’. Centres require additional treatment as
+</dd>
+<dt>centres (bool):</dt><dd><p>Whether the file is ‘centres.txt’. Centres require additional treatment as
 splitting the folder into ‘nodes.txt’ and ‘labels.txt’, therefore, it should
-be distinguished from others.</p></li>
-<li><p><strong>(</strong><strong>str</strong><strong>)</strong> – Description of the file; this information will be added to the JSON sidecar.</p></li>
-<li><p><strong>(</strong><strong>str</strong><strong>)</strong> – <dl class="simple">
-<dt>File type of the passed file. Accepted types:</dt><dd><p>’wd’ (weights and distances), ‘coord’ (coordinate), ‘ts’ (time series),
+be distinguished from others.</p>
+</dd>
+<dt>desc (str):</dt><dd><p>Description of the file; this information will be added to the JSON sidecar.</p>
+</dd>
+<dt>ftype (str):</dt><dd><dl class="simple">
+<dt>File type of the passed file. Accepted types:</dt><dd><p>‘wd’ (weights and distances), ‘coord’ (coordinate), ‘ts’ (time series),
 ‘spatial’, ‘eq’ (equations), ‘param’ (parameters), and ‘code’.</p>
 </dd>
 </dl>
-</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -305,32 +295,29 @@ be distinguished from others.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.convert.convert.to_json">
 <span class="sig-prename descclassname"><span class="pre">sim2bids.convert.convert.</span></span><span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/convert/convert.html#to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.convert.convert.to_json" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> – param shape:</p></li>
-<li><p><strong>desc</strong> – param key:</p></li>
-<li><p><strong>kwargs</strong> – return:</p></li>
-<li><p><strong>shape</strong> – </p></li>
-<li><p><strong>key</strong> – </p></li>
-<li><p><strong>**kwargs</strong> – </p></li>
-</ul>
+<dd><dl class="simple">
+<dt>path :</dt><dd><p>param shape:</p>
+</dd>
+<dt>desc :</dt><dd><p>param key:</p>
+</dd>
+<dt>kwargs :</dt><dd><p>return:</p>
 </dd>
 </dl>
+<p>shape :</p>
+<p>key :</p>
+<p><a href="#id31"><span class="problematic" id="id32">**</span></a>kwargs :</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sim2bids.convert.convert.to_tsv">
 <span class="sig-prename descclassname"><span class="pre">sim2bids.convert.convert.</span></span><span class="sig-name descname"><span class="pre">to_tsv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sim2bids/convert/convert.html#to_tsv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sim2bids.convert.convert.to_tsv" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> – param file:</p></li>
-<li><p><strong>sep</strong> – return: (Default value = None)</p></li>
-<li><p><strong>file</strong> – </p></li>
-</ul>
+<dd><dl class="simple">
+<dt>path :</dt><dd><p>param file:</p>
+</dd>
+<dt>sep :</dt><dd><p>return: (Default value = None)</p>
 </dd>
 </dl>
+<p>file :</p>
 </dd></dl>
 
 </section>
