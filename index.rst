@@ -8,15 +8,58 @@ Welcome to sim2bids documentation!
 
 sim2bids is a Python package to created to convert computational data to BIDS standard as proposed by `Michael Schirner and Petra Ritter. <https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit?usp=sharing>`_
 
-The specification proposes a data structure schema for neural network computer models that aims to be generically applicable to all kinds of neural network simulation software, mathematical models, computational models, and data models, but with a focus on dynamic circuit models of brain activity. Importantly, they not only propose suggestions for a BIDS schema for computer models, but they also propose extensions to the entire BIDS standard that solve several other problems.
+The specification proposes a data structure schema for neural network computer models that aims to be generically applicable to all kinds of neural network simulation software, mathematical models, computational models, and data models, but with a focus on dynamic circuit models of brain activity.
+
+Importantly, they not only propose suggestions for a BIDS schema for computer models, but they also propose extensions to the entire BIDS standard that solve several other problems.
+
+.. note::
+   This project is under active development.
+
+Installation
+------------
+
+Simply run the following command to get the app up and running:
+
+.. code-block:: console
+   pip install sim2bids
+
+or
+
+.. code-block:: console
+   pip3 install sim2bids
+
+Alternatively, either fork or obtain the latest sim2bids version by running the following:
+
+.. code-block:: console
+   git clone https://github.com/dissagaliyeva/sim2bids
+
+   cd sim2bids
+
+   python setup.py install
+
+Then, open up your notebook and import the following packages to set up the notebook:
+
+.. code-block:: python
+
+import sim2bids
+from sim2bids.sim2bids import MainArea
+
+import panel as pn
+pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets', sizing_mode='stretch_width', notifications=True)
+
+
+
+
+
+
+
+
 
 
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-
 
 Table of Contents
 ==================
