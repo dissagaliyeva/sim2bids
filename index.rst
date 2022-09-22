@@ -56,11 +56,9 @@ version, and source code link. Here are some templates that you can use right af
 
 
 **TheVirtualBrain (TVB) users**
-
-If you ran simulations using `TVB <https://www.thevirtualbrain.org/tvb/zwei>`_, make sure to include the following:
+   If you ran simulations using `TVB <https://www.thevirtualbrain.org/tvb/zwei>`_, make sure to include the following:
 
 .. sourcecode:: python
-
    # set required fields
    sim2bids.app.app.SoftwareVersion = 2.6
    sim2bids.app.app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6'
