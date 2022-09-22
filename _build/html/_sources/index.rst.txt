@@ -16,19 +16,17 @@ Importantly, they not only propose suggestions for a BIDS schema for computer mo
    This project is under active development.
 
 Installation
-------------
+============
+
+***************
+Get the package
+***************
 
 Simply run the following command to get the app up and running:
 
 .. sourcecode:: console
 
    $ pip install sim2bids
-
-or
-
-.. sourcecode:: console
-
-   $ pip3 install sim2bids
 
 Alternatively, either fork or obtain the latest sim2bids version by running the following:
 
@@ -49,7 +47,24 @@ Then, open up your notebook and import the following packages to set up the note
                 sizing_mode='stretch_width', notifications=True)
 
 
+*************************************
+Provide software-specific information
+*************************************
 
+The main goal of data conversion is to include all information for reproducibility. Therefore, it's required to specify the software name,
+version, and source code link. Here are some templates that you can use right after import statements.
+
+
+**TheVirtualBrain (TVB) users**
+
+If you ran simulations using `TVB <https://www.thevirtualbrain.org/tvb/zwei>`_, make sure to include the following:
+
+.. sourcecode:: python
+
+   # set required fields
+   sim2bids.app.app.SoftwareVersion = 2.6
+   sim2bids.app.app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6'
+   sim2bids.app.app.SoftwareName = 'TVB'
 
 
 

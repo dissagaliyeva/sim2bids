@@ -39,8 +39,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Welcome to sim2bids documentation!</a><ul>
-<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#">Welcome to sim2bids documentation!</a></li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#get-the-package">Get the package</a></li>
+<li><a class="reference internal" href="#provide-software-specific-information">Provide software-specific information</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
@@ -79,14 +81,13 @@
 <p class="admonition-title">Note</p>
 <p>This project is under active development.</p>
 </div>
+</section>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
+<section id="get-the-package">
+<h2>Get the package<a class="headerlink" href="#get-the-package" title="Permalink to this heading"></a></h2>
 <p>Simply run the following command to get the app up and running:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install sim2bids
-</pre></div>
-</div>
-<p>or</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip3 install sim2bids
 </pre></div>
 </div>
 <p>Alternatively, either fork or obtain the latest sim2bids version by running the following:</p>
@@ -101,6 +102,19 @@
 <span class="kn">from</span> <span class="nn">sim2bids.sim2bids</span> <span class="kn">import</span> <span class="n">MainArea</span>
 <span class="n">pn</span><span class="o">.</span><span class="n">extension</span><span class="p">(</span><span class="s1">&#39;tabulator&#39;</span><span class="p">,</span> <span class="s1">&#39;ace&#39;</span><span class="p">,</span> <span class="s1">&#39;jsoneditor&#39;</span><span class="p">,</span> <span class="s1">&#39;ipywidgets&#39;</span><span class="p">,</span>
              <span class="n">sizing_mode</span><span class="o">=</span><span class="s1">&#39;stretch_width&#39;</span><span class="p">,</span> <span class="n">notifications</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="provide-software-specific-information">
+<h2>Provide software-specific information<a class="headerlink" href="#provide-software-specific-information" title="Permalink to this heading"></a></h2>
+<p>The main goal of data conversion is to include all information for reproducibility. Therefore, it’s required to specify the software name,
+version, and source code link. Here are some templates that you can use right after import statements.</p>
+<p><strong>TheVirtualBrain (TVB) users</strong></p>
+<p>If you ran simulations using <a class="reference external" href="https://www.thevirtualbrain.org/tvb/zwei">TVB</a>, make sure to include the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set required fields</span>
+<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span> <span class="o">=</span> <span class="mf">2.6</span>
+<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6&#39;</span>
+<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span> <span class="o">=</span> <span class="s1">&#39;TVB&#39;</span>
 </pre></div>
 </div>
 <div class="toctree-wrapper compound">
