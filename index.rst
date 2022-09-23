@@ -90,7 +90,7 @@ There are two ways to run the app:
 
       pn.serve(MainArea().view())
 
-.. warning::
+.. note::
    The app performs best if ran locally. It will open up a new tab running on a local host. It's a known problem
    in the HoloViz community (the package the app built on) that the components **do not** get rendered well if ran inline.
 
