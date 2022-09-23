@@ -73,7 +73,47 @@ Here are some templates that you can use right after import statements. The list
       sim2bids.app.app.SoftwareRepository = 'https://www.mathworks.com'
       sim2bids.app.app.SoftwareName = 'MATLAB'
 
+***********
+Run the app
+***********
 
+There are two ways to run the app:
+
+**Run locally**
+   When you run the app locally (=not on a server, cluster, or anything of the sort), the app creates a localhost page
+   in a new tab that will render the app. The page should have a name like this `http://localhost:58838/`, of course,
+   with different numbers. Please note that the numbers will keep changing every time you run the app.
+
+   Here is the snippet to run the app:
+
+   .. sourcecode:: python
+
+      pn.serve(MainArea().view())
+
+.. note::
+   The app performs best if ran locally. It will open up a new tab running on a local host. It's a known problem
+   in the HoloViz community (the package the app built on) that the components **do not** get rendered well if ran inline.
+
+**Run on a server**
+   When you run the app on a server/cluster, you will need to run the app inline. The localhost will be created
+   but won't be accessible. That's why it's recommended to run it inline.
+
+   Please note that this approach might not work properly because of the rendering issues. You might see text blocked
+   but input fields or not be able to do select folders. If you encounter that, please keep restarting the notebook
+   until the issue is fixed.
+
+   Here is the snippet to run the app:
+
+   .. sourcecode:: python
+
+      MainArea().view().servable()
+
+.. note::
+   We recommend saving all your simulations created on a server and running the app locally for best performance.
+
+***************
+Complete script
+***************
 
 
 
