@@ -90,7 +90,7 @@ There are two ways to run the app:
 
       pn.serve(MainArea().view())
 
-.. note::
+.. warning::
    The app performs best if ran locally. It will open up a new tab running on a local host. It's a known problem
    in the HoloViz community (the package the app built on) that the components **do not** get rendered well if ran inline.
 
@@ -115,8 +115,35 @@ There are two ways to run the app:
 Complete script
 ***************
 
+**Run locally**
+   .. sourcecode:: python
 
+      import sim2bids
+      import panel as pn
+      from sim2bids.sim2bids import MainArea
+      pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets', sizing_mode='stretch_width', notifications=True)
 
+      # set required fields
+      sim2bids.app.app.SoftwareVersion = 2.6
+      sim2bids.app.app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6'
+      sim2bids.app.app.SoftwareName = 'TVB'
+
+      pn.serve(MainArea().view())
+
+**Run on a server**
+   .. sourcecode:: python
+
+      import sim2bids
+      import panel as pn
+      from sim2bids.sim2bids import MainArea
+      pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets', sizing_mode='stretch_width', notifications=True)
+
+      # set required fields
+      sim2bids.app.app.SoftwareVersion = 2.6
+      sim2bids.app.app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6'
+      sim2bids.app.app.SoftwareName = 'TVB'
+
+      MainArea().view().servable()
 
 
 .. toctree::
