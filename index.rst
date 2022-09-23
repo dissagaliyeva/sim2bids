@@ -51,12 +51,12 @@ Provide software-specific information
 *************************************
 
 The main goal of data conversion is to include all information for reproducibility. Therefore, it's required to specify the software name,
-version, and source code link. Here are some templates that you can use right after import statements.
+version, and source code link. For the moment, we explicitly define these variables before starting the app.
+
+Here are some templates that you can use right after import statements. The list will keep getting updated as the app grows.
 
 
 **TheVirtualBrain (TVB) users**
-   If you ran simulations using `TVB <https://www.thevirtualbrain.org/tvb/zwei>`_, make sure to include the following:
-
    .. sourcecode:: python
 
       # set required fields
@@ -64,6 +64,14 @@ version, and source code link. Here are some templates that you can use right af
       sim2bids.app.app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6'
       sim2bids.app.app.SoftwareName = 'TVB'
 
+
+**MATLAB users**
+   .. sourcecode:: python
+
+      # set required fields
+      sim2bids.app.app.SoftwareVersion = 'R2022b'
+      sim2bids.app.app.SoftwareRepository = 'https://www.mathworks.com'
+      sim2bids.app.app.SoftwareName = 'MATLAB'
 
 
 
