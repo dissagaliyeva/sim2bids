@@ -95,7 +95,7 @@ There are two ways to run the app:
    in the HoloViz community (the package the app built on) that the components **do not** get rendered well if ran inline.
 
 **Run on a server**
-   When you run the app on a server or a cluster, you will need to run the app inline. The localhost will be created
+   When you run the app on a server/cluster, you will need to run the app inline. The localhost will be created
    but won't be accessible. That's why it's recommended to run it inline.
 
    Please note that this approach might not work properly because of the rendering issues. You might see text blocked
