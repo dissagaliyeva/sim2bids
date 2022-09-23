@@ -25,15 +25,18 @@ extensions = ['sphinx_rtd_theme', 'sphinx.ext.autodoc', 'sphinx.ext.doctest', 's
               'sphinx.ext.viewcode', 'sphinx.ext.inheritance_diagram', 'sphinx.ext.githubpages'
               ]
 
-intersphinx_mapping = {
-    "rtd": ("https://docs.readthedocs.io/en/stable/", None),
-    "python": ("https://docs.python.org/3/", None),
-    "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
-}
+# intersphinx_mapping = {
+#     "rtd": ("https://docs.readthedocs.io/en/stable/", None),
+#     "python": ("https://docs.python.org/3/", None),
+#     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
+# }
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 pygments_style = 'sphinx'
+
+master_doc = "index"
+source_suffix = ".rst"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
