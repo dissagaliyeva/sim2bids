@@ -43,8 +43,7 @@ Then, open up your notebook and import the following packages to set up the note
    import sim2bids
    import panel as pn
    from sim2bids.sim2bids import MainArea
-   pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets',
-                sizing_mode='stretch_width', notifications=True)
+   pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets', sizing_mode='stretch_width', notifications=True)
 
 
 *************************************
@@ -59,6 +58,7 @@ version, and source code link. Here are some templates that you can use right af
    If you ran simulations using `TVB <https://www.thevirtualbrain.org/tvb/zwei>`_, make sure to include the following:
 
    .. sourcecode:: python
+
       # set required fields
       sim2bids.app.app.SoftwareVersion = 2.6
       sim2bids.app.app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6'
