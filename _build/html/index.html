@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to sim2bids documentation! &mdash; sim2bids 1.1.2 documentation</title>
+  <title>sim2bids documentation &mdash; sim2bids 1.1.2 documentation</title>
   
 
   
@@ -43,7 +43,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="sim2bids 1.1.2 documentation" href="#"/>
-        <link rel="next" title="Functionality" href="source/features/features.html"/> 
+        <link rel="next" title="Getting Started" href="source/get_started/install.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -93,12 +93,13 @@
             
             
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Welcome to sim2bids documentation!</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">sim2bids documentation</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="source/features/features.html">Functionality</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source/inputs/files.html">Accepted files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source/inputs/structure.html">Input structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/get_started/install.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/get_started/files.html">Accepted files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/get_started/structure.html">Input structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/features/home.html">Functionality</a></li>
 </ul>
 
             
@@ -143,7 +144,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>Welcome to sim2bids documentation!</li>
+      <li>sim2bids documentation</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -162,8 +163,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="welcome-to-sim2bids-documentation">
-<h1>Welcome to sim2bids documentation!<a class="headerlink" href="#welcome-to-sim2bids-documentation" title="Permalink to this heading"></a></h1>
+  <section id="sim2bids-documentation">
+<h1>sim2bids documentation<a class="headerlink" href="#sim2bids-documentation" title="Permalink to this heading"></a></h1>
+<p><strong>Version</strong>: 1.2.1</p>
 <p>sim2bids is a Python package to created to convert computational data to BIDS standard as proposed by <a class="reference external" href="https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit?usp=sharing">Michael Schirner and Petra Ritter.</a></p>
 <p>The specification proposes a data structure schema for neural network computer models that aims to be generically applicable to all kinds of neural network simulation software, mathematical models, computational models, and data models, but with a focus on dynamic circuit models of brain activity.</p>
 <p>Importantly, they not only propose suggestions for a BIDS schema for computer models, but they also propose extensions to the entire BIDS standard that solve several other problems.</p>
@@ -171,131 +173,22 @@
 <p class="admonition-title">Note</p>
 <p>This project is under active development.</p>
 </div>
-</section>
-<section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
-<section id="get-the-package">
-<h2>Get the package<a class="headerlink" href="#get-the-package" title="Permalink to this heading"></a></h2>
-<p>Simply run the following command to get the app up and running:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install sim2bids
-</pre></div>
-</div>
-<p>Alternatively, either fork or obtain the latest sim2bids version by running the following:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git clone https://github.com/dissagaliyeva/sim2bids
-<span class="gp">$ </span><span class="nb">cd</span> sim2bids
-<span class="gp">$ </span>python setup.py install
-</pre></div>
-</div>
-<p>Then, open up your notebook and import the following packages to set up the notebook:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sim2bids</span>
-<span class="kn">import</span> <span class="nn">panel</span> <span class="k">as</span> <span class="nn">pn</span>
-<span class="kn">from</span> <span class="nn">sim2bids.sim2bids</span> <span class="kn">import</span> <span class="n">MainArea</span>
-<span class="n">pn</span><span class="o">.</span><span class="n">extension</span><span class="p">(</span><span class="s1">&#39;tabulator&#39;</span><span class="p">,</span> <span class="s1">&#39;ace&#39;</span><span class="p">,</span> <span class="s1">&#39;jsoneditor&#39;</span><span class="p">,</span> <span class="s1">&#39;ipywidgets&#39;</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="s1">&#39;stretch_width&#39;</span><span class="p">,</span> <span class="n">notifications</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="provide-software-specific-information">
-<h2>Provide software-specific information<a class="headerlink" href="#provide-software-specific-information" title="Permalink to this heading"></a></h2>
-<p>The main goal of data conversion is to include all information for reproducibility. Therefore, it’s required to specify the software name,
-version, and source code link. For the moment, we explicitly define these variables before starting the app.</p>
-<p>Here are some templates that you can use right after import statements. The list will keep getting updated as the app grows.</p>
-<dl>
-<dt><strong>TheVirtualBrain (TVB) users</strong></dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set required fields</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span> <span class="o">=</span> <span class="mf">2.6</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6&#39;</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span> <span class="o">=</span> <span class="s1">&#39;TVB&#39;</span>
-</pre></div>
-</div>
-</dd>
-<dt><strong>MATLAB users</strong></dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set required fields</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span> <span class="o">=</span> <span class="s1">&#39;R2022b&#39;</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span> <span class="o">=</span> <span class="s1">&#39;https://www.mathworks.com&#39;</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span> <span class="o">=</span> <span class="s1">&#39;MATLAB&#39;</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-</section>
-<section id="run-the-app">
-<h2>Run the app<a class="headerlink" href="#run-the-app" title="Permalink to this heading"></a></h2>
-<p>There are two ways to run the app:</p>
-<dl>
-<dt><strong>Run locally</strong></dt><dd><p>When you run the app locally (=not on a server, cluster, or anything of the sort), the app creates a localhost page
-in a new tab that will render the app. The page should have a name like this <cite>http://localhost:58838/</cite>, of course,
-with different numbers. Please note that the numbers will keep changing every time you run the app.</p>
-<p>Here is the snippet to run the app:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pn</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="n">MainArea</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">())</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The app performs best if ran locally. It will open up a new tab running on a local host. It’s a known problem
-in the HoloViz community (the package the app built on) that the components <strong>do not</strong> get rendered well if ran inline.</p>
-</div>
-<dl>
-<dt><strong>Run on a server</strong></dt><dd><p>When you run the app on a server/cluster, you will need to run the app inline. The localhost will be created
-but won’t be accessible. That’s why it’s recommended to run it inline.</p>
-<p>Please note that this approach might not work properly because of the rendering issues. You might see text blocked
-but input fields or not be able to do select folders. If you encounter that, please keep restarting the notebook
-until the issue is fixed.</p>
-<p>Here is the snippet to run the app:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">MainArea</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">()</span><span class="o">.</span><span class="n">servable</span><span class="p">()</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>We recommend saving all your simulations created on a server and running the app locally for best performance.</p>
-</div>
-</section>
-<section id="complete-script">
-<h2>Complete script<a class="headerlink" href="#complete-script" title="Permalink to this heading"></a></h2>
-<dl>
-<dt><strong>Run locally</strong></dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sim2bids</span>
-<span class="kn">import</span> <span class="nn">panel</span> <span class="k">as</span> <span class="nn">pn</span>
-<span class="kn">from</span> <span class="nn">sim2bids.sim2bids</span> <span class="kn">import</span> <span class="n">MainArea</span>
-<span class="n">pn</span><span class="o">.</span><span class="n">extension</span><span class="p">(</span><span class="s1">&#39;tabulator&#39;</span><span class="p">,</span> <span class="s1">&#39;ace&#39;</span><span class="p">,</span> <span class="s1">&#39;jsoneditor&#39;</span><span class="p">,</span> <span class="s1">&#39;ipywidgets&#39;</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="s1">&#39;stretch_width&#39;</span><span class="p">,</span> <span class="n">notifications</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># set required fields</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span> <span class="o">=</span> <span class="mf">2.6</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6&#39;</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span> <span class="o">=</span> <span class="s1">&#39;TVB&#39;</span>
-
-<span class="n">pn</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="n">MainArea</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">())</span>
-</pre></div>
-</div>
-</dd>
-<dt><strong>Run on a server</strong></dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sim2bids</span>
-<span class="kn">import</span> <span class="nn">panel</span> <span class="k">as</span> <span class="nn">pn</span>
-<span class="kn">from</span> <span class="nn">sim2bids.sim2bids</span> <span class="kn">import</span> <span class="n">MainArea</span>
-<span class="n">pn</span><span class="o">.</span><span class="n">extension</span><span class="p">(</span><span class="s1">&#39;tabulator&#39;</span><span class="p">,</span> <span class="s1">&#39;ace&#39;</span><span class="p">,</span> <span class="s1">&#39;jsoneditor&#39;</span><span class="p">,</span> <span class="s1">&#39;ipywidgets&#39;</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="s1">&#39;stretch_width&#39;</span><span class="p">,</span> <span class="n">notifications</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># set required fields</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span> <span class="o">=</span> <span class="mf">2.6</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6&#39;</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span> <span class="o">=</span> <span class="s1">&#39;TVB&#39;</span>
-
-<span class="n">MainArea</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">()</span><span class="o">.</span><span class="n">servable</span><span class="p">()</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-</section>
-</section>
-<section id="table-of-contents">
-<h1>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this heading"></a></h1>
+<section id="where-to-go-from-here">
+<h2>Where to go from here<a class="headerlink" href="#where-to-go-from-here" title="Permalink to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="source/features/features.html">Functionality</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source/inputs/files.html">Accepted files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source/inputs/structure.html">Input structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/get_started/install.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/get_started/install.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source/get_started/files.html">Accepted files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/get_started/structure.html">Input structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/features/home.html">Functionality</a></li>
 </ul>
 </div>
+</section>
 </section>
 
 
@@ -308,7 +201,7 @@ until the issue is fixed.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="source/features/features.html" class="btn btn-neutral float-right" title="Functionality" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="source/get_started/install.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>

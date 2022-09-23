@@ -20,16 +20,13 @@ release = '1.1.2'
 
 
 extensions = ['sphinx_rtd_theme', 'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo',
-              'sphinx.ext.autosummary', 'sphinx.ext.extlinks',
-              'sphinx.ext.intersphinx',
-              'sphinx.ext.viewcode', 'sphinx.ext.inheritance_diagram', 'sphinx.ext.githubpages'
+              'sphinx.ext.autosummary', 'sphinx.ext.extlinks', 'sphinx.ext.intersphinx',
+              'sphinx.ext.viewcode', 'sphinx.ext.inheritance_diagram', 'sphinx.ext.githubpages',
+              'sphinx.ext.autosectionlabel',
               ]
 
-# intersphinx_mapping = {
-#     "rtd": ("https://docs.readthedocs.io/en/stable/", None),
-#     "python": ("https://docs.python.org/3/", None),
-#     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
-# }
+# Make sure the target is unique
+autosectionlabel_prefix_document = True
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
