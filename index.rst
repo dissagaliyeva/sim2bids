@@ -145,14 +145,18 @@ Complete script
 
       MainArea().view().servable()
 
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
 Table of Contents
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :hidden:
+
+   self
+
+.. toctree::
+   :maxdepth: 2
+
+   source/features/features.rst
+   source/inputs/structure.rst
+   source/inputs/files.rstg
+
