@@ -23,10 +23,10 @@ release = '1.1.2'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 
-extensions = ['sphinx_rtd_theme', 'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo',
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo',
               'sphinx.ext.autosummary', 'sphinx.ext.extlinks', 'sphinx.ext.intersphinx',
               'sphinx.ext.viewcode', 'sphinx.ext.inheritance_diagram', 'sphinx.ext.githubpages',
-              'sphinx.ext.autosectionlabel', 'sphinx_tabs.tabs'
+              'sphinx.ext.autosectionlabel', 'sphinx_tabs.tabs', 'sphinx_rtd_theme'
               ]
 
 # tabs config
