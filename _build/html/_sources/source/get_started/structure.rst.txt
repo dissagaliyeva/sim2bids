@@ -30,3 +30,19 @@ There are quite a few structures that are supported by the app:
             |__ weights.[txt|dat|csv]
             |__ distances.[txt|dat|csv]
             |__ centres.[txt|dat|csv]
+
+**Single subject with sessions**
+    This structure is like the structure above but with the additional folder(s) *ses-preop* and *ses-postop*.
+    If you have one of the session types, make sure to pass the entire folder. For example, if your folder structure follows
+    the layout below, make sure to select *ses-preop* folder or go back one level and select *sub-01*.
+
+    **It does not matter how you name the subject folder**, it will automatically be assumed it's a single-subject folder.
+
+    .. sourcecode:: python
+
+        |__ sub-01
+            |__ ses-preop
+                |__ weights.[txt|dat|csv]
+                |__ distances.[txt|dat|csv]
+                |__ centres.[txt|dat|csv]
+
