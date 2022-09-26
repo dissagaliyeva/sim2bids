@@ -8,6 +8,10 @@
 import os
 import sphinx_rtd_theme
 
+
+def setup(app):
+    app.add_css_file('my_theme.css')
+
 on_rtd = os.environ.get("READTHEDOCS") == "True"
 
 project = 'sim2bids'
@@ -22,8 +26,13 @@ release = '1.1.2'
 extensions = ['sphinx_rtd_theme', 'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo',
               'sphinx.ext.autosummary', 'sphinx.ext.extlinks', 'sphinx.ext.intersphinx',
               'sphinx.ext.viewcode', 'sphinx.ext.inheritance_diagram', 'sphinx.ext.githubpages',
-              'sphinx.ext.autosectionlabel',
+              'sphinx.ext.autosectionlabel', 'sphinx_tabs.tabs'
               ]
+
+# tabs config
+sphinx_tabs_valid_builders = ['linkcheck']
+# sphinx_tabs_disable_tab_closing = True
+# sphinx_tabs_disable_css_loading = True
 
 # Make sure the target is unique
 autosectionlabel_prefix_document = True
