@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sim2bids.convert.convert &mdash; sim2bids 1.1.2 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> sim2bids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">sim2bids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>sim2bids.convert.convert</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sim2bids.convert.convert</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">sim2bids.app</span> <span class="kn">import</span> <span class="n">app</span>
+<span class="kn">from</span> <span class="nn">sim2bids.generate</span> <span class="kn">import</span> <span class="n">subjects</span>
+<span class="kn">import</span> <span class="nn">sim2bids.templates.templates</span> <span class="k">as</span> <span class="nn">temp</span>
+
+<span class="c1"># define naming conventions</span>
+<span class="n">DEFAULT_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_desc-</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">.</span><span class="si">{}</span><span class="s1">&#39;</span>
+<span class="n">COORD_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;desc-</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">.</span><span class="si">{}</span><span class="s1">&#39;</span>
+
+<span class="c1"># set to true if centres.txt (nodes and labels) are the same</span>
+<span class="c1"># for all files. In that case, store only one copy of the files</span>
+<span class="c1"># in the main &#39;coord&#39; folder in the same scope as CHANGES.txt</span>
+<span class="n">IGNORE_CENTRE</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1"># location of coord files (nodes and labels) in the scope of</span>
+<span class="c1"># converted files. This information is used to supplement JSON</span>
+<span class="c1"># sidecars, specifically `CoordsRows` and `CoordsColumns`</span>
+<span class="n">COORDS</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">NETWORK</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../docs/sim2bids.convert.html#sim2bids.convert.convert.save">[docs]</a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">sub</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">folders</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ses</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Main engine to save all conversions. Several functionalities to understand:</span>
+
+<span class="sd">    1. Check all centres files to see if they have identical content. If so,</span>
+<span class="sd">       only one copy gets saved in the main area of the output folder (by default</span>
+<span class="sd">       this folder is in root level of the project in &#39;output&#39; folder), specifically,</span>
+<span class="sd">       in &#39;coord&#39; folder. The same structure is applied for single-subject inputs.</span>
+<span class="sd">       The final structure will have the following layout:</span>
+<span class="sd">                            |__ output</span>
+<span class="sd">                                |__ coord</span>
+<span class="sd">                                    |__ desc-&lt;label&gt;_&lt;suffix&gt;.json</span>
+<span class="sd">                                    |__ desc-&lt;label&gt;_&lt;suffix&gt;.tsv</span>
+
+<span class="sd">       Otherwise, if input data has multi-subject files, the &#39;coord&#39; folder will be</span>
+<span class="sd">       deleted in the root-level. The final structure will have the following layout:</span>
+<span class="sd">                            |__ output</span>
+<span class="sd">                                |__ sub-&lt;ID&gt;</span>
+<span class="sd">                                    |__ coord</span>
+<span class="sd">                                        |__ sub-&lt;ID&gt;_desc-&lt;label&gt;_&lt;suffix&gt;.json</span>
+<span class="sd">                                        |__ sub-&lt;ID&gt;_desc-&lt;label&gt;_&lt;suffix&gt;.tsv</span>
+
+<span class="sd">       To overcome redundancy, the first run will happen as usual; it will check all</span>
+<span class="sd">       centres files and update the global parameter IGNORE_CENTRE. This argument indicates</span>
+<span class="sd">       whether the following centres should be omitted or not. If true, the function will</span>
+<span class="sd">       immediately break. Otherwise, all centres will be stored in their respective folders.</span>
+
+<span class="sd">    2. Read file contents. This is pretty straight-forward, given a file location,</span>
+<span class="sd">       the app gets its contents. Supported file types are &#39;.txt&#39;, &#39;.csv&#39;, &#39;.dat&#39;, &#39;.mat&#39;,</span>
+<span class="sd">       and &#39;.h5&#39;.</span>
+
+<span class="sd">       Tips:</span>
+<span class="sd">            1. Make sure to have 1 (!) array in MATLAB (.mat), HDF5 (.h5) files. If there</span>
+<span class="sd">               are multiple arrays, the app will ignore them.</span>
+<span class="sd">            2. Make sure to store textual data (e.g., &#39;lh_bankssts&#39;) in the first column (!)</span>
+<span class="sd">               of &#39;centres.txt&#39; file. When &#39;centres.txt&#39; file is passed, the app divides its</span>
+<span class="sd">               columns to labels (Nx1, 1st column) and nodes (NxN-1, 2nd-Nth column). If you</span>
+<span class="sd">               have nodes and labels separated in &#39;nodes.txt&#39; and &#39;labels.txt&#39; files, you</span>
+<span class="sd">               can safely ignore this information.</span>
+
+<span class="sd">    3. Get folder locations. Depending on the passed file, get its respective folder location.</span>
+
+<span class="sd">    4. Save files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sub (dict):</span>
+<span class="sd">        Dictionary containing information of one file only. For example,</span>
+<span class="sd">        {&#39;name&#39;: &#39;centres&#39;, &#39;fname&#39;: &#39;centres.txt&#39;, &#39;sid&#39;: &#39;sub-01&#39;, &#39;desc&#39;: &#39;default&#39;,</span>
+<span class="sd">        &#39;sep&#39;: &#39;\t&#39;, &#39;path&#39;: PATH_TO_FILE, &#39;ext&#39;: &#39;txt&#39;}</span>
+<span class="sd">    folders (list):</span>
+<span class="sd">        List of folders corresponding to whether input files have single- or</span>
+<span class="sd">        multi-subject, or session-based structure. Each structure contains a</span>
+<span class="sd">        different sequence of folders created in &#39;app.py&#39; in &#39;create_sub_struct&#39; function.</span>
+<span class="sd">    ses (str):</span>
+<span class="sd">        Session type (ses-preop, ses-postop, None). If sessions are present,</span>
+<span class="sd">        appropriate files are stored in their appropriate session folders.</span>
+<span class="sd">        Otherwise, the structure follows the standard layout.</span>
+<span class="sd">    name (str):</span>
+<span class="sd">        Name of the file. Accepted names:</span>
+<span class="sd">            &#39;weight&#39;, &#39;distance&#39;, &#39;tract_length&#39;, &#39;delay&#39;, &#39;speed&#39;,                 # Network (net)</span>
+<span class="sd">            &#39;nodes&#39;, &#39;labels&#39;, &#39;centres&#39;, &#39;area&#39;, &#39;hemisphere&#39;, &#39;cortical&#39;,         # Coordinates (coord)</span>
+<span class="sd">            &#39;orientation&#39;, &#39;average_orientation&#39;, &#39;normal&#39;, &#39;times&#39;, &#39;vertices&#39;,    # Coordinates (coord)</span>
+<span class="sd">            &#39;faces&#39;, &#39;vnormal&#39;, &#39;fnormal&#39;, &#39;sensor&#39;, &#39;map&#39;, &#39;volume&#39;,               # Coordinates (coord)</span>
+<span class="sd">            &#39;cartesian2d&#39;, &#39;cartesian3d&#39;, &#39;polar2d&#39;, &#39;polar3d&#39;,                     # Coordinates (coord)</span>
+<span class="sd">            &#39;vars&#39;, &#39;stimuli&#39;, &#39;noise&#39;, &#39;spike&#39;, &#39;raster&#39;, &#39;ts&#39;, &#39;event&#39;, &#39;emp&#39;     # Timeseries (ts)</span>
+<span class="sd">            &#39;fc&#39;                                                                    # Spatial (spatial)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">IGNORE_CENTRE</span>
+
+    <span class="c1"># check if centres should be ignored. If so, immediately break</span>
+    <span class="c1"># the function. Otherwise, continue iteration.</span>
+    <span class="k">if</span> <span class="n">IGNORE_CENTRE</span> <span class="ow">and</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;centres&#39;</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="c1"># read file contents</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">open_file</span><span class="p">(</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">],</span> <span class="n">sub</span><span class="p">[</span><span class="s1">&#39;sep&#39;</span><span class="p">])</span>
+
+    <span class="c1"># get folder location for weights and distances</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;wd&#39;</span><span class="p">:</span>
+        <span class="c1"># set appropriate output path depending on session type</span>
+        <span class="k">if</span> <span class="n">ses</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">folder</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">folder</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># get description for weights or distances</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">file_desc</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;weights&#39;</span> <span class="ow">in</span> <span class="n">sub</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="n">temp</span><span class="o">.</span><span class="n">file_desc</span><span class="p">[</span><span class="s1">&#39;distances&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s1">&#39;content&#39;</span> <span class="ow">in</span> <span class="n">sub</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">sub</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">],</span> <span class="n">ftype</span><span class="o">=</span><span class="s1">&#39;wd&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># save conversion results</span>
+            <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="s1">&#39;wd&#39;</span><span class="p">)</span>
+
+    <span class="c1"># get folder location for centres</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;centres&#39;</span><span class="p">:</span>
+        <span class="n">save_centres</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">ses</span><span class="p">,</span> <span class="n">folders</span><span class="p">)</span>
+
+    <span class="c1"># get folder location for spatial</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">,</span> <span class="s1">&#39;fc&#39;</span><span class="p">]:</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">file_desc</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">ses</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">folder</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">folder</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s1">&#39;content&#39;</span> <span class="ow">in</span> <span class="n">sub</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">sub</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">],</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="s1">&#39;spatial&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># save conversion results</span>
+            <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="s1">&#39;spatial&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
+
+    <span class="c1"># get folder location for time series</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;bold&#39;</span><span class="p">]:</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">file_desc</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;ts&#39;</span> <span class="k">else</span> <span class="n">temp</span><span class="o">.</span><span class="n">file_desc</span><span class="p">[</span><span class="s1">&#39;bold&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;sid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;sub-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folders</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">file</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
+
+    <span class="c1"># get folder location for coordinates</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;coord&#39;</span><span class="p">:</span>
+        <span class="c1"># check nodes</span>
+        <span class="k">if</span> <span class="s1">&#39;nodes&#39;</span> <span class="ow">in</span> <span class="n">sub</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">IGNORE_CENTRE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;content&#39;</span> <span class="ow">in</span> <span class="n">sub</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">save_centres</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">sub</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">],</span> <span class="n">ses</span><span class="p">,</span> <span class="n">folders</span><span class="p">,</span> <span class="n">centre_name</span><span class="o">=</span><span class="s1">&#39;nodes&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">save_centres</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">ses</span><span class="p">,</span> <span class="n">folders</span><span class="p">,</span> <span class="n">centre_name</span><span class="o">=</span><span class="s1">&#39;nodes&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># set appropriate output path depending on session and subject types</span>
+            <span class="k">if</span> <span class="n">ses</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">folder</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">app</span><span class="o">.</span><span class="n">MULTI_INPUT</span> <span class="ow">and</span> <span class="n">ses</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">folder</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="s1">&#39;coord&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s1">&#39;content&#39;</span> <span class="ow">in</span> <span class="n">sub</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">centres</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># save conversion results</span>
+                <span class="k">if</span> <span class="s1">&#39;centres&#39;</span> <span class="ow">in</span> <span class="n">sub</span><span class="p">[</span><span class="s1">&#39;fname&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">IGNORE_CENTRE</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">app</span><span class="o">.</span><span class="n">MULTI_INPUT</span><span class="p">:</span>
+                        <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;other&#39;</span><span class="p">,</span> <span class="n">centres</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">temp</span><span class="o">.</span><span class="n">centres</span><span class="p">[</span><span class="s1">&#39;single&#39;</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">centres</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">temp</span><span class="o">.</span><span class="n">centres</span><span class="p">[</span><span class="s1">&#39;multi-unique&#39;</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">IGNORE_CENTRE</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">app</span><span class="o">.</span><span class="n">MULTI_INPUT</span><span class="p">:</span>
+                        <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;other&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">temp</span><span class="o">.</span><span class="n">file_desc</span><span class="p">[</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">temp</span><span class="o">.</span><span class="n">file_desc</span><span class="p">[</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]])</span></div>
+
+
+<div class="viewcode-block" id="save_centres"><a class="viewcode-back" href="../../../docs/sim2bids.convert.html#sim2bids.convert.convert.save_centres">[docs]</a><span class="k">def</span> <span class="nf">save_centres</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">ses</span><span class="p">,</span> <span class="n">folders</span><span class="p">,</span> <span class="n">centre_name</span><span class="o">=</span><span class="s1">&#39;centres&#39;</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">IGNORE_CENTRE</span>
+
+    <span class="c1"># check if all centres are of the same content</span>
+    <span class="k">if</span> <span class="n">check_centres</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">centre_name</span><span class="p">):</span>
+        <span class="c1"># ignore preceding centres files</span>
+        <span class="n">IGNORE_CENTRE</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># set output path to store coords in</span>
+        <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="s1">&#39;coord&#39;</span><span class="p">)</span>
+
+        <span class="c1"># save conversion results</span>
+        <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;other&#39;</span><span class="p">,</span> <span class="n">centres</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">temp</span><span class="o">.</span><span class="n">centres</span><span class="p">[</span><span class="s1">&#39;multi-same&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># get description for centres depending on input files</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">centres</span><span class="p">[</span><span class="s1">&#39;multi-unique&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">MULTI_INPUT</span> <span class="k">else</span> <span class="n">temp</span><span class="o">.</span><span class="n">centres</span><span class="p">[</span><span class="s1">&#39;single&#39;</span><span class="p">]</span>
+
+        <span class="c1"># set appropriate output path depending on session and subject types</span>
+        <span class="k">if</span> <span class="n">ses</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">folder</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">app</span><span class="o">.</span><span class="n">MULTI_INPUT</span> <span class="ow">and</span> <span class="n">ses</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">folder</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="s1">&#39;coord&#39;</span><span class="p">)</span>
+
+        <span class="c1"># save conversion results</span>
+        <span class="k">if</span> <span class="n">IGNORE_CENTRE</span><span class="p">:</span>
+            <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;other&#39;</span><span class="p">,</span> <span class="n">centres</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">centres</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_h5"><a class="viewcode-back" href="../../../docs/sim2bids.convert.html#sim2bids.convert.convert.save_h5">[docs]</a><span class="k">def</span> <span class="nf">save_h5</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">folders</span><span class="p">,</span> <span class="n">ses</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="save_files"><a class="viewcode-back" href="../../../docs/sim2bids.convert.html#sim2bids.convert.convert.save_files">[docs]</a><span class="k">def</span> <span class="nf">save_files</span><span class="p">(</span><span class="n">sub</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">folder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">centres</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="n">desc</span><span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ftype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;coord&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function prepares the data to be stored in JSON/TSV formats. It first creates</span>
+<span class="sd">    absolute paths where data is to be stored, deals with &#39;centres.txt&#39; file and</span>
+<span class="sd">    preprocesses it. Then, sends the finalized versions to the function that</span>
+<span class="sd">    saves JSON and TSV files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sub (dict):</span>
+<span class="sd">        Dictionary containing information of one file only. For example,</span>
+<span class="sd">        {&#39;name&#39;: &#39;centres&#39;, &#39;fname&#39;: &#39;centres.txt&#39;, &#39;sid&#39;: &#39;sub-01&#39;, &#39;desc&#39;: &#39;default&#39;,</span>
+<span class="sd">        &#39;sep&#39;: &#39;\t&#39;, &#39;path&#39;: PATH_TO_FILE, &#39;ext&#39;: &#39;txt&#39;}</span>
+<span class="sd">    folder (str):</span>
+<span class="sd">        Folder where to store output conversions for the specific file. For example,</span>
+<span class="sd">        if the passed file is &#39;weights.txt&#39; and the input files have both sessions and</span>
+<span class="sd">        multi-subject structure, then &#39;weights.txt&#39; will be stored like:</span>
+<span class="sd">                            |__ output</span>
+<span class="sd">                                |__ sub-&lt;ID&gt;</span>
+<span class="sd">                                    |__ ses-preop</span>
+<span class="sd">                                        |__ net</span>
+<span class="sd">                                            |__ sub-&lt;ID&gt;_desc-&lt;label&gt;_weights.json</span>
+<span class="sd">                                            |__ sub-&lt;ID&gt;_desc-&lt;label&gt;_weights.tsv</span>
+<span class="sd">    content (pd.DataFrame, np.array, ...)</span>
+<span class="sd">        Content of the specific file.</span>
+<span class="sd">    type (str):</span>
+<span class="sd">        Type of default name to use. There are two options: default and coordinate.</span>
+<span class="sd">        The first creates the following file name:</span>
+<span class="sd">                                sub-&lt;ID&gt;_desc-&lt;label&gt;_&lt;suffix&gt;.json|.tsv</span>
+<span class="sd">        The other creates the following file name (basically, omitting the ID):</span>
+<span class="sd">                                    desc-&lt;label&gt;_&lt;suffix&gt;.json|.tsv</span>
+<span class="sd">    centres (bool):</span>
+<span class="sd">        Whether the file is &#39;centres.txt&#39;. Centres require additional treatment as</span>
+<span class="sd">        splitting the folder into &#39;nodes.txt&#39; and &#39;labels.txt&#39;, therefore, it should</span>
+<span class="sd">        be distinguished from others.</span>
+<span class="sd">    desc (str):</span>
+<span class="sd">        Description of the file; this information will be added to the JSON sidecar.</span>
+<span class="sd">    ftype (str):</span>
+<span class="sd">        File type of the passed file. Accepted types:</span>
+<span class="sd">            &#39;wd&#39; (weights and distances), &#39;coord&#39; (coordinate), &#39;ts&#39; (time series),</span>
+<span class="sd">            &#39;spatial&#39;, &#39;eq&#39; (equations), &#39;param&#39; (parameters), and &#39;code&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">COORDS</span>
+
+    <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+        <span class="n">json_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">DEFAULT_TEMPLATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;sid&#39;</span><span class="p">],</span> <span class="n">sub</span><span class="p">[</span><span class="s1">&#39;desc&#39;</span><span class="p">],</span> <span class="n">sub</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;json&#39;</span><span class="p">))</span>
+        <span class="n">tsv_file</span> <span class="o">=</span> <span class="n">json_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="s1">&#39;tsv&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">json_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">COORD_TEMPLATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;desc&#39;</span><span class="p">],</span> <span class="n">sub</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;json&#39;</span><span class="p">))</span>
+        <span class="n">tsv_file</span> <span class="o">=</span> <span class="n">json_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="s1">&#39;tsv&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Save &#39;centres.txt&#39; as &#39;nodes.txt&#39; and &#39;labels.txt&#39;. This will require breaking the</span>
+    <span class="c1"># &#39;centres.txt&#39; file, the first column HAS TO BE labels, and the rest N dimensions</span>
+    <span class="c1"># are nodes.</span>
+    <span class="k">if</span> <span class="n">centres</span><span class="p">:</span>
+        <span class="c1"># create names for nodes and labels</span>
+        <span class="c1"># Since the usual structure leaves the name of the files as is,</span>
+        <span class="c1"># we need to make sure we save &#39;nodes&#39; and &#39;labels&#39; appropriately.</span>
+        <span class="c1"># If we didn&#39;t create these two values below, both labels and nodes</span>
+        <span class="c1"># would be stored as &#39;sub-&lt;ID&gt;_desc-&lt;label&gt;_centres.txt&#39;, and the</span>
+        <span class="c1"># content would only have nodes.</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">json_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;labels&#39;</span><span class="p">)</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">json_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;nodes&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">COORDS</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">IGNORE_CENTRE</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">app</span><span class="o">.</span><span class="n">MULTI_INPUT</span><span class="p">:</span>
+                <span class="n">COORDS</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;../coord/desc-</span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">DESC</span><span class="si">}</span><span class="s1">_labels.json&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;../coord/desc-</span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">DESC</span><span class="si">}</span><span class="s1">_nodes.json&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">COORDS</span> <span class="o">=</span> <span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="s1">&#39;../..&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">),</span>
+                          <span class="n">nodes</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="s1">&#39;../..&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)]</span>
+
+        <span class="c1"># save labels to json and tsv</span>
+        <span class="n">to_json</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="n">content</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;coord&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">to_tsv</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="s1">&#39;tsv&#39;</span><span class="p">),</span> <span class="n">content</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># save nodes to json and tsv</span>
+        <span class="n">to_json</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="n">content</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">content</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;coord&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">to_tsv</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="s1">&#39;tsv&#39;</span><span class="p">),</span> <span class="n">content</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ftype</span> <span class="o">==</span> <span class="s1">&#39;coord&#39;</span><span class="p">:</span>
+            <span class="n">to_json</span><span class="p">(</span><span class="n">json_file</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">shape</span><span class="o">=</span><span class="n">content</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;coord&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
+            <span class="n">to_tsv</span><span class="p">(</span><span class="n">tsv_file</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">content</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># otherwise, save files as usual</span>
+            <span class="n">to_json</span><span class="p">(</span><span class="n">json_file</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">shape</span><span class="o">=</span><span class="n">content</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">ftype</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
+            <span class="n">to_tsv</span><span class="p">(</span><span class="n">tsv_file</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">content</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_centres"><a class="viewcode-back" href="../../../docs/sim2bids.convert.html#sim2bids.convert.convert.check_centres">[docs]</a><span class="k">def</span> <span class="nf">check_centres</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;centres&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function checks all centres files in the input folder and</span>
+<span class="sd">    decides whether they have the same content or not. The logic of</span>
+<span class="sd">    this functionality is the following, we take the first arbitrary</span>
+<span class="sd">    centres.txt file and compare it to the rest. We don&#39;t check every</span>
+<span class="sd">    single centres file against the rest. Thus, only one checking round</span>
+<span class="sd">    happens here.</span>
+
+<span class="sd">    It&#39;s important to note that if users pass in 2+ subject folders and only</span>
+<span class="sd">    one contains centres.txt, the &#39;coord&#39; folder is created for one subject only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># get all centres files</span>
+    <span class="n">centres</span> <span class="o">=</span> <span class="n">get_specific</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="c1"># get the first element</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">open_file</span><span class="p">(</span><span class="n">centres</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subjects</span><span class="o">.</span><span class="n">find_separator</span><span class="p">(</span><span class="n">centres</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="c1"># define set literal</span>
+    <span class="n">same</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># iterate over centres</span>
+    <span class="k">for</span> <span class="n">centre</span> <span class="ow">in</span> <span class="n">centres</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="c1"># append to the set literal whether the contents of the first element</span>
+        <span class="c1"># are the same with the rest</span>
+        <span class="n">same</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">file</span> <span class="o">==</span> <span class="n">open_file</span><span class="p">(</span><span class="n">centre</span><span class="p">,</span> <span class="n">subjects</span><span class="o">.</span><span class="n">find_separator</span><span class="p">(</span><span class="n">centre</span><span class="p">)))</span>
+
+    <span class="c1"># check if set literal contains only one element</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">same</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">same</span><span class="p">):</span>
+            <span class="c1"># if files are the same, return True</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="c1"># False otherwise</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="get_specific"><a class="viewcode-back" href="../../../docs/sim2bids.convert.html#sim2bids.convert.convert.get_specific">[docs]</a><span class="k">def</span> <span class="nf">get_specific</span><span class="p">(</span><span class="n">filetype</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get all files that correspond to the filetype. For example,</span>
+<span class="sd">    if filetype is equal to &quot;areas&quot;, this function will return</span>
+<span class="sd">    all files containing that keyword.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filetype: str</span>
+<span class="sd">        Type of the file to search for. Accepted types:</span>
+<span class="sd">            &#39;weight&#39;, &#39;distance&#39;, &#39;tract_length&#39;, &#39;delay&#39;, &#39;speed&#39;,                 # Network (net)</span>
+<span class="sd">            &#39;nodes&#39;, &#39;labels&#39;, &#39;centres&#39;, &#39;area&#39;, &#39;hemisphere&#39;, &#39;cortical&#39;,         # Coordinates (coord)</span>
+<span class="sd">            &#39;orientation&#39;, &#39;average_orientation&#39;, &#39;normal&#39;, &#39;times&#39;, &#39;vertices&#39;,    # Coordinates (coord)</span>
+<span class="sd">            &#39;faces&#39;, &#39;vnormal&#39;, &#39;fnormal&#39;, &#39;sensor&#39;, &#39;map&#39;, &#39;volume&#39;,               # Coordinates (coord)</span>
+<span class="sd">            &#39;cartesian2d&#39;, &#39;cartesian3d&#39;, &#39;polar2d&#39;, &#39;polar3d&#39;,                     # Coordinates (coord)</span>
+<span class="sd">            &#39;vars&#39;, &#39;stimuli&#39;, &#39;noise&#39;, &#39;spike&#39;, &#39;raster&#39;, &#39;ts&#39;, &#39;event&#39;, &#39;emp&#39;     # Timeseries (ts)</span>
+<span class="sd">            &#39;fc&#39;                                                                    # Spatial (spatial)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        Returns a list of all files that end with the specified filetype.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># create emtpy list to store appropriate files</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># iterate over all files found by the app previously</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">ALL_FILES</span><span class="p">:</span>
+        <span class="c1"># check if the keyword is present</span>
+        <span class="k">if</span> <span class="n">filetype</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+            <span class="c1"># if yes, append the value</span>
+            <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="c1"># return the list of newly-found files</span>
+    <span class="k">return</span> <span class="n">content</span></div>
+
+
+<div class="viewcode-block" id="open_file"><a class="viewcode-back" href="../../../docs/sim2bids.convert.html#sim2bids.convert.convert.open_file">[docs]</a><span class="k">def</span> <span class="nf">open_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path :</span>
+<span class="sd">        param sep:</span>
+<span class="sd">    path: str :</span>
+
+<span class="sd">    sep: str :</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;txt&#39;</span><span class="p">,</span> <span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="s1">&#39;dat&#39;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">open_text</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sep</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;mat&#39;</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;h5&#39;</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="open_text"><a class="viewcode-back" href="../../../docs/sim2bids.convert.html#sim2bids.convert.convert.open_text">[docs]</a><span class="k">def</span> <span class="nf">open_text</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sep</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path :</span>
+<span class="sd">        param sep:</span>
+<span class="sd">    sep :</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">sep</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">pd</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">EmptyDataError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="to_tsv"><a class="viewcode-back" href="../../../docs/sim2bids.convert.html#sim2bids.convert.convert.to_tsv">[docs]</a><span class="k">def</span> <span class="nf">to_tsv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path :</span>
+<span class="sd">        param file:</span>
+<span class="sd">    sep :</span>
+<span class="sd">        return: (Default value = None)</span>
+<span class="sd">    file :</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sep&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+    <span class="n">sep</span> <span class="o">=</span> <span class="n">sep</span> <span class="k">if</span> <span class="n">sep</span> <span class="o">!=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="k">else</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sep</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f2</span><span class="p">:</span>
+                    <span class="n">f2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="to_json"><a class="viewcode-back" href="../../../docs/sim2bids.convert.html#sim2bids.convert.convert.to_json">[docs]</a><span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path :</span>
+<span class="sd">        param shape:</span>
+<span class="sd">    desc :</span>
+<span class="sd">        param key:</span>
+<span class="sd">    kwargs :</span>
+<span class="sd">        return:</span>
+<span class="sd">    shape :</span>
+
+<span class="sd">    key :</span>
+
+<span class="sd">    **kwargs :</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">inp</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">required</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span><span class="n">x</span><span class="p">:</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inp</span><span class="p">})</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ModelEq&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;../eq/desc-</span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">DESC</span><span class="si">}</span><span class="s1">_eq.xml&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;ModelParam&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;../param/desc-</span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">DESC</span><span class="si">}</span><span class="s1">_param.xml&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;SourceCode&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;../code/desc-</span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">DESC</span><span class="si">}</span><span class="s1">_code.py&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;SoftwareVersion&#39;</span><span class="p">:</span> <span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span><span class="p">,</span>
+              <span class="s1">&#39;SoftwareRepository&#39;</span><span class="p">:</span> <span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span><span class="p">,</span>
+              <span class="s1">&#39;SourceCodeVersion&#39;</span><span class="p">:</span> <span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span><span class="p">,</span>
+              <span class="s1">&#39;SoftwareName&#39;</span><span class="p">:</span> <span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span><span class="p">,</span>
+              <span class="s1">&#39;Network&#39;</span><span class="p">:</span> <span class="n">NETWORK</span>
+              <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;wd&#39;</span><span class="p">:</span>
+        <span class="n">struct</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">struct</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">x</span><span class="p">:</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">struct</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]})</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ModelEq&#39;</span><span class="p">,</span> <span class="s1">&#39;ModelParam&#39;</span><span class="p">,</span> <span class="s1">&#39;SourceCode&#39;</span><span class="p">,</span> <span class="s1">&#39;SoftwareVersion&#39;</span><span class="p">,</span> <span class="s1">&#39;SourceCodeVersion&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;SoftwareRepository&#39;</span><span class="p">,</span> <span class="s1">&#39;SoftwareName&#39;</span><span class="p">,</span> <span class="s1">&#39;Network&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="s1">&#39;Units&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;coord&#39;</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;Units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ms&#39;</span>
+
+    <span class="c1"># point coord files to nodes/labels TSV files instead</span>
+    <span class="n">coord</span> <span class="o">=</span> <span class="n">COORDS</span> <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;coord&#39;</span> <span class="k">else</span> <span class="p">[</span><span class="n">COORDS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="s1">&#39;tsv&#39;</span><span class="p">),</span> <span class="n">COORDS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="s1">&#39;tsv&#39;</span><span class="p">)]</span> \
+        <span class="k">if</span> <span class="n">COORDS</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">COORDS</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">populate_dict</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coord</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">file</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dinara Issagaliyeva.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
