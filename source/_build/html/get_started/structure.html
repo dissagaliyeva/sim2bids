@@ -200,7 +200,7 @@
 </div>
 </dd>
 <dt><strong>Single subject with sessions</strong></dt><dd><p>This structure is like the structure above but with the additional folder(s) <em>ses-preop</em> and <em>ses-postop</em>.
-If you have one of the session types, make sure to pass the entire folder. For example, if your folder structure follows
+If you have one of the session types, make sure to pass the <strong>entire folder</strong>. For example, if your folder structure follows
 the layout below, make sure to select <em>ses-preop</em> folder or go back one level and select <em>sub-01</em>.</p>
 <p><strong>It does not matter how you name the subject folder</strong>, it will automatically be assumed it’s a single-subject folder.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">__</span> <span class="n">sub</span><span class="o">-</span><span class="mi">01</span>
@@ -210,6 +210,8 @@ the layout below, make sure to select <em>ses-preop</em> folder or go back one l
         <span class="o">|</span><span class="n">__</span> <span class="n">centres</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
 </pre></div>
 </div>
+<p>Alternatively, you can pass both <em>ses-preop</em> and <em>ses-postop</em> folders at once or go one level up and pass the whole folder
+containing the subject with both sessions.</p>
 </dd>
 </dl>
 </section>

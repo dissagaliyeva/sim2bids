@@ -33,7 +33,7 @@ There are quite a few structures that are supported by the app:
 
 **Single subject with sessions**
     This structure is like the structure above but with the additional folder(s) *ses-preop* and *ses-postop*.
-    If you have one of the session types, make sure to pass the entire folder. For example, if your folder structure follows
+    If you have one of the session types, make sure to pass the **entire folder**. For example, if your folder structure follows
     the layout below, make sure to select *ses-preop* folder or go back one level and select *sub-01*.
 
     **It does not matter how you name the subject folder**, it will automatically be assumed it's a single-subject folder.
@@ -46,3 +46,5 @@ There are quite a few structures that are supported by the app:
                 |__ distances.[txt|dat|csv]
                 |__ centres.[txt|dat|csv]
 
+    Alternatively, you can pass both *ses-preop* and *ses-postop* folders at once or go one level up and pass the whole folder
+    containing the subject with both sessions.
