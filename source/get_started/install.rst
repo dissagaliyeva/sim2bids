@@ -131,7 +131,7 @@ Complete script
    :maxdepth: 2
 
    source/get_started/install.rst
-   source/get_started/files.rst
    source/get_started/structure.rst
+   source/get_started/app.rst
    source/features/home.rst
    source/tutorials/home.rst
