@@ -2,6 +2,9 @@
 
 ---
 
+[![Documentation Status](https://readthedocs.org/projects/sim2bids/badge/?version=latest)](https://sim2bids.readthedocs.io/en/latest/?badge=latest)
+
+
 This app is created to convert computational data to BIDS standard as proposed by [Michael Schirner and Petra Ritter](https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit?usp=sharing).
 The specification proposes a data structure schema for neural network computer models that aims to be generically applicable to all kinds of neural network simulation software, mathematical models, computational models, and data models, but with a focus on dynamic circuit models of brain activity. Importantly, they not only propose suggestions for a BIDS schema for computer models, but they also propose extensions to the entire BIDS standard that solve several other problems.
 

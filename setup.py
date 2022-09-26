@@ -4,7 +4,7 @@
 from setuptools import setup
 
 requirements = ['numpy', 'pandas', 'h5py', 'panel~=0.13.1', 'holoviews', 'param~=1.12.0',
-                'graphviz', 'mat73', 'pylems_py2xml']
+                'graphviz', 'mat73', 'pylems_py2xml', 'sphinx-tabs', 'sphinx-rtd-theme']
 
 test_requirements = ['pytest>=3']
 
