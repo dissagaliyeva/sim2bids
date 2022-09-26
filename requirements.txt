@@ -10,3 +10,5 @@ holoviews
 param~=1.12.0
 mat73~=0.59
 pylems_py2xml
+sphinx-rtd-theme
+sphinx-tabs
