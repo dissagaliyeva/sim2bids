@@ -30,6 +30,7 @@ Where to go from here
    :maxdepth: 2
 
    source/get_started/install.rst
+   source/get_started/app.rst
    source/get_started/files.rst
    source/get_started/structure.rst
    source/features/home.rst
