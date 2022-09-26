@@ -16,7 +16,7 @@ Accepted structures
 There are quite a few structures that are supported by the app:
 
 **Single subject without sessions**
-    This structure supports either a list of files or a directory storing the files. For example, it could look like:
+  This structure supports either a list of files or a directory storing the files. For example, it could look like:
 
     .. sourcecode:: python
 
@@ -32,9 +32,9 @@ There are quite a few structures that are supported by the app:
             |__ centres.[txt|dat|csv]
 
 **Single subject with sessions**
-    This structure is like the structure above but with the additional folder(s) *ses-preop* and *ses-postop*.
-    If you have one of the session types, make sure to pass the **entire folder**. For example, if your folder structure follows
-    the layout below, make sure to select *ses-preop* folder or go back one level and select *sub-01*.
+  This structure is like the structure above but with the additional folder(s) *ses-preop* and *ses-postop*.
+  If you have one of the session types, make sure to pass the **entire folder**. For example, if your folder structure follows
+  the layout below, make sure to select *ses-preop* folder or go back one level and select *sub-01*.
 
     **It does not matter how you name the subject folder**, it will automatically be assumed it's a single-subject folder.
 

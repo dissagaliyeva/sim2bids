@@ -41,7 +41,7 @@ Here are some templates that you can use right after import statements. The list
 
 
 **TheVirtualBrain (TVB) users**
-   .. sourcecode:: python
+  .. sourcecode:: python
 
       # set required fields
       sim2bids.app.app.SoftwareVersion = 2.6
@@ -50,7 +50,7 @@ Here are some templates that you can use right after import statements. The list
 
 
 **MATLAB users**
-   .. sourcecode:: python
+  .. sourcecode:: python
 
       # set required fields
       sim2bids.app.app.SoftwareVersion = 'R2022b'
@@ -78,16 +78,16 @@ There are two ways to run the app:
    in the HoloViz community (the package the app built on) that the components **do not** get rendered well if ran inline.
 
 **Run on a server**
-   When you run the app on a server/cluster, you will need to run the app inline. The localhost will be created
-   but won't be accessible. That's why it's recommended to run it inline.
+  When you run the app on a server/cluster, you will need to run the app inline. The localhost will be created
+  but won't be accessible. That's why it's recommended to run it inline.
 
-   Please note that this approach might not work properly because of the rendering issues. You might see text blocked
-   but input fields or not be able to do select folders. If you encounter that, please keep restarting the notebook
-   until the issue is fixed.
+  Please note that this approach might not work properly because of the rendering issues. You might see text blocked
+  but input fields or not be able to do select folders. If you encounter that, please keep restarting the notebook
+  until the issue is fixed.
 
-   Here is the snippet to run the app:
+  Here is the snippet to run the app:
 
-   .. sourcecode:: python
+  .. sourcecode:: python
 
       MainArea().view().servable()
 
@@ -98,7 +98,7 @@ Complete script
 ===============
 
 **Run locally**
-   .. sourcecode:: python
+  .. sourcecode:: python
 
       import sim2bids
       import panel as pn
@@ -113,7 +113,7 @@ Complete script
       pn.serve(MainArea().view())
 
 **Run on a server**
-   .. sourcecode:: python
+  .. sourcecode:: python
 
       import sim2bids
       import panel as pn
