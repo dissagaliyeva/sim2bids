@@ -3,11 +3,11 @@ How to use the app
 
 .. tabs::
 
-   .. tab:: Apples
+   .. tab:: Layout
 
       Apples are green, or sometimes red.
 
-   .. tab:: Pears
+   .. tab:: Selecting Files
 
       Pears are green.
 
