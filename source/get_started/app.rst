@@ -1,7 +1,7 @@
 How to use the app
 ##################
 
-Before you can get conversions, make sure your input data 
+Before you can get conversions, make sure your input data
 
 *
 
@@ -12,7 +12,7 @@ Before you can get conversions, make sure your input data
     When you run the app locally, you should see the following layout as shown below. There's going to be
     a small difference in the local and inline layouts but the functionality remains the same.
 
-    .. image:: ..\\..\\_static\\app\\layout.png
+    .. image:: https://raw.githubusercontent.com/dissagaliyeva/sim2bids/main/_static/app/layout.png
 
 
    .. tab:: Selecting Files
