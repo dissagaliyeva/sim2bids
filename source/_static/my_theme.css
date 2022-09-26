@@ -2,7 +2,7 @@
     max-width: 1200px !important;
 }
 
-.rst-content dl dt{
+.rst-content {
   display: table;
   margin: 6px 0;
     font-size: 90%;
