@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Input structures &mdash; sim2bids 1.1.2 documentation</title>
+  <title>Input files and structures &mdash; sim2bids 1.1.2 documentation</title>
   
 
   
@@ -47,8 +47,8 @@
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
     <link rel="top" title="sim2bids 1.1.2 documentation" href="../../index.html"/>
-        <link rel="next" title="Functionality" href="../features/home.html"/>
-        <link rel="prev" title="Accepted files" href="files.html"/> 
+        <link rel="next" title="How to use the app" href="app.html"/>
+        <link rel="prev" title="Getting Started" href="install.html"/> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
@@ -102,9 +102,12 @@
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Input files and structures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#accepted-file-extensions">Accepted file extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#accepted-structures">Accepted structures</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="app.html">How to use the app</a></li>
-<li class="toctree-l1"><a class="reference internal" href="files.html">Accepted files</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Input structures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../features/home.html">Functionality</a></li>
 </ul>
 
@@ -150,7 +153,7 @@
     
       <li><a href="../../index.html">Docs</a> &raquo;</li>
         
-      <li>Input structures</li>
+      <li>Input files and structures</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -169,8 +172,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="input-structures">
-<h1>Input structures<a class="headerlink" href="#input-structures" title="Permalink to this heading"></a></h1>
+  <section id="input-files-and-structures">
+<h1>Input files and structures<a class="headerlink" href="#input-files-and-structures" title="Permalink to this heading"></a></h1>
+<section id="accepted-file-extensions">
+<h2>Accepted file extensions<a class="headerlink" href="#accepted-file-extensions" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>txt, csv, dat files</p></li>
+<li><p>mat, MATLAB files (v4 and v6-7.2 using scipy.io.loadmat, v7.3 using mat73 package)</p></li>
+<li><p>h5, HDF5 files</p></li>
+<li><p>zip folders containing all above file extensions</p></li>
+</ul>
+</section>
+<section id="accepted-structures">
+<h2>Accepted structures<a class="headerlink" href="#accepted-structures" title="Permalink to this heading"></a></h2>
+<p>There are quite a few structures that are supported by the app:</p>
+<dl>
+<dt><strong>Single subject without sessions</strong></dt><dd><p>This structure supports either a list of files or a directory storing the files. For example, it could look like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">__</span> <span class="n">weights</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
+<span class="o">|</span><span class="n">__</span> <span class="n">distances</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
+<span class="o">|</span><span class="n">__</span> <span class="n">centres</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">__</span> <span class="n">folder_name</span>
+    <span class="o">|</span><span class="n">__</span> <span class="n">weights</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
+    <span class="o">|</span><span class="n">__</span> <span class="n">distances</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
+    <span class="o">|</span><span class="n">__</span> <span class="n">centres</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</section>
 </section>
 
 
@@ -183,10 +214,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../features/home.html" class="btn btn-neutral float-right" title="Functionality" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="app.html" class="btn btn-neutral float-right" title="How to use the app" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="files.html" class="btn btn-neutral" title="Accepted files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="install.html" class="btn btn-neutral" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
