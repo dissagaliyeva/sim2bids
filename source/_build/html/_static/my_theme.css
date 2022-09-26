@@ -2,7 +2,7 @@
     max-width: 1200px !important;
 }
 
-.rst-content dl:not(.docutils) dt {
+.rst-content dl dt{
   display: table;
   margin: 6px 0;
     font-size: 90%;
@@ -12,7 +12,4 @@
   border-top: solid 3px #6ab0de;
   padding: 6px;
   position: relative;
-}
-.rst-content dl dt {
-  font-weight: bold;
 }
