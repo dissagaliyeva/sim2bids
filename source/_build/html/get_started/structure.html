@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -187,7 +187,8 @@
 <p>There are quite a few structures that are supported by the app:</p>
 <dl>
 <dt><strong>Single subject without sessions</strong></dt><dd><p>This structure supports either a list of files or a directory storing the files. For example, it could look like:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">__</span> <span class="n">weights</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">__</span> <span class="n">weights</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
 <span class="o">|</span><span class="n">__</span> <span class="n">distances</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
 <span class="o">|</span><span class="n">__</span> <span class="n">centres</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
 </pre></div>
@@ -198,11 +199,13 @@
     <span class="o">|</span><span class="n">__</span> <span class="n">centres</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
 </pre></div>
 </div>
+</div></blockquote>
 </dd>
 <dt><strong>Single subject with sessions</strong></dt><dd><p>This structure is like the structure above but with the additional folder(s) <em>ses-preop</em> and <em>ses-postop</em>.
 If you have one of the session types, make sure to pass the <strong>entire folder</strong>. For example, if your folder structure follows
 the layout below, make sure to select <em>ses-preop</em> folder or go back one level and select <em>sub-01</em>.</p>
-<p><strong>It does not matter how you name the subject folder</strong>, it will automatically be assumed it’s a single-subject folder.</p>
+<blockquote>
+<div><p><strong>It does not matter how you name the subject folder</strong>, it will automatically be assumed it’s a single-subject folder.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">__</span> <span class="n">sub</span><span class="o">-</span><span class="mi">01</span>
     <span class="o">|</span><span class="n">__</span> <span class="n">ses</span><span class="o">-</span><span class="n">preop</span>
         <span class="o">|</span><span class="n">__</span> <span class="n">weights</span><span class="o">.</span><span class="p">[</span><span class="n">txt</span><span class="o">|</span><span class="n">dat</span><span class="o">|</span><span class="n">csv</span><span class="p">]</span>
@@ -212,6 +215,7 @@ the layout below, make sure to select <em>ses-preop</em> folder or go back one l
 </div>
 <p>Alternatively, you can pass both <em>ses-preop</em> and <em>ses-postop</em> folders at once or go one level up and pass the whole folder
 containing the subject with both sessions.</p>
+</div></blockquote>
 </dd>
 </dl>
 </section>
@@ -274,6 +278,7 @@ containing the subject with both sessions.</p>
       <script type="text/javascript" src="../_static/underscore.js"></script>
       <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
 
   
 
