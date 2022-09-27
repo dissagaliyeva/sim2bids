@@ -190,8 +190,35 @@
 <section id="accepted-files">
 <h2>Accepted files<a class="headerlink" href="#accepted-files" title="Permalink to this heading"></a></h2>
 <div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Network (net)</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Coordinates (coord)</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Time series (ts)</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">Spatial</button><button aria-controls="panel-0-0-4" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-4" name="0-4" role="tab" tabindex="-1">Code</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p><code class="docutils literal notranslate"><span class="pre">weights</span></code> → Structural connectivity that contains the connectome.</p>
-</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"></div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"></div><div aria-labelledby="tab-0-0-3" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-3" name="0-3" role="tabpanel" tabindex="0"></div><div aria-labelledby="tab-0-0-4" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-4" name="0-4" role="tabpanel" tabindex="0"></div></div>
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Network (net)</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Coordinates (coord)</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Time series (ts)</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">Spatial</button><button aria-controls="panel-0-0-4" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-4" name="0-4" role="tab" tabindex="-1">Code</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">weight</span></code> →  must be present in the input folder (nxn matrix)</dt><dd><p>The Structural Connectivity that contains the connectome.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">distance</span></code> → should be present in the input folder (nxn matrix)</dt><dd><p>The distances between areas.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">delay</span></code> →</dt><dd><p>The connection delays.</p>
+</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">speed</span></code> → The connection speeds. (nxn matrix)</p>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><p><code class="docutils literal notranslate"><span class="pre">centres</span></code> → The container storing <code class="docutils literal notranslate"><span class="pre">labels</span></code> and <code class="docutils literal notranslate"><span class="pre">nodes</span></code> (in this exact format).
+<code class="docutils literal notranslate"><span class="pre">nodes</span></code> →
+<code class="docutils literal notranslate"><span class="pre">labels</span></code> →
+<code class="docutils literal notranslate"><span class="pre">bold_times</span></code> -&gt;
+<code class="docutils literal notranslate"><span class="pre">times</span></code> →
+<code class="docutils literal notranslate"><span class="pre">average_orientation</span></code> or <code class="docutils literal notranslate"><span class="pre">orientation</span></code> →
+<code class="docutils literal notranslate"><span class="pre">face</span></code> →
+<code class="docutils literal notranslate"><span class="pre">vertices</span></code> -&gt;
+<code class="docutils literal notranslate"><span class="pre">vnormal</span></code> →
+<code class="docutils literal notranslate"><span class="pre">fnormal</span></code> →
+<code class="docutils literal notranslate"><span class="pre">cortical</span></code> →
+<code class="docutils literal notranslate"><span class="pre">hemisphere</span></code> →
+<code class="docutils literal notranslate"><span class="pre">sensor</span></code> →
+<code class="docutils literal notranslate"><span class="pre">map</span></code> →
+<code class="docutils literal notranslate"><span class="pre">volume</span></code> →
+<code class="docutils literal notranslate"><span class="pre">cartesian2d</span></code> →
+<code class="docutils literal notranslate"><span class="pre">cartesian3d</span></code> →
+<code class="docutils literal notranslate"><span class="pre">polar2d</span></code> →
+<code class="docutils literal notranslate"><span class="pre">polar3d</span></code> →</p>
+</div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"></div><div aria-labelledby="tab-0-0-3" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-3" name="0-3" role="tabpanel" tabindex="0"></div><div aria-labelledby="tab-0-0-4" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-4" name="0-4" role="tabpanel" tabindex="0"></div></div>
 </section>
 <section id="accepted-structures">
 <h2>Accepted structures<a class="headerlink" href="#accepted-structures" title="Permalink to this heading"></a></h2>
@@ -267,8 +294,9 @@ same folder or stored in their own respective folders. For example:</p>
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>All contents of MATLAB/H5 files will be extracted and placed in unique subject-specific folders. This is applicable
-for both structures where subjects are in unique folders or all subjects in one folder. The extracted structure should look like this:</p>
+<p>All contents of MATLAB/H5 files will be extracted and placed in unique subject-specific folders. This hold true for
+subjects both in one folder or unique folders. All extracted files will be saved in txt file format. The overall
+structure should resemble the following:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">__</span> <span class="mi">1</span>
     <span class="o">|</span><span class="n">__</span> <span class="n">weights</span><span class="o">.</span><span class="n">txt</span>
     <span class="o">|</span><span class="n">__</span> <span class="n">distances</span><span class="o">.</span><span class="n">txt</span>
@@ -276,8 +304,8 @@ for both structures where subjects are in unique folders or all subjects in one 
     <span class="o">|</span><span class="n">__</span> <span class="n">SC_mean_agg</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
 </div>
-<p><strong>Beware that everything inside the structure will be extracted</strong>. The files that are understood by the app will be converted. Preprocessing
-the rest is your responsibility. We accounted for this scenario and created a preprocessing pipeline for your convenience. See the links below to learn more:</p>
+<p>If the extracted files do not match the app’s list of accepted files, you can use the preprocessing pipeline
+specifically created for this purpose. Please visit the following links to learn more:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://sim2bids.readthedocs.io/en/latest/get_started/structure.html#accepted-files">List of accepted files here</a></p></li>
 <li><p><a class="reference external" href="https://sim2bids.readthedocs.io/en/latest/get_started/app.html#preprocessing-pipeline">Preprocessing pipeline</a></p></li>
