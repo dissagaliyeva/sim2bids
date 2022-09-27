@@ -13,13 +13,39 @@ Accepted file extensions
 Accepted files
 **************
 
+
+
 .. tabs::
 
     .. tab:: Network (net)
-        ``weights`` → Structural connectivity that contains the connectome.
+        ``weight`` →  must be present in the input folder (nxn matrix)
+            The Structural Connectivity that contains the connectome.
+        ``distance`` → should be present in the input folder (nxn matrix)
+            The distances between areas.
+        ``delay`` →
+            The connection delays.
+        ``speed`` → The connection speeds. (nxn matrix)
 
     .. tab:: Coordinates (coord)
-
+        ``centres`` → The container storing ``labels`` and ``nodes`` (in this exact format).
+        ``nodes`` →
+        ``labels`` →
+        ``bold_times`` ->
+        ``times`` →
+        ``average_orientation`` or ``orientation`` →
+        ``face`` →
+        ``vertices`` ->
+        ``vnormal`` →
+        ``fnormal`` →
+        ``cortical`` →
+        ``hemisphere`` →
+        ``sensor`` →
+        ``map`` →
+        ``volume`` →
+        ``cartesian2d`` →
+        ``cartesian3d`` →
+        ``polar2d`` →
+        ``polar3d`` →
 
     .. tab:: Time series (ts)
 
@@ -107,8 +133,9 @@ Multi-subject inputs
                 |__ N.mat
 
   .. note::
-    All contents of MATLAB/H5 files will be extracted and placed in unique subject-specific folders. This is applicable
-    for both structures where subjects are in unique folders or all subjects in one folder. The extracted structure should look like this:
+    All contents of MATLAB/H5 files will be extracted and placed in unique subject-specific folders. This hold true for
+    subjects both in one folder or unique folders. All extracted files will be saved in txt file format. The overall
+    structure should resemble the following:
 
     .. sourcecode:: python
 
@@ -118,8 +145,8 @@ Multi-subject inputs
             |__ emp_fc.txt
             |__ SC_mean_agg.txt
 
-    **Beware that everything inside the structure will be extracted**. The files that are understood by the app will be converted. Preprocessing
-    the rest is your responsibility. We accounted for this scenario and created a preprocessing pipeline for your convenience. See the links below to learn more:
+    If the extracted files do not match the app's list of accepted files, you can use the preprocessing pipeline
+    specifically created for this purpose. Please visit the following links to learn more:
 
     * `List of accepted files here <https://sim2bids.readthedocs.io/en/latest/get_started/structure.html#accepted-files>`_
 
