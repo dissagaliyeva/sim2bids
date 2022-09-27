@@ -191,17 +191,23 @@
 <h2>Accepted files<a class="headerlink" href="#accepted-files" title="Permalink to this heading"></a></h2>
 <p>Here is the list of files that are supported by the app categorized by their respective folders. Please note the following rules and features:</p>
 <ul class="simple">
-<li><p>the most important file to have for conversions is <code class="docutils literal notranslate"><span class="pre">weight</span></code> or <code class="docutils literal notranslate"><span class="pre">weights</span></code>. It can have <code class="docutils literal notranslate"><span class="pre">txt</span></code>, <code class="docutils literal notranslate"><span class="pre">csv</span></code>, or <code class="docutils literal notranslate"><span class="pre">dat</span></code> file formats or be stored</p></li>
+<li><p>the most important file to have for conversions is <code class="docutils literal notranslate"><span class="pre">weight</span></code> or <code class="docutils literal notranslate"><span class="pre">weights</span></code>. It can have <code class="docutils literal notranslate"><span class="pre">txt</span></code>, <code class="docutils literal notranslate"><span class="pre">csv</span></code>, or <code class="docutils literal notranslate"><span class="pre">dat</span></code> file formats or be stored in MATLAB, H5 files.</p></li>
 </ul>
-<p>in MATLAB, H5 files.
-Other files are strongly recommended to be present, especially <code class="docutils literal notranslate"><span class="pre">centres</span></code> (or <code class="docutils literal notranslate"><span class="pre">nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">labels</span></code> separately),
-<code class="docutils literal notranslate"><span class="pre">distances</span></code> (or <code class="docutils literal notranslate"><span class="pre">tract_lengths</span></code> which is the other name for distances, thus this file will be renamed to distances both in the input and output,
-folders), <code class="docutils literal notranslate"><span class="pre">Python</span> <span class="pre">code</span></code> that can reproduce the results, and both empirical and simulated time series.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<dl class="simple">
+<dt>Other files are strongly recommended to be present, specifically:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">centres</span></code> (or <code class="docutils literal notranslate"><span class="pre">nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">labels</span></code> separately),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">distances</span></code> (or <code class="docutils literal notranslate"><span class="pre">tract_lengths</span></code> which is the other name for distances, thus this file will be renamed to distances both in the input and output, folders)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Python</span> <span class="pre">code</span></code> that can reproduce the results, and both empirical and simulated time series.</p></li>
+</ul>
+</dd>
+</dl>
+</div>
 <ul class="simple">
 <li><p>majority of file names accept singular form naming, e.g., if the file name is <code class="docutils literal notranslate"><span class="pre">weight_SC</span></code>, it will be recognized as <code class="docutils literal notranslate"><span class="pre">weights</span></code>. The only exceptions are: <code class="docutils literal notranslate"><span class="pre">vertices</span></code>, <code class="docutils literal notranslate"><span class="pre">nodes</span></code>, <code class="docutils literal notranslate"><span class="pre">times</span></code>, <code class="docutils literal notranslate"><span class="pre">faces</span></code>, and <code class="docutils literal notranslate"><span class="pre">vars</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">average_orientation</span></code> or <code class="docutils literal notranslate"><span class="pre">orientation</span></code> will be renamed to <code class="docutils literal notranslate"><span class="pre">normals</span></code> <a class="reference external" href="https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit?usp=sharing">according to BEP034</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">average_orientation</span></code> or <code class="docutils literal notranslate"><span class="pre">orientation</span></code> will be renamed to <code class="docutils literal notranslate"><span class="pre">normals</span></code> <a class="reference external" href="https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit?usp=sharing">according to BEP034</a> both in the input and output folders.</p></li>
 </ul>
-<p>both in the input and output folders.</p>
 <table class="docutils align-default" id="id1">
 <caption><span class="caption-text">Network (net)</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
 <colgroup>
