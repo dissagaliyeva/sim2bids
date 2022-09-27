@@ -39,6 +39,7 @@ version, and source code link. For the moment, we explicitly define these variab
 
 Here are some templates that you can use right after import statements. The list will keep getting updated as the app grows.
 
+.. rst-class:: special
 
 **TheVirtualBrain (TVB) users**
   .. sourcecode:: python
@@ -48,6 +49,7 @@ Here are some templates that you can use right after import statements. The list
       sim2bids.app.app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6'
       sim2bids.app.app.SoftwareName = 'TVB'
 
+.. rst-class:: special
 
 **MATLAB users**
   .. sourcecode:: python
@@ -61,6 +63,8 @@ Run the app
 ===========
 
 There are two ways to run the app:
+
+.. rst-class:: special
 
 **Run locally**
    When you run the app locally (=not on a server, cluster, or anything of the sort), the app creates a localhost page
@@ -76,6 +80,8 @@ There are two ways to run the app:
 .. note::
    The app performs best if ran locally. It will open up a new tab running on a local host. It's a known problem
    in the HoloViz community (the package the app built on) that the components **do not** get rendered well if ran inline.
+
+.. rst-class:: special
 
 **Run on a server**
   When you run the app on a server/cluster, you will need to run the app inline. The localhost will be created
@@ -97,6 +103,8 @@ There are two ways to run the app:
 Complete script
 ===============
 
+.. rst-class:: special
+
 **Run locally**
   .. sourcecode:: python
 
@@ -111,6 +119,8 @@ Complete script
       sim2bids.app.app.SoftwareName = 'TVB'
 
       pn.serve(MainArea().view())
+
+.. rst-class:: special
 
 **Run on a server**
   .. sourcecode:: python
