@@ -9,6 +9,28 @@ Accepted file extensions
 * h5, HDF5 files
 * zip folders containing all above file extensions
 
+
+Accepted files
+**************
+
+.. tabs::
+
+    .. tab:: Network (net)
+        ``weights`` → Structural connectivity that contains the connectome.
+
+    .. tab:: Coordinates (coord)
+
+
+    .. tab:: Time series (ts)
+
+
+    .. tab:: Spatial
+
+
+    .. tab:: Code
+
+
+
 Accepted structures
 *******************
 
@@ -60,29 +82,47 @@ Multi-subject inputs
 
 .. rst-class:: special
 
-**MATLAB files**
-  This structure accepts MATLAB files containing all information about a single subject. They can be either all in the
+**MATLAB/H5 files**
+  This structure accepts MATLAB/H5 files containing all information about a single subject. They can be either all in the
   same folder or stored in their own respective folders. For example:
 
   #. Single-folder
-
         .. sourcecode:: python
 
-        |__ 1.mat
-        .
-        .
-        .
-        |__ N.mat
+            |__ 1.mat
+            .
+            .
+            .
+            |__ N.mat
 
   #. Multi-folder
-
         .. sourcecode:: python
 
+            |__ 1
+                |__ 1.mat
+            .
+            .
+            .
+            |__ N
+                |__ N.mat
+
+  .. note::
+    All contents of MATLAB/H5 files will be extracted and placed in unique subject-specific folders. This is applicable
+    for both structures where subjects are in unique folders or all subjects in one folder. The extracted structure should look like this:
+
+    .. sourcecode:: python
+
         |__ 1
-            |__ 1.mat
-        .
-        .
-        .
-        |__ N
-            |__ N.mat
+            |__ weights.txt
+            |__ distances.txt
+            |__ emp_fc.txt
+            |__ SC_mean_agg.txt
+
+    **Beware that everything inside the structure will be extracted**. The files that are understood by the app will be converted. Preprocessing
+    the rest is your responsibility. We accounted for this scenario and created a preprocessing pipeline for your convenience. See the links below to learn more:
+
+    * `List of accepted files here <https://sim2bids.readthedocs.io/en/latest/get_started/structure.html#accepted-files>`_
+
+    * `Preprocessing pipeline <https://sim2bids.readthedocs.io/en/latest/get_started/app.html#preprocessing-pipeline>`_
+
 

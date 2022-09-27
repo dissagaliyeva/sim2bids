@@ -1,9 +1,13 @@
 How to use the app
 ##################
 
-Before you can get conversions, make sure your input data
+Preprocessing pipeline
+**********************
 
-*
+
+
+App layout & features
+*********************
 
 .. tabs::
 

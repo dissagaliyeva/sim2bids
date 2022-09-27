@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Input files and structures</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#accepted-file-extensions">Accepted file extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#accepted-files">Accepted files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#accepted-structures">Accepted structures</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#single-subject-inputs">Single-subject inputs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#multi-subject-inputs">Multi-subject inputs</a></li>
@@ -186,6 +187,12 @@
 <li><p>zip folders containing all above file extensions</p></li>
 </ul>
 </section>
+<section id="accepted-files">
+<h2>Accepted files<a class="headerlink" href="#accepted-files" title="Permalink to this heading"></a></h2>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Network (net)</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Coordinates (coord)</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Time series (ts)</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">Spatial</button><button aria-controls="panel-0-0-4" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-4" name="0-4" role="tab" tabindex="-1">Code</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p><code class="docutils literal notranslate"><span class="pre">weights</span></code> → Structural connectivity that contains the connectome.</p>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"></div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"></div><div aria-labelledby="tab-0-0-3" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-3" name="0-3" role="tabpanel" tabindex="0"></div><div aria-labelledby="tab-0-0-4" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-4" name="0-4" role="tabpanel" tabindex="0"></div></div>
+</section>
 <section id="accepted-structures">
 <h2>Accepted structures<a class="headerlink" href="#accepted-structures" title="Permalink to this heading"></a></h2>
 <p>There are quite a few structures that are supported by the app:</p>
@@ -230,38 +237,52 @@ containing the subject with both sessions.</p>
 <section id="multi-subject-inputs">
 <h3>Multi-subject inputs<a class="headerlink" href="#multi-subject-inputs" title="Permalink to this heading"></a></h3>
 <dl class="special">
-<dt><strong>MATLAB files</strong></dt><dd><p>This structure accepts MATLAB files containing all information about a single subject. They can be either all in the
+<dt><strong>MATLAB/H5 files</strong></dt><dd><p>This structure accepts MATLAB/H5 files containing all information about a single subject. They can be either all in the
 same folder or stored in their own respective folders. For example:</p>
 <ol class="arabic">
-<li><p>Single-folder</p>
-<blockquote>
-<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<li><dl>
+<dt>Single-folder</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">__</span> <span class="mf">1.</span><span class="n">mat</span>
+<span class="o">.</span>
+<span class="o">.</span>
+<span class="o">.</span>
+<span class="o">|</span><span class="n">__</span> <span class="n">N</span><span class="o">.</span><span class="n">mat</span>
 </pre></div>
 </div>
-<p><a href="#id1"><span class="problematic" id="id2">|</span></a>__ 1.mat
-.
-.
-.
-<a href="#id3"><span class="problematic" id="id4">|</span></a>__ N.mat</p>
-</div></blockquote>
-</li>
-<li><p>Multi-folder</p>
-<blockquote>
-<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><a href="#id5"><span class="problematic" id="id6">|</span></a>__ 1</dt><dd><p><a href="#id7"><span class="problematic" id="id8">|</span></a>__ 1.mat</p>
 </dd>
 </dl>
-<p>.
-<a href="#id9"><span class="problematic" id="id10">|</span></a>__ N</p>
-<blockquote>
-<div><p><a href="#id11"><span class="problematic" id="id12">|</span></a>__ N.mat</p>
-</div></blockquote>
-</div></blockquote>
+</li>
+<li><dl>
+<dt>Multi-folder</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">__</span> <span class="mi">1</span>
+    <span class="o">|</span><span class="n">__</span> <span class="mf">1.</span><span class="n">mat</span>
+<span class="o">.</span>
+<span class="o">.</span>
+<span class="o">.</span>
+<span class="o">|</span><span class="n">__</span> <span class="n">N</span>
+    <span class="o">|</span><span class="n">__</span> <span class="n">N</span><span class="o">.</span><span class="n">mat</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 </li>
 </ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All contents of MATLAB/H5 files will be extracted and placed in unique subject-specific folders. This is applicable
+for both structures where subjects are in unique folders or all subjects in one folder. The extracted structure should look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">__</span> <span class="mi">1</span>
+    <span class="o">|</span><span class="n">__</span> <span class="n">weights</span><span class="o">.</span><span class="n">txt</span>
+    <span class="o">|</span><span class="n">__</span> <span class="n">distances</span><span class="o">.</span><span class="n">txt</span>
+    <span class="o">|</span><span class="n">__</span> <span class="n">emp_fc</span><span class="o">.</span><span class="n">txt</span>
+    <span class="o">|</span><span class="n">__</span> <span class="n">SC_mean_agg</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<p><strong>Beware that everything inside the structure will be extracted</strong>. The files that are understood by the app will be converted. Preprocessing
+the rest is your responsibility. We accounted for this scenario and created a preprocessing pipeline for your convenience. See the links below to learn more:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://sim2bids.readthedocs.io/en/latest/get_started/structure.html#accepted-files">List of accepted files here</a></p></li>
+<li><p><a class="reference external" href="https://sim2bids.readthedocs.io/en/latest/get_started/app.html#preprocessing-pipeline">Preprocessing pipeline</a></p></li>
+</ul>
+</div>
 </dd>
 </dl>
 </section>
@@ -325,6 +346,7 @@ same folder or stored in their own respective folders. For example:</p>
       <script type="text/javascript" src="../_static/underscore.js"></script>
       <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/tabs.js"></script>
 
   
 
