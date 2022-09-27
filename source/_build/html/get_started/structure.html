@@ -182,31 +182,89 @@
 <h2>Accepted file extensions<a class="headerlink" href="#accepted-file-extensions" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>txt, csv, dat files</p></li>
-<li><p>mat, MATLAB files (v4 and v6-7.2 using scipy.io.loadmat, v7.3 using mat73 package)</p></li>
-<li><p>h5, HDF5 files</p></li>
+<li><p>MATLAB (mat) files (v4 and v6-7.2 using scipy.io.loadmat, v7.3 using mat73 package)</p></li>
+<li><p>HDF5 (h5) files</p></li>
 <li><p>zip folders containing all above file extensions</p></li>
 </ul>
 </section>
 <section id="accepted-files">
 <h2>Accepted files<a class="headerlink" href="#accepted-files" title="Permalink to this heading"></a></h2>
+<p>Here is the list of files that are supported by the app categorized by their respective folders. Please note the following rules and features:</p>
+<ul class="simple">
+<li><p>the most important file to have for conversions is <code class="docutils literal notranslate"><span class="pre">weight</span></code> or <code class="docutils literal notranslate"><span class="pre">weights</span></code>. It can have <code class="docutils literal notranslate"><span class="pre">txt</span></code>, <code class="docutils literal notranslate"><span class="pre">csv</span></code>, or <code class="docutils literal notranslate"><span class="pre">dat</span></code> file formats or be stored</p></li>
+</ul>
+<p>in MATLAB, H5 files.
+Other files are strongly recommended to be present, especially <code class="docutils literal notranslate"><span class="pre">centres</span></code> (or <code class="docutils literal notranslate"><span class="pre">nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">labels</span></code> separately),
+<code class="docutils literal notranslate"><span class="pre">distances</span></code> (or <code class="docutils literal notranslate"><span class="pre">tract_lengths</span></code> which is the other name for distances, thus this file will be renamed to distances both in the input and output,
+folders), <code class="docutils literal notranslate"><span class="pre">Python</span> <span class="pre">code</span></code> that can reproduce the results, and both empirical and simulated time series.</p>
+<ul class="simple">
+<li><p>majority of file names accept singular form naming, e.g., if the file name is <code class="docutils literal notranslate"><span class="pre">weight_SC</span></code>, it will be recognized as <code class="docutils literal notranslate"><span class="pre">weights</span></code>. The only exceptions are: <code class="docutils literal notranslate"><span class="pre">vertices</span></code>, <code class="docutils literal notranslate"><span class="pre">nodes</span></code>, <code class="docutils literal notranslate"><span class="pre">times</span></code>, <code class="docutils literal notranslate"><span class="pre">faces</span></code>, and <code class="docutils literal notranslate"><span class="pre">vars</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">average_orientation</span></code> or <code class="docutils literal notranslate"><span class="pre">orientation</span></code> will be renamed to <code class="docutils literal notranslate"><span class="pre">normals</span></code> <a class="reference external" href="https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit?usp=sharing">according to BEP034</a></p></li>
+</ul>
+<p>both in the input and output folders.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Network (net)</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 31%" />
+<col style="width: 19%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>File name</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Dimensions</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>weight</p></td>
+<td><p>The Structural Connectivity that contains the connectome.</p></td>
+<td><p>nxn</p></td>
+<td><p>must be present in the input folder.</p></td>
+</tr>
+<tr class="row-odd"><td><p>distance</p></td>
+<td><p>The distances between areas.</p></td>
+<td><p>nxn</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>tract_length</p></td>
+<td><p>The distances between areas.</p></td>
+<td><p>nxn</p></td>
+<td><p>will be renamed to <code class="docutils literal notranslate"><span class="pre">distance</span></code></p></td>
+</tr>
+</tbody>
+</table>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Network (net)</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Coordinates (coord)</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Time series (ts)</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">Spatial</button><button aria-controls="panel-0-0-4" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-4" name="0-4" role="tab" tabindex="-1">Code</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">weight</span></code> →  must be present in the input folder (nxn matrix)</dt><dd><p>The Structural Connectivity that contains the connectome.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">weight</span></code> → must be present in the input folder (nxn matrix)</dt><dd><p>The Structural Connectivity that contains the connectome.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">distance</span></code> → should be present in the input folder (nxn matrix)</dt><dd><p>The distances between areas.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">delay</span></code> →</dt><dd><p>The connection delays.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">tract_length</span></code> → should be present in the input folder (nxn matrix)</dt><dd><p><strong>Same as distance</strong>, it’s another name for distances. This file will be renamed to “distances” during conversion.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">delay</span></code> → good to have in the input folder (nxn matrix)</dt><dd><p>The connection delays.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">speed</span></code> → good to have in the input folder (nxn matrix)</dt><dd><p>The connection speeds.</p>
 </dd>
 </dl>
-<p><code class="docutils literal notranslate"><span class="pre">speed</span></code> → The connection speeds. (nxn matrix)</p>
-</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><p><code class="docutils literal notranslate"><span class="pre">centres</span></code> → The container storing <code class="docutils literal notranslate"><span class="pre">labels</span></code> and <code class="docutils literal notranslate"><span class="pre">nodes</span></code> (in this exact format).
-<code class="docutils literal notranslate"><span class="pre">nodes</span></code> →
-<code class="docutils literal notranslate"><span class="pre">labels</span></code> →
-<code class="docutils literal notranslate"><span class="pre">bold_times</span></code> -&gt;
-<code class="docutils literal notranslate"><span class="pre">times</span></code> →
-<code class="docutils literal notranslate"><span class="pre">average_orientation</span></code> or <code class="docutils literal notranslate"><span class="pre">orientation</span></code> →
-<code class="docutils literal notranslate"><span class="pre">face</span></code> →
-<code class="docutils literal notranslate"><span class="pre">vertices</span></code> -&gt;
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">centres</span></code> → should be present in the input folder (nx4 matrix)</dt><dd><p>The container storing <code class="docutils literal notranslate"><span class="pre">labels</span></code> and <code class="docutils literal notranslate"><span class="pre">nodes</span></code> (in this exact sequence).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">labels</span></code> → should be present in the input folder (nx1 matrix)</dt><dd><p>The region labels that is unique for each individual.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">nodes</span></code> → should be present in the input folder (nx3 matrix)</dt><dd><p>The 3d coordinate centres that is unique for each individual.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">bold_times</span></code> -&gt; should be present in the input folder (nxn matrix)</dt><dd><p>The functional connectivity matrix based on BOLD time series.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">times</span></code> → should be present in the input folder (nxn matrix)</dt><dd><p>The time series of the simulated time series</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">average_orientation</span></code> or <code class="docutils literal notranslate"><span class="pre">orientation</span></code> → good to have in the input folder (nx1 matrix)</dt><dd><p>The container for connectivity center orientations. It will be renamed to “normals” in the app.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">face</span></code> → good to have in the input folder (nxm matrix)</dt><dd><p>The faces of cortex surface shape (triangles, rectangles, …).</p>
+</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">vertices</span></code> -&gt;
 <code class="docutils literal notranslate"><span class="pre">vnormal</span></code> →
 <code class="docutils literal notranslate"><span class="pre">fnormal</span></code> →
 <code class="docutils literal notranslate"><span class="pre">cortical</span></code> →
