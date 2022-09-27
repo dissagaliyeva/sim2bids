@@ -21,7 +21,8 @@ Here is the list of files that are supported by the app categorized by their res
     Other files are strongly recommended to be present, specifically:
         - ``centres`` (or ``nodes`` and ``labels`` separately),
         - ``distances`` (or ``tract_lengths`` which is the other name for distances, thus this file will be renamed to distances both in the input and output, folders)
-        - ``Python code`` that can reproduce the results, and both empirical and simulated time series.
+        - ``Python code`` that can reproduce the results
+        - ``empirical`` and ``simulated`` time series.
 
 - majority of file names accept singular form naming, e.g., if the file name is ``weight_SC``, it will be recognized as ``weights``. The only exceptions are: ``vertices``, ``nodes``, ``times``, ``faces``, and ``vars``.
 
