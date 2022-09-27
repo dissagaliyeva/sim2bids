@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -37,9 +37,9 @@
   
     <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
   
+    <link rel="stylesheet" href="../_static/my_theme.css" type="text/css" />
+  
     <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
-
-        <link rel="stylesheet" href="../_static/my_theme.css" type="text/css" />
   
 
   
@@ -225,7 +225,7 @@ version, and source code link. For the moment, we explicitly define these variab
 <section id="run-the-app">
 <h3>Run the app<a class="headerlink" href="#run-the-app" title="Permalink to this heading"></a></h3>
 <p>There are two ways to run the app:</p>
-<dl class="rst-content">
+<dl>
 <dt><strong>Run locally</strong></dt><dd><p>When you run the app locally (=not on a server, cluster, or anything of the sort), the app creates a localhost page
 in a new tab that will render the app. The page should have a name like this <cite>http://localhost:58838/</cite>, of course,
 with different numbers. Please note that the numbers will keep changing every time you run the app.</p>
@@ -240,7 +240,7 @@ with different numbers. Please note that the numbers will keep changing every ti
 <p>The app performs best if ran locally. It will open up a new tab running on a local host. It’s a known problem
 in the HoloViz community (the package the app built on) that the components <strong>do not</strong> get rendered well if ran inline.</p>
 </div>
-<dl class="rst-content">
+<dl>
 <dt><strong>Run on a server</strong></dt><dd><p>When you run the app on a server/cluster, you will need to run the app inline. The localhost will be created
 but won’t be accessible. That’s why it’s recommended to run it inline.</p>
 <p>Please note that this approach might not work properly because of the rendering issues. You might see text blocked
@@ -259,7 +259,7 @@ until the issue is fixed.</p>
 </section>
 <section id="complete-script">
 <h3>Complete script<a class="headerlink" href="#complete-script" title="Permalink to this heading"></a></h3>
-<dl class="rst-content">
+<dl>
 <dt><strong>Run locally</strong></dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sim2bids</span>
 <span class="kn">import</span> <span class="nn">panel</span> <span class="k">as</span> <span class="nn">pn</span>
 <span class="kn">from</span> <span class="nn">sim2bids.sim2bids</span> <span class="kn">import</span> <span class="n">MainArea</span>
@@ -274,7 +274,7 @@ until the issue is fixed.</p>
 </pre></div>
 </div>
 </dd>
-<dt class="rst-content"><strong>Run on a server</strong></dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sim2bids</span>
+<dt><strong>Run on a server</strong></dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sim2bids</span>
 <span class="kn">import</span> <span class="nn">panel</span> <span class="k">as</span> <span class="nn">pn</span>
 <span class="kn">from</span> <span class="nn">sim2bids.sim2bids</span> <span class="kn">import</span> <span class="n">MainArea</span>
 <span class="n">pn</span><span class="o">.</span><span class="n">extension</span><span class="p">(</span><span class="s1">&#39;tabulator&#39;</span><span class="p">,</span> <span class="s1">&#39;ace&#39;</span><span class="p">,</span> <span class="s1">&#39;jsoneditor&#39;</span><span class="p">,</span> <span class="s1">&#39;ipywidgets&#39;</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="s1">&#39;stretch_width&#39;</span><span class="p">,</span> <span class="n">notifications</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -350,7 +350,6 @@ until the issue is fixed.</p>
       <script type="text/javascript" src="../_static/underscore.js"></script>
       <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
 
   
 
