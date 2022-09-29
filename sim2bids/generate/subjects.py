@@ -148,12 +148,14 @@ def prepare_subs(file_paths, sid):
 
     for file_path in file_paths:
         print(file_path)
+        # name = get_name(file_path)
+        #
         name = get_filename(file_path)
 
         if file_path.endswith('.h5'):
             name = name.split('_')[0] + '.h5'
         else:
-            if 'bold' not in name:
+            if 'bold' not in name or 'emp' not in name:
                 name = name.split('_')[-1] if '_' in name else name
         desc = app.DESC
 
@@ -198,7 +200,11 @@ def prepare_subs(file_paths, sid):
             file_path = new_path
 
         # check if separator is missing, if so remove the file entirely
-        if accepted(name):
+        name = get_name(file_path)
+
+        if name is False:
+            continue
+        else:
             sep = find_separator(file_path)
 
             if sep == 'remove':
@@ -206,8 +212,8 @@ def prepare_subs(file_paths, sid):
                 continue
 
             subs[name] = {
-                'name': name.split('.')[0],
-                'fname': name,
+                'name': name,
+                'fname': file_path.split('/')[-1],
                 'sid': sid,
                 'desc': desc,
                 'sep': sep,
@@ -235,13 +241,51 @@ def prepare_subs(file_paths, sid):
     return subs
 
 
+def get_name(path):
+    # get file's basename (=without root directory)
+    base = os.path.basename(path)
+
+    # instantiate speed, global coupling, and rhythms
+    speed, g, series = None, None, None
+
+    # iterate over rhythms if exist to get naming for the file
+    for s in ['alpha', 'delta', 'gamma']:
+        if s in path.lower():
+            speed_temp = re.findall(r'speed[0-9\.]+', path)
+            series = s
+
+            if len(speed_temp) > 0:
+                speed = speed_temp[0]
+
+            g_temp = re.findall(r'csf\s[0-9\.]+', path)
+
+            if len(g_temp) > 0:
+                g = g_temp[0].replace('csf', '').strip()
+
+    name = accepted(base.split('.')[0])
+
+    if name is False:
+        return name
+
+    if series is not None and speed is not None and g is not None:
+        return f'{series}-{speed}-G{g}-{name[-1]}'
+    elif series is not None and speed is None and g is None:
+        return f'{series}'
+    return name[-1]
+
+
 def accepted(name):
     for accept in app.ACCEPTED:
         if accept in name:
-            if accept == 'ts' and len(name) == 2:
-                return True
+            if accept == 'ts':
+                split = name.split('_')
+                if len(split) >= 2:
+                    return True, split[-2] + '_' + split[-1]
+                return True, accept
+            if accept == 'emp' and 'emp_fc' in name:
+                return True, 'emp_fc'
             elif accept != 'ts':
-                return True
+                return True, accept
 
     return False
 

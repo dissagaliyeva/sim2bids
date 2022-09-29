@@ -33,13 +33,14 @@ SoftwareRepository = None
 SoftwareName = None
 
 # define all accepted files
-ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',  # Network (net)
-            'nodes', 'label', 'centre', 'area', 'hemisphere', 'cortical',  # Coordinates (coord)
-            'orientation', 'average_orientation', 'normal', 'times', 'vertices',  # Coordinates (coord)
-            'faces', 'vnormal', 'fnormal', 'sensor', 'map', 'volume',  # Coordinates (coord)
-            'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',  # Coordinates (coord)
-            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'emp', 'bold',  # Timeseries (ts)
-                                                                          'fc']  # Spatial (spatial)
+ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',                     # Network (net)
+            'nodes', 'label', 'centre', 'area', 'hemisphere', 'cortical',               # Coordinates (coord)
+            'orientation', 'average_orientation', 'normal', 'times', 'vertices',        # Coordinates (coord)
+            'faces', 'vnormal', 'fnormal', 'sensor', 'map', 'volume',                   # Coordinates (coord)
+            'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',                         # Coordinates (coord)
+            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event',               # Timeseries (ts)
+            'emp', 'bold_ts', 'bold',                                                   # Timeseries (ts)
+            'emp_fc', 'fc']                                                                       # Spatial (spatial)
 
 TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',  # folder "net"
               'areas.txt', 'average_orientations.txt', 'cortical.txt',  # folder "coord"
@@ -189,7 +190,7 @@ def save_output(subs):
                 convert.save_h5(sub[k], folders, ses=None)
                 continue
             elif k_lower.endswith('.mat'):
-                mat.save_mat(sub[k])
+                mat.save_mat(sub[k], sub[k]['path'], extract=False)
             elif k_lower.endswith('txt') or k_lower.endswith('csv') or k_lower.endswith('dat'):
                 name = 'coord'
 

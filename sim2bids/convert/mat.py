@@ -9,9 +9,13 @@ from sim2bids.app import app
 from sim2bids.generate import subjects
 
 
-def save_mat(sub, extract=True):
+def save_mat(sub, og_path, extract=True):
     file = traverse_file(sub['path'])
     root = os.path.dirname(sub['path'])
+    multi_folder = False
+
+    if og_path == root:
+        multi_folder = True
 
     if extract:
         new_files = []
@@ -26,7 +30,16 @@ def save_mat(sub, extract=True):
                         f = file[k][:, 0, :, 0]
 
                     name = check_name(k)
-                    path = os.path.join(root, name + '.txt')
+
+                    if multi_folder:
+                        sid, folder = sub['sid'], os.path.join(root, sub['sid'])
+
+                        if not os.path.exists(folder):
+                            os.mkdir(folder)
+
+                        path = os.path.join(folder, name + '.txt')
+                    else:
+                        path = os.path.join(root, name + '.txt')
 
                     if not os.path.exists(path):
                         new_files.append(name + '.txt')
@@ -40,7 +53,6 @@ def save_mat(sub, extract=True):
 
 def check_name(name):
     name = name.lower()
-    print(name)
 
     if 'time' in name:
         if 'times' in name:
