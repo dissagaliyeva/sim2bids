@@ -51,7 +51,7 @@ def recursive_walk(path: str, basename: bool = False) -> list:
                 content += extract_h5(os.path.join(root, file))
 
             if file.endswith('.mat'):
-                content += extract_mat(os.path.join(root, file), root)
+                content += extract_mat(os.path.join(root, file))
 
             # if code is found, save its location
             if file.endswith('.py'):
@@ -227,10 +227,8 @@ def extract_h5(path) -> list:
     return contents
 
 
-def extract_mat(path, root) -> list:
-    print('root:', root, 'path:', path)
-    mat.save_mat({'path': path, 'sid': preprocess.create_uuid()})
-    return os.listdir(root)
+def extract_mat(path) -> list:
+    return mat.save_mat({'path': path, 'sid': preprocess.create_uuid()})
 
 
 def get_model():
