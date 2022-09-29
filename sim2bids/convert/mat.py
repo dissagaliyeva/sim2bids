@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 
 import panel as pn
@@ -8,24 +9,46 @@ from sim2bids.app import app
 from sim2bids.generate import subjects
 
 
-def save_mat(sub):
+def save_mat(sub, extract=True):
     file = traverse_file(sub['path'])
     root = os.path.dirname(sub['path'])
-    sid = sub['sid']
 
-    # extract files
-    if file is not None:
-        for k in file.keys():
-            path = os.path.join(root, sid)
-            if not os.path.exists(path):
-                os.mkdir(path)
+    if extract:
+        new_files = []
 
-            if subjects.accepted(k):
-                # save files separately
-                pd.DataFrame(file[k]).to_csv(os.path.join(path, k + '.txt'), index=None, header=None, sep='\t')
+        # extract files
+        if file is not None:
+            for k in file.keys():
+                if type(file[k]) in [np.ndarray, list] and not k.startswith('__'):
+                    f = file[k]
+
+                    if len(file[k].shape) == 4:
+                        f = file[k][:, 0, :, 0]
+
+                    name = check_name(k)
+                    path = os.path.join(root, name + '.txt')
+
+                    if not os.path.exists(path):
+                        new_files.append(name + '.txt')
+                        pd.DataFrame(f).to_csv(path, index=None, header=None, sep='\t')
 
         # delete mat file
         os.remove(sub['path'])
+
+        return new_files
+
+
+def check_name(name):
+    name = name.lower()
+    print(name)
+
+    if 'time' in name:
+        if 'times' in name:
+            return name
+        return name.replace('time', 'times')
+    if 'data' in name:
+        return name.replace('data', 'ts')
+    return name
 
 
 def save_mat73(subs, folders, ses):

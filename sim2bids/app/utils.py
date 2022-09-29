@@ -228,6 +228,7 @@ def extract_h5(path) -> list:
 
 
 def extract_mat(path, root) -> list:
+    print('root:', root, 'path:', path)
     mat.save_mat({'path': path, 'sid': preprocess.create_uuid()})
     return os.listdir(root)
 

@@ -34,7 +34,7 @@ SoftwareName = None
 
 # define all accepted files
 ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',  # Network (net)
-            'nodes', 'labels', 'centres', 'area', 'hemisphere', 'cortical',  # Coordinates (coord)
+            'nodes', 'label', 'centre', 'area', 'hemisphere', 'cortical',  # Coordinates (coord)
             'orientation', 'average_orientation', 'normal', 'times', 'vertices',  # Coordinates (coord)
             'faces', 'vnormal', 'fnormal', 'sensor', 'map', 'volume',  # Coordinates (coord)
             'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',  # Coordinates (coord)
