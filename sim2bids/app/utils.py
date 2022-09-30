@@ -70,18 +70,10 @@ def recursive_walk(path: str, basename: bool = False) -> list:
             # save file name
             if basename:
                 content.append(file)
-                # if file.split('.')[0] in app.ACCEPTED or file.endswith('.py'):
-                #     content.append(file)
-                # else:
-                #     TO_RENAME.append(file)
 
             # save absolute path
             else:
                 content.append(os.path.join(root, file))
-                # if file.split('.')[0] in app.ACCEPTED or file.endswith('.py'):
-                #     content.append(os.path.join(root, file))
-                # else:
-                #     TO_RENAME.append(os.path.join(root, file))
 
     # return contents
     return content

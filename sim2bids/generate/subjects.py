@@ -107,7 +107,13 @@ class Files:
             self.subs[sid][ses].update(prepare_subs(utils.get_content(path, ses), sid))
 
     def create_sid_sub(self, sid=None):
-        sid = prep.create_uuid() if sid is None else sid
+        if sid is None:
+            if len(self.subs) > 0:
+                for k, v in self.subs.items():
+                    if len(v) == 0:
+                        return k
+            else:
+                sid = prep.create_uuid()
 
         # create a dictionary to store values
         if sid not in self.subs.keys():
@@ -249,7 +255,7 @@ def get_name(path):
     speed, g, series = None, None, None
 
     # iterate over rhythms if exist to get naming for the file
-    for s in ['alpha', 'delta', 'gamma']:
+    for s in ['alpha', 'delta', 'gamma', 'theta', 'beta']:
         if s in path.lower():
             speed_temp = re.findall(r'speed[0-9\.]+', path)
             series = s
@@ -314,7 +320,6 @@ def find_separator(path):
         return 'remove'
     except pd.errors.ParserError:
         print(path)
-
 
     # if cortical.txt, hemisphere.txt, or areas.txt are present, return '\n' delimiter
     if path.endswith('hemisphere.txt') or path.endswith('cortical.txt') or path.endswith('areas.txt') \

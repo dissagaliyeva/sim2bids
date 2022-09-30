@@ -79,13 +79,13 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     """
     global MODEL_NAME
 
+    prep.reset_index()
+
     # whether to generate layout
     if layout:
         # if no subjects are passed, define them
         if subs is None:
             subs = subjects.Files(path, files).subs
-
-    prep.reset_index()
 
     # only save conversions if 'save' is True
     if save and subs is not None:
