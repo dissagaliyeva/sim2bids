@@ -87,8 +87,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
-    print(subs)
-
     # only save conversions if 'save' is True
     if save and subs is not None:
         # save conversions
@@ -112,6 +110,7 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         supply_participants()
         check_json()
         check_output()
+        pn.state.notifications.success(f'{OUTPUT} folder is ready!')
 
     if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
         pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=os.path.join(OUTPUT, 'param'),
