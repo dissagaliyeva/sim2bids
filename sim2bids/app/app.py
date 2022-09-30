@@ -34,9 +34,9 @@ SoftwareName = None
 
 # define all accepted files
 ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',                     # Network (net)
-            'nodes', 'label', 'centre', 'area', 'hemisphere', 'cortical',               # Coordinates (coord)
+            'nodes', 'labels', 'centre', 'area', 'hemisphere', 'cortical',               # Coordinates (coord)
             'orientation', 'average_orientation', 'normal', 'times', 'vertices',        # Coordinates (coord)
-            'faces', 'vnormal', 'fnormal', 'sensor', 'map', 'volume',                   # Coordinates (coord)
+            'faces', 'vnormal', 'fnormal', 'sensor', 'volume', 'map',                   # Coordinates (coord)
             'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',                         # Coordinates (coord)
             'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event',               # Timeseries (ts)
             'emp', 'bold_ts', 'bold',                                                   # Timeseries (ts)
@@ -86,6 +86,8 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         # if no subjects are passed, define them
         if subs is None:
             subs = subjects.Files(path, files).subs
+
+    print(subs)
 
     # only save conversions if 'save' is True
     if save and subs is not None:
