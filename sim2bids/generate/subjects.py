@@ -3,6 +3,7 @@ import csv
 import re
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from sim2bids.app import app
@@ -31,7 +32,7 @@ class Files:
         self.match = find_matches(self.basename)
 
         # check if the input is for single-subject or multi-subject
-        app.MULTI_INPUT = not self.check_input()
+        app.MULTI_INPUT = self.check_input()
 
         # define a variable that is going to check whether input
         # contains sessions-based subject. Sessions include `ses-preop` and 'ses-postop'
@@ -41,19 +42,25 @@ class Files:
         self.traverse_files()
 
     def check_input(self):
-        # simple check counting set literals
-        if len(self.content) == len(self.basename):
-            # check for multi-subject in one folder
-            if len(self.match) == 0:
-                return True
-            return False
-        return False
+        # weights are the essential files for each subject,
+        # therefore, finding the number of weights will reveal
+        # whether the file folder is multi-folder or not
+        basename = [os.path.basename(x) for x in self.content]
+        vals, count = np.unique(basename, return_counts=True)
+
+        weights = 0
+
+        for k, v in zip(vals, count):
+            if 'weight' in k:
+                weights += 1
+        return False if weights == 1 else True
 
     def traverse_files(self):
         # if the whole folder is passed, open that folder
         path, files, changed = self.path, self.files, False
 
-        if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop', 'ses-postop']:
+        if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop',
+                                                                                                'ses-postop']:
             path = os.path.join(path, files[0])
             files = os.listdir(path)
 
@@ -153,9 +160,6 @@ def prepare_subs(file_paths, sid):
     subs = {}
 
     for file_path in file_paths:
-        print(file_path)
-        # name = get_name(file_path)
-        #
         name = get_filename(file_path)
 
         if file_path.endswith('.h5'):
@@ -277,6 +281,11 @@ def get_name(path):
         return f'{series}-{speed}-G{g}-{name[-1]}'
     elif series is not None and speed is None and g is None:
         return f'{series}'
+
+    if name[-1] in [*app.ACCEPTED[:4], *app.ACCEPTED[7:9], *app.ACCEPTED[11:13], *app.ACCEPTED[17:20],
+                    'spike', 'event']:
+        return name[-1] + 's'
+
     return name[-1]
 
 
