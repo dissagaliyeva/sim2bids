@@ -140,7 +140,7 @@ def find_matches(paths):
     unique_ids = []
 
     for path in paths:
-        match = re.findall('^[A-Za-z]{2,3}_[0-9]{2,}', path)
+        match = re.findall('[A-Za-z]{2,3}_[0-9]{2,}', path)
         if len(match) > 0 and not path.endswith('.h5'):
             unique_ids.append(match[0])
 
@@ -297,6 +297,8 @@ def accepted(name, return_accepted=False):
                 if len(split) >= 2:
                     if return_accepted:
                         return accept
+                    if 'min' in name:
+                        return True, split[-3] + '_' + split[-2] + '_' + split[-1]
                     return True, split[-2] + '_' + split[-1]
 
                 if return_accepted:

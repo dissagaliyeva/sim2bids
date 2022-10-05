@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 
 import numpy as np
 import pandas as pd
@@ -43,6 +44,19 @@ def save_mat(sub, og_path, extract=True):
 
                         if not os.path.exists(folder):
                             os.mkdir(folder)
+
+                        # find matches for unique patients and transfer files there,
+                        # e.g., weights and distances
+                        match = subjects.find_matches([sub['path']])
+
+                        print('match:', match)
+
+                        if len(match) > 0:
+                            for file in os.listdir(og_path):
+                                print('all files one-by-one:', file)
+
+                                if match[0] in file:
+                                    shutil.move(os.path.join(og_path, file), os.path.join(og_path, sid))
 
                         path = os.path.join(folder, name + '.txt')
                     else:
