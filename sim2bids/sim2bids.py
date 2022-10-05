@@ -18,6 +18,16 @@ OPTIONS = ['App 101', 'Preprocess data', 'Supported files', 'Functionality', 'BE
 REQUIRED = None
 AUTOFILL = True
 
+rhythms = pn.Column('#### Specify rhythms', pn.widgets.CheckBoxGroup(
+    value=[], options=['Alpha', 'Beta', 'Delta', 'Gamma', 'Theta'],
+    inline=True, margin=(-10, 0, 0, 0)))
+
+speed = pn.Column('#### Specify `conduction speed` folder name',
+                  pn.widgets.TextInput(value='cspeed', margin=(-10, 0, 0, 0)))
+
+global_coupling = pn.Column('#### Specify `global coupling scaling factor` folder name',
+                            pn.widgets.TextInput(value='csf', margin=(-10, 0, 0, 0)))
+
 
 class MainArea(param.Parameterized):
     # generate files button
@@ -41,13 +51,15 @@ class MainArea(param.Parameterized):
                                               options=checkbox_options,
                                               margin=(-20, 10, 0, 10))
 
-    rhythms = pn.Column('#### Specify rhythms', pn.widgets.CheckBoxGroup(value=[], options=['Alpha', 'Beta',
-                                                                                            'Delta', 'Gamma', 'Theta'],
-                                                                         inline=True))
+    rhythms = pn.Column('#### Specify rhythms', pn.widgets.CheckBoxGroup(
+        value=[], options=['Alpha', 'Beta', 'Delta', 'Gamma', 'Theta'],
+        inline=True, margin=(-10, 0, 0, 10)))
 
-    speed = pn.Column('#### Specify `conduction speed` folder name', pn.widgets.TextInput())
+    speed = pn.Column('#### Specify `conduction speed` folder name',
+                      pn.widgets.TextInput(value=app.COND_SPEED, margin=(-10, 0, 0, 0)))
 
-    global_coupling = pn.Column('#### Specify `global coupling scaling factor` folder name', pn.widgets.TextInput())
+    global_coupling = pn.Column('#### Specify `global coupling scaling factor` folder name',
+                                pn.widgets.TextInput(value=app.GLB_COUP_SF, margin=(-10, 0, 0, 0)))
 
     rename_files = pn.WidgetBox()
 
@@ -177,7 +189,6 @@ class MainArea(param.Parameterized):
             self.desc,
             '#### Select additional settings',
             self.checkbox_group,
-            '### Specify simulation information',
             self.rhythms, self.speed, self.global_coupling
         )
 
