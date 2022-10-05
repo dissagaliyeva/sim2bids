@@ -34,6 +34,9 @@ SoftwareName = None
 COND_SPEED = 'cspeed'
 GLB_COUP_SF = 'csf'
 
+# store different time series accounting for 'times'
+TIMES = []
+
 # define all accepted files
 ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',                     # Network (net)
             'nodes', 'labels', 'centre', 'area', 'hemisphere', 'cortical',               # Coordinates (coord)

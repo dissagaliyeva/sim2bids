@@ -165,7 +165,7 @@ def prepare_subs(file_paths, sid):
         if file_path.endswith('.h5'):
             name = name.split('_')[0] + '.h5'
         else:
-            if 'bold' not in name or 'emp' not in name:
+            if 'bold' not in name or 'emp' not in name or 'times' not in name:
                 name = name.split('_')[-1] if '_' in name else name
         desc = app.DESC
 
@@ -289,19 +289,29 @@ def get_name(path):
     return name[-1]
 
 
-def accepted(name):
+def accepted(name, return_accepted=False):
     for accept in app.ACCEPTED:
         if accept in name:
-            if accept == 'ts':
+            if accept == 'ts' or accept == 'times':
                 split = name.split('_')
                 if len(split) >= 2:
+                    if return_accepted:
+                        return accept
                     return True, split[-2] + '_' + split[-1]
-                return True, accept
-            if accept == 'emp' and 'emp_fc' in name:
-                return True, 'emp_fc'
-            elif accept != 'ts':
+
+                if return_accepted:
+                    return accept
+
                 return True, accept
 
+            if accept == 'emp' and 'emp_fc' in name:
+                if return_accepted:
+                    return accept
+                return True, 'emp_fc'
+            if accept != 'ts':
+                if return_accepted:
+                    return accept
+                return True, accept
     return False
 
 
