@@ -31,6 +31,8 @@ MODEL_NAME = None
 SoftwareVersion = None
 SoftwareRepository = None
 SoftwareName = None
+COND_SPEED = 'cspeed'
+GLB_COUP_SF = 'csf'
 
 # define all accepted files
 ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',                     # Network (net)
