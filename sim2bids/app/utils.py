@@ -54,7 +54,8 @@ def recursive_walk(path: str, basename: bool = False) -> list:
                 content += extract_mat(os.path.join(root, file), path)
 
             if 'times' in file:
-                app.TIMES.append()
+                app.TIMES.append(subj.accepted(file)[-1])
+                app.TIMES = list(set(app.TIMES))
 
             # if code is found, save its location
             if file.endswith('.py'):

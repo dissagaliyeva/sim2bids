@@ -14,13 +14,19 @@ COORD_TEMPLATE = 'desc-{}_{}.{}'
 
 # set to true if centres.txt (nodes and labels) are the same
 # for all files. In that case, store only one copy of the files
-# in the main 'coord' folder in the same scope as CHANGES.txt
+# (json, tsv) in the main 'coord' folder, in the global scope
 IGNORE_CENTRE = False
 
 # location of coord files (nodes and labels) in the scope of
 # converted files. This information is used to supplement JSON
 # sidecars, specifically `CoordsRows` and `CoordsColumns`
 COORDS = None
+
+# set true if `times` are the same for all files. In that case,
+# store only one copy of the files (json, tsv) in the main 'coord'
+# folder, in the global scope
+IGNORE_TIMES = False
+
 
 NETWORK = []
 
@@ -139,7 +145,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             save_files(sub, folder, file, type='default', ftype='spatial', desc=desc)
 
     # get folder location for time series
-    elif name in ['ts', 'bold']:
+    elif name in ['ts']:
         desc = temp.file_desc['ts'] if name == 'ts' else temp.file_desc['bold'].format(sub['sid'].replace('sub-', ''))
         save_files(sub, folders[-1], file, type='default', ftype='ts', desc=desc)
 
