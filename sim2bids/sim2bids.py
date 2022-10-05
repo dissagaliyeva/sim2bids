@@ -51,9 +51,9 @@ class MainArea(param.Parameterized):
                                               options=checkbox_options,
                                               margin=(-20, 10, 0, 10))
 
-    rhythms = pn.Column('#### Specify rhythms', pn.widgets.CheckBoxGroup(
-        value=[], options=['Alpha', 'Beta', 'Delta', 'Gamma', 'Theta'],
-        inline=True, margin=(-10, 0, 0, 10)))
+    # rhythms = pn.Column('#### Specify rhythms', pn.widgets.CheckBoxGroup(
+    #     value=[], options=['Alpha', 'Beta', 'Delta', 'Gamma', 'Theta'],
+    #     inline=True, margin=(-10, 0, 0, 10)))
 
     speed = pn.Column('#### Specify `conduction speed` folder name',
                       pn.widgets.TextInput(value=app.COND_SPEED, margin=(-10, 0, 0, 0)))
@@ -189,7 +189,8 @@ class MainArea(param.Parameterized):
             self.desc,
             '#### Select additional settings',
             self.checkbox_group,
-            self.rhythms, self.speed, self.global_coupling
+            '#### Specify simulation information',
+            self.speed, self.global_coupling
         )
 
         return pn.template.MaterialTemplate(
