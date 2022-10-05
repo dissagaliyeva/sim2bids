@@ -6,7 +6,6 @@ import pandas as pd
 import panel as pn
 import param
 
-import sim2bids.generate.subjects as subj
 from sim2bids import utils
 from sim2bids.app import app, utils as app_utils
 from sim2bids.templates import user_guide as ug
@@ -41,6 +40,15 @@ class MainArea(param.Parameterized):
     checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders', 'Autocomplete columns'],
                                               options=checkbox_options,
                                               margin=(-20, 10, 0, 10))
+
+    rhythms = pn.Column('#### Specify rhythms', pn.widgets.CheckBoxGroup(value=[], options=['Alpha', 'Beta',
+                                                                                            'Delta', 'Gamma', 'Theta'],
+                                                                         inline=True))
+
+    speed = pn.Column('#### Specify `conduction speed` folder name', pn.widgets.TextInput())
+
+    global_coupling = pn.Column('#### Specify `global coupling scaling factor` folder name', pn.widgets.TextInput())
+
     rename_files = pn.WidgetBox()
 
     def __init__(self, **params):
@@ -169,6 +177,8 @@ class MainArea(param.Parameterized):
             self.desc,
             '#### Select additional settings',
             self.checkbox_group,
+            '### Specify simulation information',
+            self.rhythms, self.speed, self.global_coupling
         )
 
         return pn.template.MaterialTemplate(
