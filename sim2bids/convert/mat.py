@@ -1,4 +1,6 @@
 import os
+import re
+
 import numpy as np
 import pandas as pd
 
@@ -29,7 +31,12 @@ def save_mat(sub, og_path, extract=True):
                     if len(file[k].shape) == 4:
                         f = file[k][:, 0, :, 0]
 
+                    if len(file[k].shape) == 3:
+                        f = file[k][:, 0, :]
+
                     name = check_name(k)
+                    minutes = re.findall(r'[0-9]+min', sub['path'])
+                    name = f'{name}_{minutes[0]}' if len(minutes) > 0 else name
 
                     if multi_folder:
                         sid, folder = sub['sid'], os.path.join(root, sub['sid'])
