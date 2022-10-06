@@ -29,7 +29,7 @@ class Files:
         self.basename = set(utils.get_content(path, files, basename=True))
 
         # check for multi-subject in one folder
-        self.match = find_matches(self.basename)
+        self.match = find_matches(self.content)
 
         # check if the input is for single-subject or multi-subject
         app.MULTI_INPUT = self.check_input()
@@ -69,6 +69,9 @@ class Files:
             # traverse multi-subject in one folder structure
             if len(self.match) > 0:
                 print('multi-subject with matches')
+
+                print('self.match:', self.match)
+                print(get_unique_subs(self.match, self.content).items())
                 for k, v in get_unique_subs(self.match, self.content).items():
                     print(k, v)
 
@@ -233,7 +236,7 @@ def prepare_subs(file_paths, sid):
         # check if separator is missing, if so remove the file entirely
         name = get_name(file_path)
 
-        if name is False:
+        if name.endswith('txt'):
             continue
         else:
             sep = find_separator(file_path)

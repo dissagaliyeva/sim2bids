@@ -105,6 +105,8 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
+    print(subs)
+
     # only save conversions if 'save' is True
     if save and subs is not None:
         # save conversions
@@ -199,7 +201,7 @@ def save_output(subs):
                 name = 'coord'
             elif 'fc' in k_lower:
                 name = 'spatial'
-            elif 'bold_times' in k_lower:
+            elif 'times' in k_lower:
                 name = 'times'
             elif 'vars' in k_lower or 'stimuli' in k_lower or 'noise' in k_lower \
                     or 'spike' in k_lower or 'raster' in k_lower or 'ts' in k_lower \
