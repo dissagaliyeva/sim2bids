@@ -14,6 +14,7 @@ import pylems_py2xml as py2xml
 import sim2bids.utils
 from sim2bids.generate import structure, subjects
 from sim2bids.preprocess import preprocess as prep
+from sim2bids.preprocess import prepare_inputs as prepare
 from sim2bids.convert import convert, mat
 from sim2bids.templates import templates as temp
 from sim2bids.app import utils
@@ -21,6 +22,8 @@ from sim2bids.app import utils
 # define global variables
 SID = None
 DESC = 'default'  # short description that identifies input data
+INPUT = 'inputs'  # placeholder to store preprocessed input files
+INPUT_TRANSFERRED = False
 OUTPUT = 'output'  # output folder to store conversions
 CENTRES = False  # whether centres.txt|nodes.txt|labels.txt were found
 MULTI_INPUT = False  # whether input files include single- or multi-subjects
@@ -80,11 +83,17 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 
     Returns
     -------
+    :param input_path:
 
     """
-    global MODEL_NAME
+    global MODEL_NAME, INPUT, INPUT_TRANSFERRED
 
-    prep.reset_index()
+    # call the preprocessing pipeline that standardizes the input folder
+    result = prepare.preprocess(path, files, INPUT)
+    if result is not None and INPUT_TRANSFERRED is False:
+        INPUT = result
+        INPUT_TRANSFERRED = True
+        path, files = result, os.listdir(result)
 
     # whether to generate layout
     if layout:
@@ -134,7 +143,7 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         return subs, structure.create_layout(subs)
 
     # otherwise, return None
-    return None, None
+    return None
 
 
 def save_output(subs):
