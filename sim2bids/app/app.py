@@ -88,16 +88,16 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     """
     global MODEL_NAME, INPUT, INPUT_TRANSFERRED
 
-    # call the preprocessing pipeline that standardizes the input folder
-    result = prepare.preprocess(path, files, INPUT)
-
-    if result is not None:
-        INPUT = result
-        INPUT_TRANSFERRED = True
-
-    if isinstance(INPUT, str):
-        print(INPUT)
-        path, files = INPUT, os.listdir(INPUT)
+    # # call the preprocessing pipeline that standardizes the input folder
+    # result = prepare.preprocess(path, files, INPUT)
+    #
+    # if result is not None:
+    #     INPUT = result
+    #     INPUT_TRANSFERRED = True
+    #
+    # if isinstance(INPUT, str):
+    #     print(INPUT)
+    #     path, files = INPUT, os.listdir(INPUT)
 
     # whether to generate layout
     if layout:
