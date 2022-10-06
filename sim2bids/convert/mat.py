@@ -15,18 +15,21 @@ from sim2bids.generate import subjects
 def save_mat(sub, og_path, extract=True):
     file = traverse_file(sub['path'])
     root = os.path.dirname(sub['path'])
-    multi_folder = False
-
-    if og_path == root:
-        multi_folder = True
+    multi_folder, extracted = og_path == root, False
 
     if extract:
         new_files = []
 
         # extract files
         if file is not None:
+            # first, check if there are matches according to unique ID
+            # find matches for unique patients and transfer files there,
+            # e.g., weights and distances
+            transfer_files(sub, og_path)
+
+            # iterate over matlab files and extract files
             for k in file.keys():
-                if type(file[k]) in [np.ndarray, list] and not k.startswith('__'):
+                if not k.startswith('__') and type(file[k]) in [np.ndarray, list]:
                     f = file[k]
 
                     if len(file[k].shape) == 4:
@@ -40,36 +43,40 @@ def save_mat(sub, og_path, extract=True):
                     name = f'{name}_{minutes[0]}' if len(minutes) > 0 else name
 
                     if multi_folder:
-                        sid, folder = sub['sid'], os.path.join(root, sub['sid'])
-
-                        if not os.path.exists(folder):
-                            os.mkdir(folder)
-
-                        # find matches for unique patients and transfer files there,
-                        # e.g., weights and distances
-                        match = subjects.find_matches([sub['path']])
-
-                        print('match:', match)
-
-                        if len(match) > 0:
-                            for file in os.listdir(og_path):
-                                print('all files one-by-one:', file)
-
-                                if match[0] in file:
-                                    shutil.move(os.path.join(og_path, file), os.path.join(og_path, sid))
-
-                        path = os.path.join(folder, name + '.txt')
+                        path = os.path.join(os.path.join(root, sub['sid']), name + '.txt')
                     else:
                         path = os.path.join(root, name + '.txt')
 
                     if not os.path.exists(path):
+                        extracted = True
                         new_files.append(name + '.txt')
                         pd.DataFrame(f).to_csv(path, index=None, header=None, sep='\t')
 
-        # delete mat file
-        os.remove(sub['path'])
+            if extracted:
+                # delete mat file
+                os.remove(sub['path'])
 
         return new_files
+
+
+def transfer_files(sub, og_path):
+    """
+    Iterate over folder and find unique ID's corresponding files
+    """
+    root = os.path.dirname(sub['path'])
+
+    match = subjects.find_matches([sub['path']])
+    sid, folder = sub['sid'], os.path.join(root, sub['sid'])
+
+    if len(match) > 0:
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+
+        for f in os.listdir(og_path):
+            if os.path.isdir(os.path.join(og_path, f)) or f.endswith('mat'):
+                continue
+            if match[0] in f:
+                shutil.move(os.path.join(og_path, f), os.path.join(og_path, sub['sid']))
 
 
 def check_name(name):
