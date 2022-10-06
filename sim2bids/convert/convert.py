@@ -108,6 +108,8 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     # read file contents
     file = open_file(sub['path'], sub['sep'])
 
+    print(name)
+
     # get folder location for weights and distances
     if name == 'wd':
         # set appropriate output path depending on session type
@@ -148,6 +150,9 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     elif name in ['ts']:
         desc = temp.file_desc['ts'] if name == 'ts' else temp.file_desc['bold'].format(sub['sid'].replace('sub-', ''))
         save_files(sub, folders[-1], file, type='default', ftype='ts', desc=desc)
+
+    elif name in ['times']:
+        pass
 
     # get folder location for coordinates
     elif name == 'coord':
