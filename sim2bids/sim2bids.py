@@ -101,7 +101,6 @@ class MainArea(param.Parameterized):
             self.to_rename_path = []
             self.structure.value = []
             self.rename_files = pn.WidgetBox()
-            utils.reset_values()
 
         if len(selected) > 0:
             # check files for preprocessing step
@@ -122,10 +121,6 @@ class MainArea(param.Parameterized):
     def _generate_files(self, event=None):
         _ = app.main(path=self.text_input.value, files=self.cross_select.value,
                           subs=self.subjects, save=True, layout=True)
-        # if len(output) == 2 and isinstance(output[0], 'str') and isinstance(output[1], list):
-        #     self.text_input.value = output[0]
-        #     self.cross_select.value = output[1]
-        # subj.TO_RENAME = None
         app.ALL_FILES = None
         utils.reset_values()
 

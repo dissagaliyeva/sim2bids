@@ -90,19 +90,20 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 
     # call the preprocessing pipeline that standardizes the input folder
     result = prepare.preprocess(path, files, INPUT)
-    if result is not None and INPUT_TRANSFERRED is False:
+
+    if result is not None:
         INPUT = result
         INPUT_TRANSFERRED = True
-        path, files = result, os.listdir(result)
+
+    if isinstance(INPUT, str):
+        print(INPUT)
+        path, files = INPUT, os.listdir(INPUT)
 
     # whether to generate layout
     if layout:
         # if no subjects are passed, define them
         if subs is None:
             subs = subjects.Files(path, files).subs
-
-    print('TIMES:', TIMES)
-    print(subs)
 
     # only save conversions if 'save' is True
     if save and subs is not None:
@@ -199,7 +200,7 @@ def save_output(subs):
             elif 'fc' in k_lower:
                 name = 'spatial'
             elif 'bold_times' in k_lower:
-                name = 'coord'
+                name = 'times'
             elif 'vars' in k_lower or 'stimuli' in k_lower or 'noise' in k_lower \
                     or 'spike' in k_lower or 'raster' in k_lower or 'ts' in k_lower \
                     or 'event' in k_lower or 'emp' in k_lower or 'bold' in k_lower:

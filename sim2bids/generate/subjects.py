@@ -46,12 +46,10 @@ class Files:
         # therefore, finding the number of weights will reveal
         # whether the file folder is multi-folder or not
         basename = [os.path.basename(x) for x in self.content]
-        vals, count = np.unique(basename, return_counts=True)
-
         weights = 0
 
-        for k, v in zip(vals, count):
-            if 'weight' in k:
+        for name in basename:
+            if 'weight' in name:
                 weights += 1
         return False if weights == 1 else True
 
@@ -73,7 +71,14 @@ class Files:
                     sid = self.create_sid_sub()
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
             else:
+
                 for file in files:
+                    if not os.path.isdir(os.path.join(path, file)):
+                        continue
+
+                    if file.endswith('.py'):
+                        app.CODE = file
+
                     sid = self.create_sid_sub()
 
                     # Step 5: get all content
@@ -89,9 +94,11 @@ class Files:
 
                     if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
                         if os.path.basename(path) == file:
-                            self.subs[sid] = prepare_subs(utils.get_content(path.replace(file, ''), file), sid)
+                            self.subs[sid] = prepare_subs([*utils.get_content(path.replace(file, ''), file),
+                                                           *self.get_extra_files(all_files, path)], sid)
                         else:
-                            self.subs[sid] = prepare_subs(utils.get_content(path, file), sid)
+                            self.subs[sid] = prepare_subs([*utils.get_content(path, file),
+                                                           *self.get_extra_files(all_files, path)], sid)
 
         else:
             # check if there are no folders inside
@@ -102,6 +109,11 @@ class Files:
             if not self.ses_found:
                 self.create_sid_sub(sid)
                 self.subs[sid] = prepare_subs(utils.get_content(path, files), sid)
+
+        prep.reset_index()
+
+    def get_extra_files(self, files, path):
+        return [os.path.join(path, file) for file in files if not os.path.isdir(os.path.join(path, file))]
 
     def save_sessions(self, ses, files, sid, path):
         if ses in files:
@@ -119,8 +131,10 @@ class Files:
                 for k, v in self.subs.items():
                     if len(v) == 0:
                         return k
+                    return prep.create_uuid()
             else:
                 sid = prep.create_uuid()
+                return sid
 
         # create a dictionary to store values
         if sid not in self.subs.keys():
@@ -140,7 +154,7 @@ def find_matches(paths):
     unique_ids = []
 
     for path in paths:
-        match = re.findall('[A-Za-z]{2,3}_[0-9]{2,}', path)
+        match = re.findall('[A-Z]{2,3}_[0-9]{2,}', path)
         if len(match) > 0 and not path.endswith('.h5'):
             unique_ids.append(match[0])
 

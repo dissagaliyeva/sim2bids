@@ -12,6 +12,8 @@ def preprocess(path, files, input_path='inputs'):
     # create directory if doesn't exist
     if not os.path.exists(input_path):
         os.mkdir(input_path)
+    else:
+        return input_path
 
     # check if the "files" is a single directory, if so
     # change the path to that folder storing all files
