@@ -347,7 +347,7 @@ def check_centres(name='centres'):
     return False
 
 
-def get_specific(filetype: str) -> list:
+def get_specific(filetype: str, constraint: str = None) -> list:
     """
     Get all files that correspond to the filetype. For example,
     if filetype is equal to "areas", this function will return
@@ -368,6 +368,7 @@ def get_specific(filetype: str) -> list:
     Returns
     -------
         Returns a list of all files that end with the specified filetype.
+        :param constraint:
     """
 
     # create emtpy list to store appropriate files
@@ -377,8 +378,11 @@ def get_specific(filetype: str) -> list:
     for file in app.ALL_FILES:
         # check if the keyword is present
         if filetype in file:
-            # if yes, append the value
-            content.append(file)
+            if constraint is not None and constraint in file:
+                content.append(file)
+            if constraint is None:
+                # if yes, append the value
+                content.append(file)
 
     # return the list of newly-found files
     return content
@@ -417,7 +421,8 @@ def traverse_times(sub, folders, ses):
     # get description
     desc = temp.file_desc['times'] if 'bold' not in sub['name'] else temp.file_desc['bold_times']
 
-    # check if bold times are similar
+    # check if times are similar
+    ftype = sub['path'].split('-')[-1].split(_)[0:2]
 
 
 def open_text(path, sep):
