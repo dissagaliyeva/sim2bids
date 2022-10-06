@@ -12,7 +12,7 @@ from sim2bids.app import app
 from sim2bids.generate import subjects
 
 
-def save_mat(sub, og_path, extract=True):
+def save_mat(sub, og_path, extract=False):
     file = traverse_file(sub['path'])
     root = os.path.dirname(sub['path'])
     multi_folder, extracted = og_path == root, False
@@ -25,7 +25,7 @@ def save_mat(sub, og_path, extract=True):
             # first, check if there are matches according to unique ID
             # find matches for unique patients and transfer files there,
             # e.g., weights and distances
-            transfer_files(sub, og_path)
+            # transfer_files(sub, og_path)
 
             # iterate over matlab files and extract files
             for k in file.keys():
@@ -76,7 +76,8 @@ def transfer_files(sub, og_path):
             if os.path.isdir(os.path.join(og_path, f)) or f.endswith('mat'):
                 continue
             if match[0] in f:
-                shutil.move(os.path.join(og_path, f), os.path.join(og_path, sub['sid']))
+                basename = f.replace(match[0], '').strip('_')
+                shutil.move(os.path.join(og_path, f), os.path.join(og_path, sub['sid'], basename))
 
 
 def check_name(name):

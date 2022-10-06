@@ -11,6 +11,7 @@ from sim2bids.app import app, utils as app_utils
 from sim2bids.templates import user_guide as ug
 from sim2bids.validate import validate
 
+
 JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
 UNITS = ['s', 'm', 'ms', 'degrees', 'radians']
@@ -41,7 +42,10 @@ class MainArea(param.Parameterized):
 
     # sidebar components
     output_path = pn.widgets.TextInput(value=app.OUTPUT, margin=(-20, 10, 0, 10))
-    app.OUTPUT = output_path.value
+    # app.OUTPUT = output_path.value
+
+    input_path = pn.widgets.TextInput(value=app.INPUT, margin=(-20, 10, 0, 10))
+    # app.OUTPUT = output_path.value
 
     desc = pn.widgets.TextInput(value='default', max_length=30, margin=(-20, 10, 0, 10))
     app.DESC = desc.value
@@ -97,9 +101,11 @@ class MainArea(param.Parameterized):
             self.to_rename_path = []
             self.structure.value = []
             self.rename_files = pn.WidgetBox()
+            utils.reset_values()
 
         if len(selected) > 0:
             # check files for preprocessing step
+            utils.reset_values()
             path = self.text_input.value
             self.to_rename = validate.filter(app_utils.get_content(path, selected, basename=True))
             self.to_rename_path = validate.filter(app_utils.get_content(path, selected), self.to_rename)
@@ -115,9 +121,13 @@ class MainArea(param.Parameterized):
 
     def _generate_files(self, event=None):
         _ = app.main(path=self.text_input.value, files=self.cross_select.value,
-                     subs=self.subjects, save=True, layout=True)
+                          subs=self.subjects, save=True, layout=True)
+        # if len(output) == 2 and isinstance(output[0], 'str') and isinstance(output[1], list):
+        #     self.text_input.value = output[0]
+        #     self.cross_select.value = output[1]
         # subj.TO_RENAME = None
         app.ALL_FILES = None
+        utils.reset_values()
 
     def _generate_struct(self, event=None):
         self.subjects, self.struct = app.main(path=self.text_input.value,
@@ -139,6 +149,18 @@ class MainArea(param.Parameterized):
         # whether to not alter original input folder
         # if self.checkbox_options[2] in self.checkbox_group.value:
         #     self.text_input.value = app.duplicate_folder(self.text_input.value)
+
+    @pn.depends('input_path.value', watch=True)
+    def _store_input(self):
+        inputs = self.input_path.value
+
+        if len(inputs) > 0:
+            if not os.path.exists(inputs):
+                pn.state.notifications.success(f'Folder {inputs} is created...')
+                os.mkdir(inputs)
+
+            pn.state.notifications.success(f'Folder `{inputs}` is selected as input folder...')
+            app.INPUT = inputs
 
     @pn.depends('output_path.value', watch=True)
     def _store_output(self):
@@ -183,6 +205,8 @@ class MainArea(param.Parameterized):
 
         sidebar = pn.Column(
             '## Settings',
+            '#### Provide input path',
+            self.input_path,
             '#### Provide output path',
             self.output_path,
             '#### Provide short description (max 30 chars)',
