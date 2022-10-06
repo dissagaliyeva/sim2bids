@@ -50,8 +50,8 @@ def recursive_walk(path: str, basename: bool = False) -> list:
             if file.endswith('.h5'):
                 content += extract_h5(os.path.join(root, file))
 
-            # if file.endswith('.mat'):
-            #     content += extract_mat(os.path.join(root, file), path)
+            if file.endswith('.mat'):
+                content += extract_mat(os.path.join(root, file), path)
 
             if 'times' in file:
                 app.TIMES.append(subj.accepted(file)[-1])
@@ -142,9 +142,9 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
             extract_h5(file_path)
             continue
 
-        # if file.endswith('.mat'):
-        #     contents += extract_mat(os.path.join(path, file), path)
-        #     continue
+        if file.endswith('.mat'):
+            contents += extract_mat(os.path.join(path, file), path)
+            continue
 
         # check if it's among the accepted extensions
         if ext in app.ACCEPTED_EXT:

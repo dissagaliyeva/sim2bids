@@ -27,7 +27,6 @@ COORDS = None
 # folder, in the global scope
 IGNORE_TIMES = False
 
-
 NETWORK = []
 
 
@@ -108,8 +107,6 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     # read file contents
     file = open_file(sub['path'], sub['sep'])
 
-    print(name)
-
     # get folder location for weights and distances
     if name == 'wd':
         # set appropriate output path depending on session type
@@ -151,8 +148,8 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
         desc = temp.file_desc['ts'] if name == 'ts' else temp.file_desc['bold'].format(sub['sid'].replace('sub-', ''))
         save_files(sub, folders[-1], file, type='default', ftype='ts', desc=desc)
 
-    elif name in ['times']:
-        pass
+    elif name == 'times':
+        traverse_times(sub, folders, ses)
 
     # get folder location for coordinates
     elif name == 'coord':
@@ -414,6 +411,13 @@ def open_file(path: str, sep: str):
 
     elif ext == 'h5':
         pass
+
+
+def traverse_times(sub, folders, ses):
+    # get description
+    desc = temp.file_desc['times'] if 'bold' not in sub['name'] else temp.file_desc['bold_times']
+
+    # check if bold times are similar
 
 
 def open_text(path, sep):

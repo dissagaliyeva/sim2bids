@@ -38,13 +38,19 @@ def save_mat(sub, og_path, extract=False):
                     if len(file[k].shape) == 3:
                         f = file[k][:, 0, :]
 
-                    name = check_name(k)
+                    name = check_name(os.path.join(root, k))
+                    print(name)
+
                     minutes = re.findall(r'[0-9]+min', sub['path'])
                     name = f'{name}_{minutes[0]}' if len(minutes) > 0 else name
 
+                    print('name, minutes:', name, minutes)
+
                     if multi_folder:
+                        print('multi folder:', os.path.join(os.path.join(root, sub['sid']), name + '.txt'))
                         path = os.path.join(os.path.join(root, sub['sid']), name + '.txt')
                     else:
+                        print('single folder:', os.path.join(root, name + '.txt'))
                         path = os.path.join(root, name + '.txt')
 
                     if not os.path.exists(path):
@@ -81,7 +87,7 @@ def transfer_files(sub, og_path):
 
 
 def check_name(name):
-    name = name.lower()
+    name = subjects.get_name(name).lower()
 
     if 'time' in name:
         if 'times' in name:
@@ -105,6 +111,8 @@ def traverse_file(path):
         return mat73.loadmat(path)
     except sio.matlab._miobase.MatReadError:
         pn.state.notifications.error(f'File `{name}` is empty! Aborting...')
+        return None
+    except FileNotFoundError:
         return None
     else:
         return mat
