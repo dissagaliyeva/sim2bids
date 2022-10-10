@@ -71,26 +71,35 @@ class Files:
 
             # traverse multi-subject in one folder structure
             if len(self.match) > 0:
+                print('\n\nMULTI_INPUT: MATCH', end='\n\n')
                 for k, v in get_unique_subs(self.match, self.content).items():
                     # create a new ID
                     sid = self.create_sid_sub()
-                    # print('sid:', sid)
-                    # print('content:', prepare_subs([os.path.join(path, x) for x in v], sid))
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
             else:
+                print('\n\nMULTI_INPUT: NO MATCH', end='\n\n')
                 for file in files:
+                    print(file)
                     sid = self.create_sid_sub()
 
                     # Step 5: get all content
-                    all_files = os.listdir(path)
+                    if os.path.isdir(os.path.join(path, file)):
+                        print('MULTI-INPUT DIR')
+                        all_files = os.listdir(os.path.join(path, file))
+                    else:
+                        all_files = os.listdir(path)
+
+                    print('ALL FILES:', all_files)
 
                     # Step 6: traverse ses-preop if present
                     if 'ses-preop' in all_files:
-                        self.save_sessions('ses-preop', all_files, sid, path)
+                        print('SES-PREOP SAVE @94')
+                        self.save_sessions('ses-preop', all_files, sid, os.path.join(path, file))
 
                     # Step 7: traverse ses-postop if present
                     if 'ses-postop' in all_files:
-                        self.save_sessions('ses-postop', all_files, sid, path)
+                        print('SES-POSTOP SAVE @94')
+                        self.save_sessions('ses-postop', all_files, sid, os.path.join(path, file))
 
                     if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
                         print('sid:', sid)
@@ -102,6 +111,7 @@ class Files:
                         print(self.subs)
 
         else:
+            print('\n\nSINGLE-SUBJECT INPUT', end='\n\n')
             # check if there are no folders inside
             sid = self.create_sid_sub()
             self.save_sessions('ses-preop', files, sid, os.path.join(path, 'ses-preop'))
@@ -121,6 +131,8 @@ class Files:
                 self.subs[sid][ses] = OrderedDict()
 
             self.subs[sid][ses].update(prepare_subs(utils.get_content(path, ses), sid))
+            print(f'sid: {sid}, path: {path}, ses: {ses}')
+            print('prepare subs @134:', prepare_subs(utils.get_content(path, ses), sid))
 
     def create_sid_sub(self):
         self.check_empty()
@@ -314,6 +326,9 @@ def accepted(name, return_accepted=False):
     for accept in app.ACCEPTED:
         if accept in name:
             if accept == 'ts' or accept == 'times':
+                if accept == 'ts':
+                    if len(name) != 2 or '_ts' not in name:
+                        return False
                 split = name.split('_')
                 if len(split) == 2:
                     if return_accepted:
@@ -371,8 +386,10 @@ def find_separator(path):
             file.to_csv(path, sep='\n', header=None, index=None)
             return '\n'
 
-        if file.shape[0] > 1 and file.shape[1] > 1:
-            return '\s'
+        # try with '\t'
+        trial =  pd.read_csv(path, header=None, sep='\t')
+        if trial.shape[0] > 1 and trial.shape[1] > 1:
+            return '\t'
 
         sniffer = csv.Sniffer()
 
