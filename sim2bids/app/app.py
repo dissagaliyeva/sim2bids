@@ -218,10 +218,10 @@ def save_output(subs):
 
             if 'weight' in k_lower or 'distance' in k_lower:
                 name = 'wd'
-            elif 'centre' in k_lower:
+            elif 'centres' == k_lower:
                 name = 'centres'
-            elif 'node' in k_lower or 'label' in k_lower:
-                name = 'coord'
+            # elif 'node' in k_lower or 'label' in k_lower:
+            #     name = 'coord'
             elif 'fc' in k_lower:
                 name = 'spatial'
             elif 'times' in k_lower:

@@ -100,6 +100,9 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     """
     global IGNORE_CENTRE
 
+    if name == 'centres' and sub['name'] != 'centres':
+        name = 'coord'
+
     # check if centres should be ignored. If so, immediately break
     # the function. Otherwise, continue iteration.
     if IGNORE_CENTRE and name == 'centres':
@@ -126,7 +129,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             save_files(sub, folder, file, desc=desc, ftype='wd')
 
     # get folder location for centres
-    elif name == 'centres':
+    elif name == 'centres' and 'centres' in sub['name']:
         save_centres(sub, file, ses, folders)
 
     # get folder location for spatial
@@ -161,6 +164,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             else:
                 save_centres(sub, file, ses, folders, centre_name='nodes')
         else:
+            print('COORD')
             # set appropriate output path depending on session and subject types
             if ses is not None:
                 folder = folders[4]
@@ -170,23 +174,32 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
                 folder = os.path.join(app.OUTPUT, 'coord')
 
             if 'content' in sub.keys():
+                print('\n\n\n\n\nCENTRES @173')
+                print(file, end='\n\n\n\n\n')
                 save_files(sub, folder, file, type='default', centres=True)
             else:
                 # save conversion results
                 if 'centres' in sub['fname']:
                     if IGNORE_CENTRE or not app.MULTI_INPUT:
+                        print(f'CENTRES @178: {sub["name"]}')
                         save_files(sub, folder, file, type='other', centres=True, desc=temp.centres['single'])
                     else:
+                        print(f'CENTRES @181: {sub["name"]}')
                         save_files(sub, folder, file, type='default', centres=True, desc=temp.centres['multi-unique'])
                 else:
                     if IGNORE_CENTRE or not app.MULTI_INPUT:
+                        print(f'CENTRES @185: {sub["name"]}')
                         save_files(sub, folder, file, type='other', desc=temp.file_desc[sub['name']])
                     else:
+                        print(f'CENTRES @188: {sub["name"]}')
                         save_files(sub, folder, file, type='default', desc=temp.file_desc[sub['name']])
 
 
 def save_centres(sub, file, ses, folders, centre_name='centres'):
     global IGNORE_CENTRE
+
+    if sub['name'] != 'centres':
+        save(sub, folders, ses, 'coord')
 
     # check if all centres are of the same content
     if check_centres(name=centre_name):

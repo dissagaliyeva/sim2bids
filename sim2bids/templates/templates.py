@@ -9,6 +9,11 @@ file_desc = {
     'spatial': 'This is the time series.',
     'bold_times': 'This is the functional connectivity matrix based on BOLD time series.',
     'areas': 'This is the areas for subject {}.',
+    'cortical': 'This is a container for connectivity cortical/non-cortical region flags.',
+    'normals': 'This is a container for connectivity center orientations.',
+    'faces': 'Faces of cortex surface triangulation.',
+    'vertices': 'Vertices of cortex surface triangulation.',
+    'hemisphere': 'This is a container for hemisphere inclusion flag for connectivity regions.'
 }
 
 centres = {'multi-unique': ['These are the region labels which are unique for each individual.',
