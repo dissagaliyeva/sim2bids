@@ -442,17 +442,52 @@ def supply_participants():
 
 
 def check_json():
-    for file in utils.get_content(OUTPUT, os.listdir(OUTPUT)):
-        if file.endswith('json'):
-            f = json.load(open(file))
-            if convert.COORDS is not None and 'CoordsRows' in f.keys() and f['CoordsRows'] == '':
-                if 'coord' in file:
-                    coords = [convert.COORDS[0].replace('json', 'tsv'), convert.COORDS[1].replace('json', 'tsv')]
-                    f['CoordsRows'] = coords
-                    f['CoordsColumns'] = coords
-                else:
-                    f['CoordsRows'] = convert.COORDS
-                    f['CoordsColumns'] = convert.COORDS
+    for root, dirs, files in os.walk(OUTPUT):
+        # get level number from the root folder
+        level = len(root.split('\\'))
 
-            with open(file, 'w') as f2:
-                json.dump(f, f2)
+        for file in files:
+            if file.endswith('json'):
+                path = os.path.join(root, file)
+                json_file = json.load(open(path))
+
+                if convert.IGNORE_CENTRE:
+                    lvl = '../' * (level - 1)
+                    coords = [f'{lvl}coord/desc-{DESC}_labels.json', f'{lvl}coord/desc-{DESC}_nodes.json']
+                else:
+                    if 'sub-' in path:
+                        if 'coord' in root:
+                            coords = None
+                        else:
+                            sub = re.findall(r'sub-[0-9]+', path)[0]
+                            coords = [f'../coord/{sub}_desc-{DESC}_labels.json',
+                                      f'../coord/{sub}_desc-{DESC}_nodes.json']
+
+                # check if CoordRows and CoordColumns exist
+                if 'CoordsRows' in json_file.keys():
+                    # remove CoordRows and CoordColumns from nodes/labels
+                    if 'nodes' in file or 'labels' in file or coords is None:
+                        del json_file['CoordsRows']
+                        del json_file['CoordsColumns']
+                    else:
+                        json_file['CoordsRows'] = coords
+                        json_file['CoordsColumns'] = coords
+
+                    # save changes
+                    with open(path, 'w') as f:
+                        json.dump(json_file, f)
+
+    # for file in utils.get_content(OUTPUT, os.listdir(OUTPUT)):
+    #     if file.endswith('json'):
+    #         f = json.load(open(file))
+    #         if convert.COORDS is not None and 'CoordsRows' in f.keys() and f['CoordsRows'] == '':
+    #             if 'coord' in file:
+    #                 coords = [convert.COORDS[0].replace('json', 'tsv'), convert.COORDS[1].replace('json', 'tsv')]
+    #                 f['CoordsRows'] = coords
+    #                 f['CoordsColumns'] = coords
+    #             else:
+    #                 f['CoordsRows'] = convert.COORDS
+    #                 f['CoordsColumns'] = convert.COORDS
+    #
+    #         with open(file, 'w') as f2:
+    #             json.dump(f, f2)
