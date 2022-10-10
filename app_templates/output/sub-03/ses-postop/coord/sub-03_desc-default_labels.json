@@ -1,1 +1,1 @@
-{"NumberOfRows": 68, "NumberOfColumns": 1, "CoordsRows": ["../../sub-01/ses-preop/coord/sub-01_desc-default_labels.tsv", "../../sub-01/ses-preop/coord/sub-01_desc-default_nodes.tsv"], "CoordsColumns": ["../../sub-01/ses-preop/coord/sub-01_desc-default_labels.tsv", "../../sub-01/ses-preop/coord/sub-01_desc-default_nodes.tsv"], "Description": "These are the region labels which are unique for each individual.", "Units": ""}
+{"NumberOfRows": 68, "NumberOfColumns": 1, "Description": "These are the region labels which are unique for each individual.", "Units": ""}
