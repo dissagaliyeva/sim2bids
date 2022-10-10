@@ -3,12 +3,12 @@ import os
 import re
 import shutil
 from collections import OrderedDict
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import panel as pn
 import pylems_py2xml
-import pylems_py2xml as py2xml
 
 # import local packages
 import sim2bids.utils
@@ -29,6 +29,7 @@ CENTRES = False  # whether centres.txt|nodes.txt|labels.txt were found
 MULTI_INPUT = False  # whether input files include single- or multi-subjects
 ALL_FILES = None  # list of all file paths (gets supplemented in subjects.py)
 CODE = None  # path to python code if exists
+SESSIONS = False
 H5_CONTENT = dict()
 MODEL_NAME = None
 SoftwareVersion = None
@@ -111,6 +112,7 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     if save and subs is not None:
         # save conversions
         save_output(subs)
+        save_missing(path, files)
 
         # save code
         if CODE is not None:
@@ -147,6 +149,27 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 
     # otherwise, return None
     return None
+
+
+def save_missing(path, files):
+    global CODE
+
+    if len(files) == 1 and os.path.isdir(path, files[0]):
+        path = os.path.join(path, files[0])
+
+    get_path = lambda x: Path(os.path.join(path, x))
+    missing = [get_path(p) for p in os.listdir(path) if not os.path.isdir(get_path(p))]
+
+    for file in missing:
+        name = os.path.basename(str(file)).split('.')[0]
+
+        if str(file).endswith('.py'):
+            CODE = file
+        elif 'centre' in str(file):
+            print(file)
+            f = convert.open_file(os.path.join(path, file), subjects.find_separator(os.path.join(path, file)))
+            convert.save_files(dict(desc=DESC, name=name), f'{OUTPUT}/coord', f,
+                               type='coord', centres=True, desc=temp.centres['single'])
 
 
 def save_output(subs):
@@ -239,7 +262,7 @@ def check_output_folder():
         prep.reset_index()
 
 
-def create_sub_struct(path, subs, ses_name=None):
+def create_sub_struct(path, subs=None, ses_name=None):
     """
 
     Parameters
@@ -299,14 +322,13 @@ def save_code():
     template = f'desc-{DESC}_code.py'
     path = os.path.join(OUTPUT, 'code', template)
 
-    if CODE is not None:
-        shutil.copy(CODE, path)
-        supply_dict('code', os.path.join(path.replace('py', 'json')))
+    shutil.copy(CODE, path)
+    supply_dict('code', os.path.join(path.replace('py', 'json')))
 
-        # save JSON files
-        py2xml.main.XML(inp=CODE, output_path=os.path.join(OUTPUT, 'param'), suffix=DESC, app=True)
-        MODEL_NAME = utils.get_model()
-        transfer_xml()
+    # save JSON files
+    pylems_py2xml.main.XML(inp=path, output_path=os.path.join(OUTPUT, 'param'), suffix=DESC, app=True)
+    MODEL_NAME = utils.get_model()
+    transfer_xml()
 
 
 def transfer_xml():
