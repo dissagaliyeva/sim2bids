@@ -28,6 +28,7 @@ COORDS = None
 IGNORE_TIMES = False
 
 NETWORK = []
+TIMES_TO_SKIP = []
 
 
 def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
@@ -202,12 +203,15 @@ def save_centres(sub, file, ses, folders, centre_name='centres'):
         desc = temp.centres['multi-unique'] if app.MULTI_INPUT else temp.centres['single']
 
         # set appropriate output path depending on session and subject types
-        if ses is not None:
-            folder = folders[4]
-        elif app.MULTI_INPUT and ses is None:
-            folder = folders[3]
+        if len(folders) > 1:
+            if ses is not None:
+                folder = folders[4]
+            elif app.MULTI_INPUT and ses is None:
+                folder = folders[3]
+            else:
+                folder = os.path.join(app.OUTPUT, 'coord')
         else:
-            folder = os.path.join(app.OUTPUT, 'coord')
+            folder = folders[0]
 
         # save conversion results
         if IGNORE_CENTRE:
@@ -418,11 +422,62 @@ def open_file(path: str, sep: str):
 
 
 def traverse_times(sub, folders, ses):
+    global TIMES_TO_SKIP
+
     # get description
     desc = temp.file_desc['times'] if 'bold' not in sub['name'] else temp.file_desc['bold_times']
 
+    print('ALL TIMES:', app.TIMES)
+
     # check if times are similar
-    ftype = sub['path'].split('-')[-1].split(_)[0:2]
+    for times in app.TIMES:
+        for rhythm in ['alpha', 'delta', 'beta', 'gamma', 'theta']:
+            # check if the file needs to be skipped
+            if f'{rhythm}_{times}' in TIMES_TO_SKIP:
+                return
+
+            print('TIMES:', times)
+            print('RHYTHM:', rhythm)
+
+            results = get_specific(times, rhythm)
+            print('RESULTS @435:', results)
+
+            if len(results) > 0:
+                open_df = lambda x: pd.read_csv(x, header=None, sep='\t')
+                first = open_df(results[0])
+
+
+                if len(results) > 1:
+                    print('results > 1')
+                    for result in results[1:]:
+                        if first.equals(open_df(result)):
+                            print(f'result[0]={results[0]} IS SIMILAR to result[idx]={result}', end='\n\n')
+                            similar = True
+                            TIMES_TO_SKIP.append(f'{rhythm}_{times}')
+
+                            # save in global folder
+                            sub['name'] = f'{rhythm}-{times}'
+                            save_files(sub, os.path.join(app.OUTPUT, 'coord'), first, 'coord', desc=desc)
+                        else:
+                            print(f'result[0]={results[0]} IS NOT SIMILAR to result[idx]={result}', end='\n\n')
+                            # set appropriate output path depending on session and subject types
+                            if ses is not None:
+                                folder = folders[4]
+                            elif app.MULTI_INPUT and ses is None:
+                                folder = folders[3]
+                            else:
+                                folder = os.path.join(app.OUTPUT, 'coord')
+
+                            save_files(sub, folder, first, 'default', desc=desc)
+                            save_files(sub, folder, open_df(result), 'default', desc=desc)
+                else:
+                    print('results not bigger than 1')
+                    similar = True
+                    TIMES_TO_SKIP.append(f'{rhythm}_{times}')
+                    # save in global folder
+                    sub['name'] = f'{rhythm}-{times.replace(".txt", "")}'
+                    save_files(sub, os.path.join(app.OUTPUT, 'coord'), first, 'coord', desc=desc)
+
 
 
 def open_text(path, sep):

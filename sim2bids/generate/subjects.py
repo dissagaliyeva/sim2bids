@@ -13,6 +13,9 @@ from sim2bids.convert import convert
 from sim2bids.app import utils
 
 
+GLOBAL_FILES = []
+
+
 class Files:
     def __init__(self, path, files):
         self.path = path
@@ -68,13 +71,7 @@ class Files:
 
             # traverse multi-subject in one folder structure
             if len(self.match) > 0:
-                print('multi-subject with matches')
-
-                print('self.match:', self.match)
-                print(get_unique_subs(self.match, self.content).items())
                 for k, v in get_unique_subs(self.match, self.content).items():
-                    print(k, v)
-
                     # create a new ID
                     sid = self.create_sid_sub()
                     # print('sid:', sid)
@@ -83,7 +80,6 @@ class Files:
             else:
                 for file in files:
                     sid = self.create_sid_sub()
-                    print(sid)
 
                     # Step 5: get all content
                     all_files = os.listdir(path)
@@ -112,12 +108,13 @@ class Files:
             self.save_sessions('ses-postop', files, sid, os.path.join(path, 'ses-postop'))
 
             if not self.ses_found:
-                self.create_sid_sub(sid)
+                self.create_sid_sub()
                 self.subs[sid] = prepare_subs(utils.get_content(path, files), sid)
 
     def save_sessions(self, ses, files, sid, path):
         if ses in files:
             self.ses_found = True
+            app.SESSIONS = True
             if sid not in self.subs.keys():
                 self.subs[sid] = OrderedDict()
             if ses not in self.subs[sid].keys():
@@ -367,26 +364,26 @@ def find_separator(path):
         return 'remove'
     except pd.errors.ParserError:
         print(path)
+    else:
+        # if cortical.txt, hemisphere.txt, or areas.txt are present, return '\n' delimiter
+        if path.endswith('hemisphere.txt') or path.endswith('cortical.txt') or path.endswith('areas.txt') \
+                or path.endswith('times.txt'):
+            file.to_csv(path, sep='\n', header=None, index=None)
+            return '\n'
 
-    # if cortical.txt, hemisphere.txt, or areas.txt are present, return '\n' delimiter
-    if path.endswith('hemisphere.txt') or path.endswith('cortical.txt') or path.endswith('areas.txt') \
-            or path.endswith('times.txt'):
-        file.to_csv(path, sep='\n', header=None, index=None)
-        return '\n'
+        if file.shape[0] > 1 and file.shape[1] > 1:
+            return '\s'
 
-    if file.shape[0] > 1 and file.shape[1] > 1:
-        return '\s'
+        sniffer = csv.Sniffer()
 
-    sniffer = csv.Sniffer()
+        with open(path) as fp:
+            try:
+                delimiter = sniffer.sniff(fp.read(5000)).delimiter
+            except Exception:
+                delimiter = sniffer.sniff(fp.read(50)).delimiter
 
-    with open(path) as fp:
-        try:
-            delimiter = sniffer.sniff(fp.read(5000)).delimiter
-        except Exception:
-            delimiter = sniffer.sniff(fp.read(50)).delimiter
-
-    delimiter = '\s' if delimiter == ' ' else delimiter
-    return delimiter
+        delimiter = '\s' if delimiter == ' ' else delimiter
+        return delimiter
 
 # import os
 # import csv
