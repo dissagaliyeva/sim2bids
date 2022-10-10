@@ -311,14 +311,10 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         to_tsv(nodes.replace('json', 'tsv'), content.iloc[:, 1:])
     else:
         if ftype == 'coord':
-            print('\n\n sub["name"] @314:', sub['name'])
-            print('sub["path"]:', sub['path'], end='\n\n')
-
             to_json(json_file.lower(), shape=content.shape, key='coord', desc=desc)
             to_tsv(tsv_file.lower(), content)
         else:
             # otherwise, save files as usual
-            print('\n\n sub["name"]:', sub['name'], end='\n\n')
             to_json(json_file.lower(), shape=content.shape, key=ftype, desc=desc)
             to_tsv(tsv_file.lower(), content)
 

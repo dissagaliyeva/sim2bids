@@ -31,7 +31,6 @@ def extract_zip(path):
         # iterate over zip content and extract everything
         for ext in to_extract:
             if ext in archive.namelist():
-                print(ext)
                 # get filename
                 new_filename = os.path.join(parent, ext)
 
