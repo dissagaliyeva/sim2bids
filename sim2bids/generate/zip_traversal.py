@@ -18,10 +18,10 @@ def extract_zip(path):
     contents = os.listdir(parent)
 
     # if files are already extracted, exit the function
-    if to_extract in contents:
-        return
+    if len(set(to_extract).difference(set(contents))) == 0:
+        return []
 
-    if len(set(to_extract).intersection(set(contents))) != 7:
+    if len(set(to_extract).intersection(set(contents))) < len(to_extract):
         # open zip file
         archive = zipfile.ZipFile(path)
 
@@ -31,6 +31,7 @@ def extract_zip(path):
         # iterate over zip content and extract everything
         for ext in to_extract:
             if ext in archive.namelist():
+                print(ext)
                 # get filename
                 new_filename = os.path.join(parent, ext)
 
@@ -38,14 +39,8 @@ def extract_zip(path):
                 if not os.path.exists(new_filename):
                     archive.extract(ext, path=parent)
 
-                    # rename tract_lengths.txt to distances.txt
-                    if ext.startswith('tract_lengths'):
-                        new_filename = new_filename.replace('tract_lengths', 'distances')
-
-                        # rename the new file
-                        os.replace(os.path.join(parent, ext), new_filename)
-
                     # append newly added files
                     added.append(new_filename)
-
         return added
+
+    return []

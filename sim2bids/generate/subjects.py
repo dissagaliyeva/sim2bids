@@ -71,47 +71,37 @@ class Files:
 
             # traverse multi-subject in one folder structure
             if len(self.match) > 0:
-                print('\n\nMULTI_INPUT: MATCH', end='\n\n')
+
                 for k, v in get_unique_subs(self.match, self.content).items():
                     # create a new ID
                     sid = self.create_sid_sub()
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
             else:
-                print('\n\nMULTI_INPUT: NO MATCH', end='\n\n')
                 for file in files:
-                    print(file)
                     sid = self.create_sid_sub()
 
                     # Step 5: get all content
                     if os.path.isdir(os.path.join(path, file)):
-                        print('MULTI-INPUT DIR')
                         all_files = os.listdir(os.path.join(path, file))
                     else:
                         all_files = os.listdir(path)
 
-                    print('ALL FILES:', all_files)
-
                     # Step 6: traverse ses-preop if present
                     if 'ses-preop' in all_files:
-                        print('SES-PREOP SAVE @94')
                         self.save_sessions('ses-preop', all_files, sid, os.path.join(path, file))
 
                     # Step 7: traverse ses-postop if present
                     if 'ses-postop' in all_files:
-                        print('SES-POSTOP SAVE @94')
                         self.save_sessions('ses-postop', all_files, sid, os.path.join(path, file))
 
                     if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
-                        print('sid:', sid)
                         if os.path.basename(path) == file:
                             self.subs[sid] = prepare_subs(utils.get_content(path.replace(file, ''), file), sid)
                         else:
                             self.subs[sid] = prepare_subs(utils.get_content(path, file), sid)
 
-                        print(self.subs)
 
         else:
-            print('\n\nSINGLE-SUBJECT INPUT', end='\n\n')
             # check if there are no folders inside
             sid = self.create_sid_sub()
             self.save_sessions('ses-preop', files, sid, os.path.join(path, 'ses-preop'))
@@ -131,8 +121,6 @@ class Files:
                 self.subs[sid][ses] = OrderedDict()
 
             self.subs[sid][ses].update(prepare_subs(utils.get_content(path, ses), sid))
-            print(f'sid: {sid}, path: {path}, ses: {ses}')
-            print('prepare subs @134:', prepare_subs(utils.get_content(path, ses), sid))
 
     def create_sid_sub(self):
         self.check_empty()
@@ -198,7 +186,7 @@ def prepare_subs(file_paths, sid):
         if file_path.endswith('.h5'):
             name = name.split('_')[0] + '.h5'
         else:
-            if 'bold' not in name or 'emp' not in name or 'times' not in name:
+            if 'bold' not in name or 'emp' not in name or 'times' not in name or 'orientation' not in name:
                 name = name.split('_')[-1] if '_' in name else name
         desc = app.DESC
 
@@ -223,11 +211,11 @@ def prepare_subs(file_paths, sid):
         if name == 'tract_lengths.txt':
             name = 'distances.txt'
 
-        if not os.path.exists(file_path) and 'distances' in file_path:
-            if os.path.exists(file_path.replace('distances', 'tract_lengths')):
-                os.replace(file_path.replace('distances', 'tract_lengths'), file_path)
-            else:
-                continue
+        # if not os.path.exists(file_path) and 'distances' in file_path:
+        #     if os.path.exists(file_path.replace('distances', 'tract_lengths')):
+        #         os.replace(file_path.replace('distances', 'tract_lengths'), file_path)
+        #     else:
+        #         continue
 
         # rename tract_lengths to distances in the physical folder location
         if 'tract_lengths' in file_path:
@@ -236,16 +224,16 @@ def prepare_subs(file_paths, sid):
             file_path = new_path
 
         # rename average_orientations to normals in both subject- and physical levels
-        if name in ['average_orientations.txt', 'orientations.txt']:
-            name = 'normals.txt'
-            new_path = file_path.replace(name.replace('.txt', ''), 'normals')
+        if 'orientation' in file_path or name == 'normal.txt':
+            new_path = file_path.replace('average_orientations', 'normals').\
+                                 replace('orientations', 'normals')
             os.replace(file_path, new_path)
             file_path = new_path
 
         # check if separator is missing, if so remove the file entirely
         name = get_name(file_path)
 
-        if name.endswith('txt'):
+        if not file_path.endswith('txt'):
             continue
         else:
             sep = find_separator(file_path)
@@ -315,8 +303,11 @@ def get_name(path):
     elif series is not None and speed is None and g is None:
         return f'{series}'
 
-    if name[-1] in [*app.ACCEPTED[:4], *app.ACCEPTED[7:9], *app.ACCEPTED[11:13], *app.ACCEPTED[17:20],
-                    'spike', 'event']:
+    if name[-1] in ['weight', 'distance', 'tract_length', 'delay', 'speed',
+                    'centre', 'area', 'orientation', 'average_orientation', 'normal',
+                    'vnormal', 'fnormal', 'sensor', 'volume', 'spike', 'event']:
+        if name[-1].endswith('s'):
+            return name[-1]
         return name[-1] + 's'
 
     return name[-1]

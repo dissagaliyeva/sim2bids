@@ -106,8 +106,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
-    print(subs)
-
     # only save conversions if 'save' is True
     if save and subs is not None:
         # save conversions
@@ -166,7 +164,6 @@ def save_missing(path, files):
         if str(file).endswith('.py'):
             CODE = file
         elif 'centre' in str(file):
-            print(file)
             f = convert.open_file(os.path.join(path, file), subjects.find_separator(os.path.join(path, file)))
             convert.save_files(dict(desc=DESC, name=name), f'{OUTPUT}/coord', f,
                                type='coord', centres=True, desc=temp.centres['single'])
@@ -212,6 +209,7 @@ def save_output(subs):
         name = None
 
         for k, v in sub.items():
+
             # create folders according to session and subject count types
             folders = create_sub_struct(OUTPUT, v, ses_name=ses)
             k_lower = k.lower()
@@ -220,8 +218,6 @@ def save_output(subs):
                 name = 'wd'
             elif 'centres' == k_lower:
                 name = 'centres'
-            # elif 'node' in k_lower or 'label' in k_lower:
-            #     name = 'coord'
             elif 'fc' in k_lower:
                 name = 'spatial'
             elif 'times' in k_lower:
@@ -235,7 +231,7 @@ def save_output(subs):
                 continue
             elif k_lower.endswith('.mat'):
                 mat.save_mat(sub[k], sub[k]['path'], extract=False)
-            elif k_lower.endswith('txt') or k_lower.endswith('csv') or k_lower.endswith('dat'):
+            elif subjects.accepted(k_lower):
                 name = 'coord'
 
             if name is not None:
