@@ -100,6 +100,9 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     """
     global IGNORE_CENTRE
 
+    if name == 'centres' and sub['name'] != 'centres':
+        name = 'coord'
+
     # check if centres should be ignored. If so, immediately break
     # the function. Otherwise, continue iteration.
     if IGNORE_CENTRE and name == 'centres':
@@ -126,7 +129,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             save_files(sub, folder, file, desc=desc, ftype='wd')
 
     # get folder location for centres
-    elif name == 'centres':
+    elif name == 'centres' and 'centres' in sub['name']:
         save_centres(sub, file, ses, folders)
 
     # get folder location for spatial
@@ -187,6 +190,9 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
 def save_centres(sub, file, ses, folders, centre_name='centres'):
     global IGNORE_CENTRE
+
+    if sub['name'] != 'centres':
+        save(sub, folders, ses, 'coord')
 
     # check if all centres are of the same content
     if check_centres(name=centre_name):
@@ -305,10 +311,14 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         to_tsv(nodes.replace('json', 'tsv'), content.iloc[:, 1:])
     else:
         if ftype == 'coord':
+            print('\n\n sub["name"] @314:', sub['name'])
+            print('sub["path"]:', sub['path'], end='\n\n')
+
             to_json(json_file.lower(), shape=content.shape, key='coord', desc=desc)
             to_tsv(tsv_file.lower(), content)
         else:
             # otherwise, save files as usual
+            print('\n\n sub["name"]:', sub['name'], end='\n\n')
             to_json(json_file.lower(), shape=content.shape, key=ftype, desc=desc)
             to_tsv(tsv_file.lower(), content)
 
@@ -427,8 +437,6 @@ def traverse_times(sub, folders, ses):
     # get description
     desc = temp.file_desc['times'] if 'bold' not in sub['name'] else temp.file_desc['bold_times']
 
-    print('ALL TIMES:', app.TIMES)
-
     # check if times are similar
     for times in app.TIMES:
         for rhythm in ['alpha', 'delta', 'beta', 'gamma', 'theta']:
@@ -436,22 +444,15 @@ def traverse_times(sub, folders, ses):
             if f'{rhythm}_{times}' in TIMES_TO_SKIP:
                 return
 
-            print('TIMES:', times)
-            print('RHYTHM:', rhythm)
-
             results = get_specific(times, rhythm)
-            print('RESULTS @435:', results)
 
             if len(results) > 0:
                 open_df = lambda x: pd.read_csv(x, header=None, sep='\t')
                 first = open_df(results[0])
 
-
                 if len(results) > 1:
-                    print('results > 1')
                     for result in results[1:]:
                         if first.equals(open_df(result)):
-                            print(f'result[0]={results[0]} IS SIMILAR to result[idx]={result}', end='\n\n')
                             similar = True
                             TIMES_TO_SKIP.append(f'{rhythm}_{times}')
 
@@ -459,7 +460,6 @@ def traverse_times(sub, folders, ses):
                             sub['name'] = f'{rhythm}-{times}'
                             save_files(sub, os.path.join(app.OUTPUT, 'coord'), first, 'coord', desc=desc)
                         else:
-                            print(f'result[0]={results[0]} IS NOT SIMILAR to result[idx]={result}', end='\n\n')
                             # set appropriate output path depending on session and subject types
                             if ses is not None:
                                 folder = folders[4]
@@ -471,13 +471,11 @@ def traverse_times(sub, folders, ses):
                             save_files(sub, folder, first, 'default', desc=desc)
                             save_files(sub, folder, open_df(result), 'default', desc=desc)
                 else:
-                    print('results not bigger than 1')
                     similar = True
                     TIMES_TO_SKIP.append(f'{rhythm}_{times}')
                     # save in global folder
                     sub['name'] = f'{rhythm}-{times.replace(".txt", "")}'
                     save_files(sub, os.path.join(app.OUTPUT, 'coord'), first, 'coord', desc=desc)
-
 
 
 def open_text(path, sep):

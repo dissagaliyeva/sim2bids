@@ -111,7 +111,9 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
         return recursive_walk(os.path.join(path, files))
 
     for file in files:
-        if os.path.isdir(os.path.join(path, file)) and file.startswith('.ipy'):
+        if os.path.isdir(os.path.join(path, file)) and (file.startswith('.ipy') or file.startswith('.git') or
+                                                        file.startswith('.MS') or file.startswith('.idea') or
+                                                        file.startswith('vscode')):
             shutil.rmtree(os.path.join(path, file))
 
     # preprocess folder and remove all folders/files starting with '.'
