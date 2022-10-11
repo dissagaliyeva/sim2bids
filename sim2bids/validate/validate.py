@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 import pandas as pd
 import panel as pn
 from scipy.io import loadmat
@@ -7,7 +8,8 @@ import mat73
 import scipy
 
 import sim2bids.generate.subjects as subj
-from sim2bids.app import app
+from sim2bids.convert import convert
+from sim2bids.app import app, utils
 
 RENAMED = []
 
@@ -37,40 +39,99 @@ def filter(contents, files=None):
     return paths
 
 
-def validate(unique_files, paths):
-    to_rename = []
+def validate(unique_files, paths, input_path, input_files):
+    print('\n\n\nunique files:', unique_files)
+    print('paths:', paths, end='\n\n\n')
+
+    # to_rename = []
 
     for idx, file in enumerate(unique_files):
         if type(file) == pn.widgets.select.Select:
             name, value = file.name.replace('Specify ', ''), file.value
             ext = name.split('.')[-1]
 
-            if value in ['weights', 'distances', *app.ACCEPTED[3:]]:
-                to_rename.append(value)
+            print(f'name: {name}, value: {value}, ext: {ext}', end='\n\n')
 
-                if verify_weights(name):
-                    rename_files(name, value, paths)
-            elif value == 'weights & nodes':
-                result = verify_weights_nodes(name, paths)
-
-                if isinstance(result, bool):
-                    pass
-                elif isinstance(result, list):
-                    extract_files(name, result[1], result[-1], paths)
-
-            # if the selection's value is "skip", remove the file from input folder
+            if value == 'weights':
+                rename_weights(name, ext, paths, input_path, input_files)
             elif value == 'skip':
                 remove_files(name, paths)
-            elif value == 'map':
-                if ext in ['csv', 'dat', 'txt']:
-                    rename_files(name, 'map', paths)
-            elif value == 'ts':
-                if ext in ['csv', 'dat', 'txt']:
-                    rename_files(name, 'ts', paths)
+
+            # if subj.accepted(name):
+            #     # to_rename.append(value)
+            #
+            #     if verify_weights(name):
+            #         rename_files(name, value, paths)
+            # elif value == 'weights & nodes':
+            #     result = verify_weights_nodes(name, paths)
+            #
+            #     if isinstance(result, bool):
+            #         pass
+            #     elif isinstance(result, list):
+            #         extract_files(name, result[1], result[-1], paths)
+            #
+            # # if the selection's value is "skip", remove the file from input folder
+            # elif value == 'skip':
+            #     remove_files(name, paths)
+            # elif value == 'map':
+            #     if ext in ['csv', 'dat', 'txt']:
+            #         rename_files(name, 'map', paths)
+            # elif value == 'ts':
+            #     if ext in ['csv', 'dat', 'txt']:
+            #         rename_files(name, 'ts', paths)
+            # elif value == 'fc':
+            #     rename_files(name, 'fc', paths)
 
     # let users know that files were successfully renamed
-    if len(to_rename) == len(RENAMED):
-        pn.state.notifications.success('Renamed all files!')
+    # if len(to_rename) == len(RENAMED):
+    #     pn.state.notifications.success('Renamed all files!')
+
+def rename_weights(name, ext, paths, input_path, input_files):
+    """
+    This function checks if weights file already exists. If not, it creates
+    a new weights file. Otherwise, checks against the existing weights,
+    if the two weights file are equal, then saves only one copy. Otherwise,
+    saves the new file with the extension used in the file.
+
+    :param name:
+    :param paths:
+    :return:
+    """
+    files = get_files(paths, name, 'weights.txt', search1dir=True)
+    open_file = lambda x: pd.read_csv(x, header=None, sep=subj.find_separator(x)).values
+
+    # read the new file
+    if ext in ['txt', 'dat', 'csv', 'tsv']:
+        if len(files) > 1:
+            f1, f2 = open_file(files[0]), open_file(files[1])
+
+            # check if two files are different
+            if not np.array_equal(f1, f2):
+                # print(get_files(paths, name, 'weights'))
+                for f in get_files(utils.get_content(input_path, input_files), name, 'weights'):
+                    if 'weights' in f:
+                        try:
+                            os.rename(f, f.replace('weights.txt', f'weights_SCnotthrAn.txt'))
+                        except FileExistsError:
+                            return
+                    else:
+                        try:
+                            os.rename(f, f.replace(name, f'weights_{name}'))
+                        except FileExistsError:
+                            return
+
+
+def get_files(paths, file_name, constraint, search1dir=False):
+    files, dir_name = [], os.path.dirname(paths[0])
+
+    if search1dir:
+        paths = [os.path.join(dir_name, f) for f in os.listdir(dir_name)]
+
+    for path in paths:
+        if file_name in path or constraint in path:
+            files.append(path)
+
+    return files
 
 
 def verify_weights(name):
@@ -132,8 +193,17 @@ def rename_files(name, new_ext, paths):
     for file in paths:
         if file.endswith(name):
             if file.endswith('txt') or file.endswith('csv') or file.endswith('dat'):
-                os.rename(file, file.replace(name, new_ext + '.txt'))
-                RENAMED.append(file)
+                p = os.path.dirname(file)
+                if new_ext == 'weights' and 'weights.txt' in os.listdir(p):
+                    os.rename(file, os.path.join(p, f'weights_{name}'))
+                    os.rename(os.path.join(p, 'weights.txt'), os.path.join(p, 'weights_SCnotthrAn.txt'))
+                else:
+                    try:
+                        os.rename(file, file.replace(name, f'{name.replace(".txt", "")}_{new_ext}' + '.txt'))
+                    except FileExistsError:
+                        pn.state.notifications.error(f'File {new_ext} already exists!')
+                    else:
+                        RENAMED.append(file)
             elif file.endswith('mat'):
                 pass
 

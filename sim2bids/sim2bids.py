@@ -171,7 +171,7 @@ class MainArea(param.Parameterized):
 
     def _rename(self, event=None):
 
-        validate.validate(self.rename_files, self.to_rename_path)
+        validate.validate(self.rename_files, self.to_rename_path, self.text_input.value, self.cross_select.value)
 
     @pn.depends('desc.value', watch=True)
     def _change_desc(self):

@@ -35,7 +35,7 @@ def rm_tree(path: str = '../output'):
 
 
 def get_selector(name):
-    return pn.widgets.Select(name=f'Specify {name}', groups={
+    return pn.widgets.Select(name=f'Specify {name}', value='skip', groups={
         'Network (net)': ['weights', 'distances', 'delays', 'speed', 'weights & nodes'],
         'Coordinates (coord)': ['times', 'centres', 'orientations', 'areas', 'hemispheres',
                                 'cortical', 'nodes', 'labels', 'vertices', 'faces', 'vnormals',

@@ -106,6 +106,8 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
+    print(subs)
+
     # only save conversions if 'save' is True
     if save and subs is not None:
         # save conversions

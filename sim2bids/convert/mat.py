@@ -39,18 +39,13 @@ def save_mat(sub, og_path, extract=False):
                         f = file[k][:, 0, :]
 
                     name = check_name(os.path.join(root, k))
-                    print(name)
-
                     minutes = re.findall(r'[0-9]+min', sub['path'])
                     name = f'{name}_{minutes[0]}' if len(minutes) > 0 else name
 
-                    print('name, minutes:', name, minutes)
-
                     if multi_folder:
-                        print('multi folder:', os.path.join(os.path.join(root, sub['sid']), name + '.txt'))
+
                         path = os.path.join(os.path.join(root, sub['sid']), name + '.txt')
                     else:
-                        print('single folder:', os.path.join(root, name + '.txt'))
                         path = os.path.join(root, name + '.txt')
 
                     if not os.path.exists(path):
