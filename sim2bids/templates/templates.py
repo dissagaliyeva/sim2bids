@@ -13,7 +13,9 @@ file_desc = {
     'normals': 'This is a container for connectivity center orientations.',
     'faces': 'Faces of cortex surface triangulation.',
     'vertices': 'Vertices of cortex surface triangulation.',
-    'hemisphere': 'This is a container for hemisphere inclusion flag for connectivity regions.'
+    'hemisphere': 'This is a container for hemisphere inclusion flag for connectivity regions.',
+    'map': 'nxm matrix where the coordinates along rows are mapped to the coordinates along columns. The types of '
+           'coordinates are specified in sidecar JSON fields "CoordsRows" and "CoordsColumns".',
 }
 
 centres = {'multi-unique': ['These are the region labels which are unique for each individual.',
