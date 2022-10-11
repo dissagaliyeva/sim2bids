@@ -247,6 +247,8 @@ def prepare_subs(file_paths, sid):
                 os.remove(file_path)
                 continue
 
+            name = os.path.basename(file_path).split('.')[0]
+
             subs[name] = {
                 'name': name,
                 'fname': os.path.basename(file_path),
