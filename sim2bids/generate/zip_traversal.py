@@ -21,7 +21,7 @@ def extract_zip(path):
     if len(set(to_extract).difference(set(contents))) == 0:
         return []
 
-    if len(set(to_extract).intersection(set(contents))) < len(to_extract):
+    if len(set(to_extract).intersection(set(contents))) < len(to_extract) - 1:
         # open zip file
         archive = zipfile.ZipFile(path)
 
@@ -40,6 +40,7 @@ def extract_zip(path):
 
                     # append newly added files
                     added.append(new_filename)
+
         return added
 
     return []

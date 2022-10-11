@@ -45,6 +45,9 @@ def recursive_walk(path: str, basename: bool = False) -> list:
             if file.endswith('.zip'):
                 # add zip content to the files
                 content += z.extract_zip(os.path.join(root, file))
+
+                # remove zip folder to not get into recursion
+                os.remove(os.path.join(root, file))
                 continue
 
             if file.endswith('.h5'):
