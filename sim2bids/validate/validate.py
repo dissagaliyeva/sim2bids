@@ -40,22 +40,17 @@ def filter(contents, files=None):
 
 
 def validate(unique_files, paths, input_path, input_files):
-    print('\n\n\nunique files:', unique_files)
-    print('paths:', paths, end='\n\n\n')
-
-    # to_rename = []
-
     for idx, file in enumerate(unique_files):
         if type(file) == pn.widgets.select.Select:
             name, value = file.name.replace('Specify ', ''), file.value
             ext = name.split('.')[-1]
 
-            print(f'name: {name}, value: {value}, ext: {ext}', end='\n\n')
-
             if value == 'weights':
                 rename_weights(name, ext, paths, input_path, input_files)
             elif value == 'skip':
                 remove_files(name, paths)
+            else:
+                rename_files(name, value, ext, paths)
 
             # if subj.accepted(name):
             #     # to_rename.append(value)
@@ -107,7 +102,6 @@ def rename_weights(name, ext, paths, input_path, input_files):
 
             # check if two files are different
             if not np.array_equal(f1, f2):
-                # print(get_files(paths, name, 'weights'))
                 for f in get_files(utils.get_content(input_path, input_files), name, 'weights'):
                     if 'weights' in f:
                         try:
@@ -186,7 +180,7 @@ def get_nodes(arr: list) -> list:
     return all_nodes
 
 
-def rename_files(name, new_ext, paths):
+def rename_files(name, new_ext, ext, paths):
     global RENAMED
     new_ext = new_ext.replace('.', '').lower()
 
@@ -198,8 +192,11 @@ def rename_files(name, new_ext, paths):
                     os.rename(file, os.path.join(p, f'weights_{name}'))
                     os.rename(os.path.join(p, 'weights.txt'), os.path.join(p, 'weights_SCnotthrAn.txt'))
                 else:
+                    if name.lower() == new_ext.lower():
+                        return
+
                     try:
-                        os.rename(file, file.replace(name, f'{name.replace(".txt", "")}_{new_ext}' + '.txt'))
+                        os.rename(file, file.replace(name, f'{name.replace("." + ext, "")}_{new_ext}' + '.txt'))
                     except FileExistsError:
                         pn.state.notifications.error(f'File {new_ext} already exists!')
                     else:

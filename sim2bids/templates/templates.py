@@ -1,21 +1,24 @@
 required = ['NumberOfRows', 'NumberOfColumns', 'CoordsRows', 'CoordsColumns', 'Description']
 
 file_desc = {
-    'weights': 'The Structural Connectivity (SC) that contains the connectome.',
+    'weights': 'This is the Structural Connectivity (SC), where zeros represent unconnected areas.',
     'distances': 'The distances between areas.',
-    'times': 'Time series of the simulated time series.',
-    'ts': 'Time series of the simulated time series.',
-    'bold': 'This is the time series for subject {} with BOLD monitor.',
+    'delays': 'These are the connection delays.',
+    'speeds': 'These are the connection speeds.',
+    'times': 'These are the time steps of the simulated time series.',
+    'bold_times': 'These are the time steps of the simulated BOLD time series',
+    'ts': 'This is the time series for subject {}.',
+    'bold_ts': 'This is the time series for subject {} with BOLD monitor.',
     'spatial': 'This is the time series.',
-    'bold_times': 'This is the functional connectivity matrix based on BOLD time series.',
-    'areas': 'This is the areas for subject {}.',
-    'cortical': 'This is a container for connectivity cortical/non-cortical region flags.',
-    'normals': 'This is a container for connectivity center orientations.',
-    'faces': 'Faces of cortex surface triangulation.',
-    'vertices': 'Vertices of cortex surface triangulation.',
-    'hemisphere': 'This is a container for hemisphere inclusion flag for connectivity regions.',
-    'map': 'nxm matrix where the coordinates along rows are mapped to the coordinates along columns. The types of '
-           'coordinates are specified in sidecar JSON fields "CoordsRows" and "CoordsColumns".',
+    'areas': 'This is the vector that specifies each region area in mm^2.',
+    'cortical': 'The vector that distinguishes cortical (1) from subcortical (0) regions.',
+    'normals': 'These are the average normal vectors of the dipoles (regions).',
+    'faces': 'These are the faces of cortex surface triangulation.',
+    'vertices': 'These are the vertices of cortex surface triangulation.',
+    'hemisphere': 'The vector that distinguishes right (1) from left (0) hemisphere.',
+    'map': 'nxm matrix where the coordinates along rows are mapped to the coordinates along columns.',
+    'hrf': 'These are hemodynamic response functions (HRF). The neural time series are multiplied with a HRF in order '
+           'to predict fMRI time series.'
 }
 
 centres = {'multi-unique': ['These are the region labels which are unique for each individual.',

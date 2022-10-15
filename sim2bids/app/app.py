@@ -48,7 +48,7 @@ ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',             
             'faces', 'vnormal', 'fnormal', 'sensor', 'volume', 'map',                   # Coordinates (coord)
             'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',                         # Coordinates (coord)
             'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event',               # Timeseries (ts)
-            'emp', 'bold_ts', 'bold',                                                   # Timeseries (ts)
+            'emp', 'bold_ts', 'bold_times', 'hrf'                                             # Timeseries (ts)
             'emp_fc', 'fc']                                                                       # Spatial (spatial)
 
 TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',  # folder "net"
@@ -106,8 +106,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
-    print(subs)
-
     # only save conversions if 'save' is True
     if save and subs is not None:
         # save conversions
@@ -118,18 +116,7 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if CODE is not None:
             save_code()
 
-        # add standard text to txt files in output folder's root level
-        with open(os.path.join(OUTPUT, 'CHANGES.txt'), 'w') as f:
-            f.write('None so far.')
-
-        with open(os.path.join(OUTPUT, 'README.txt'), 'w') as f:
-            f.write(f'Simulation output for {MODEL_NAME} model.')
-
-        with open(os.path.join(OUTPUT, 'dataset_description.json'), 'w') as f:
-            json.dump({'Name': f'Simulation output for {MODEL_NAME} model.',
-                       'BIDSVersion': '1.7.0'}, f)
-
-        supply_participants()
+        supply_extra_files()
         check_json()
         check_output()
         pn.state.notifications.success(f'{OUTPUT} folder is ready!')
@@ -162,13 +149,16 @@ def save_missing(path, files):
 
     for file in missing:
         name = os.path.basename(str(file)).split('.')[0]
+        file = str(file)
 
-        if str(file).endswith('.py'):
+        if file.endswith('.py'):
             CODE = file
-        elif 'centre' in str(file):
+        elif 'centre' in file:
             f = convert.open_file(os.path.join(path, file), subjects.find_separator(os.path.join(path, file)))
             convert.save_files(dict(desc=DESC, name=name), f'{OUTPUT}/coord', f,
                                type='coord', centres=True, desc=temp.centres['single'])
+        elif 'participants' in file or 'CHANGES' in file or 'description' in file or 'README' in file:
+            shutil.copy(file, OUTPUT)
 
 
 def save_output(subs):
@@ -226,7 +216,7 @@ def save_output(subs):
                 name = 'times'
             elif 'vars' in k_lower or 'stimuli' in k_lower or 'noise' in k_lower \
                     or 'spike' in k_lower or 'raster' in k_lower or 'ts' in k_lower \
-                    or 'event' in k_lower or 'emp' in k_lower or 'bold' in k_lower:
+                    or 'event' in k_lower or 'emp' in k_lower or 'bold' in k_lower or 'hrf' in k_lower:
                 name = 'ts'
             elif k_lower.endswith('.h5'):
                 convert.save_h5(sub[k], folders, ses=None)
@@ -430,17 +420,33 @@ def check_output():
                     os.replace(os.path.join(path, file), os.path.join(path, file.replace(match, '').strip('_')))
 
 
-def supply_participants():
-    df = pd.DataFrame(columns=['participant_id', 'species', 'age', 'sex', 'handedness', 'strain', 'strain_rrid'],
-                      index=None)
-    files = os.listdir(OUTPUT)
+def supply_extra_files():
+    # add standard text to txt files in output folder's root level
+    files = ['CHANGES.txt', 'README.txt', 'dataset_description.json']
+    descr = ['None so far.', f'Simulation output for {MODEL_NAME} model.', f'BIDSVersion: {SoftwareVersion}']
 
-    for file in files:
-        if file.startswith('sub-'):
-            df = df.append({'participant_id': file}, ignore_index=True)
-            df.replace(np.NaN, 'n/a', inplace=True)
+    for idx in range(len(files)):
+        path = os.path.join(OUTPUT, files[idx])
+        if not os.path.exists(path):
+            if idx == 2:
+                with open(path, 'w') as f:
+                    json.dump({'Name': f'Simulation output for {MODEL_NAME} model.',
+                               'BIDSVersion': {SoftwareVersion}}, f)
+            else:
+                with open(path, 'w') as f:
+                    f.write(descr[idx])
 
-    df.to_csv(os.path.join(OUTPUT, 'participants.tsv'), index=None, sep='\t')
+    if not os.path.exists(os.path.join(OUTPUT, 'participants.json')):
+        df = pd.DataFrame(columns=['participant_id', 'species', 'age', 'sex', 'handedness', 'strain', 'strain_rrid'],
+                          index=None)
+        files = os.listdir(OUTPUT)
+
+        for file in files:
+            if file.startswith('sub-'):
+                df = df.append({'participant_id': file}, ignore_index=True)
+                df.replace(np.NaN, 'n/a', inplace=True)
+
+        df.to_csv(os.path.join(OUTPUT, 'participants.tsv'), index=None, sep='\t')
 
 
 def check_json():
