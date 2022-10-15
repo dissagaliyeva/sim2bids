@@ -1,0 +1,1 @@
+{"NumberOfRows": 68, "NumberOfColumns": 68, "CoordsRows": ["../coord/sub-07_desc-default_labels.json", "../coord/sub-07_desc-default_nodes.json"], "CoordsColumns": ["../coord/sub-07_desc-default_labels.json", "../coord/sub-07_desc-default_nodes.json"], "Description": "This is the Structural Connectivity (SC), where zeros represent unconnected areas."}
