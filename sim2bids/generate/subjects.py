@@ -182,7 +182,6 @@ def prepare_subs(file_paths, sid):
 
     for file_path in file_paths:
         name = get_filename(file_path)
-        print(name)
 
         if file_path.endswith('.h5'):
             name = name.split('_')[0] + '.h5'
@@ -232,11 +231,6 @@ def prepare_subs(file_paths, sid):
                                  replace('orientations', 'normals')
             os.replace(file_path, new_path)
             file_path = new_path
-
-        print('name:', name)
-
-        # check if separator is missing, if so remove the file entirely
-        name = get_name(file_path)
 
         if not file_path.endswith('txt'):
             continue

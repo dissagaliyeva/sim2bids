@@ -1,1 +1,1 @@
-{"NumberOfRows": 68, "NumberOfColumns": 1, "Description": "This is the vector that specifies each region area in mm^2.", "Units": ""}
+{"NumberOfRows": 68, "NumberOfColumns": 1, "CoordsRows": ["../../sub-05/ses-preop/coord/sub-05_desc-default_labels.tsv", "../../sub-05/ses-preop/coord/sub-05_desc-default_nodes.tsv"], "CoordsColumns": ["../../sub-05/ses-preop/coord/sub-05_desc-default_labels.tsv", "../../sub-05/ses-preop/coord/sub-05_desc-default_nodes.tsv"], "Description": "This is the vector that specifies each region area in mm^2.", "Units": ""}
