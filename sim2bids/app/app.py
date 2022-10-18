@@ -148,6 +148,7 @@ def save_missing(path, files):
     missing = [get_path(p) for p in os.listdir(path) if not os.path.isdir(get_path(p))]
 
     for file in missing:
+        print(f'missing: {file}')
         name = os.path.basename(str(file)).split('.')[0]
         file = str(file)
 
@@ -158,7 +159,7 @@ def save_missing(path, files):
             convert.save_files(dict(desc=DESC, name=name), f'{OUTPUT}/coord', f,
                                type='coord', centres=True, desc=temp.centres['single'])
         elif 'participants' in file or 'CHANGES' in file or 'description' in file or 'README' in file:
-            shutil.copy(file, OUTPUT)
+            shutil.copy(file, os.path.join(OUTPUT, file + '.txt'))
 
 
 def save_output(subs):
@@ -422,7 +423,7 @@ def check_output():
 
 def supply_extra_files():
     # add standard text to txt files in output folder's root level
-    files = ['CHANGES.txt', 'README.txt', 'dataset_description.json']
+    files = ['CHANGES', 'README', 'dataset_description']
     descr = ['None so far.', f'Simulation output for {MODEL_NAME} model.', f'BIDSVersion: {SoftwareVersion}']
 
     for idx in range(len(files)):
@@ -436,7 +437,7 @@ def supply_extra_files():
                 with open(path, 'w') as f:
                     f.write(descr[idx])
 
-    if not os.path.exists(os.path.join(OUTPUT, 'participants.json')):
+    if not os.path.exists(os.path.join(OUTPUT, 'participants.tsv')):
         df = pd.DataFrame(columns=['participant_id', 'species', 'age', 'sex', 'handedness', 'strain', 'strain_rrid'],
                           index=None)
         files = os.listdir(OUTPUT)

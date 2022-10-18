@@ -134,7 +134,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
     # get folder location for spatial
     elif name in ['spatial', 'fc']:
-        desc = temp.file_desc['spatial']
+        desc = temp.file_desc[subjects.accepted(sub['name'], return_accepted=True)]
 
         if ses is None:
             folder = folders[2]

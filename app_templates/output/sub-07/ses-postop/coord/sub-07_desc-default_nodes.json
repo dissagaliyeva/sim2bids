@@ -1,1 +1,1 @@
-{"NumberOfRows": 68, "NumberOfColumns": 3, "Description": "These are the 3d coordinate centres which are unique for each individual.", "Units": ""}
+{"NumberOfRows": 68, "NumberOfColumns": 3, "CoordsRows": ["../../sub-05/ses-preop/coord/sub-05_desc-default_labels.tsv", "../../sub-05/ses-preop/coord/sub-05_desc-default_nodes.tsv"], "CoordsColumns": ["../../sub-05/ses-preop/coord/sub-05_desc-default_labels.tsv", "../../sub-05/ses-preop/coord/sub-05_desc-default_nodes.tsv"], "Description": "These are the 3d coordinate centres which are unique for each individual.", "Units": ""}
