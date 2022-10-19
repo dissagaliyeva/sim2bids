@@ -554,28 +554,28 @@ def to_json(path, shape, desc, key, **kwargs):
     -------
 
     """
-
-    inp = temp.required
-    out = OrderedDict({x: '' for x in inp})
+    if key not in ['param', 'eq', 'code']:
+        out = OrderedDict({x: '' for x in temp.required})
+    else:
+        out = OrderedDict()
 
     if key != 'wd':
         struct = temp.struct[key]
         out.update({x: '' for x in struct['required']})
 
-    if app.CODE is not None:
-        params = {'ModelEq': f'../eq/desc-{app.DESC}_eq.xml',
-                  'ModelParam': f'../param/desc-{app.DESC}_param.xml',
-                  'SourceCode': f'../code/desc-{app.DESC}_code.py',
-                  'SoftwareVersion': app.SoftwareVersion,
-                  'SoftwareRepository': app.SoftwareRepository,
-                  'SourceCodeVersion': app.SoftwareVersion,
-                  'SoftwareName': app.SoftwareName,
-                  'Network': NETWORK
-                  }
-        for k in ['ModelEq', 'ModelParam', 'SourceCode', 'SoftwareVersion', 'SourceCodeVersion',
-                  'SoftwareRepository', 'SoftwareName', 'Network']:
-            if k in out.keys():
-                out[k] = params[k]
+    params = {'ModelEq': f'../eq/desc-{app.DESC}_eq.xml',
+              'ModelParam': f'../param/desc-{app.DESC}_param.xml',
+              'SourceCode': f'../code/desc-{app.DESC}_code.py' if app.CODE else None,
+              'SoftwareVersion': app.SoftwareVersion if app.SoftwareVersion else None,
+              'SoftwareRepository': app.SoftwareRepository if app.SoftwareRepository else None,
+              'SourceCodeVersion': app.SoftwareVersion if app.SoftwareVersion else None,
+              'SoftwareName': app.SoftwareName if app.SoftwareName else None,
+              'Network': NETWORK if NETWORK else None
+              }
+
+    for k in params.keys():
+        if k in out.keys():
+            out[k] = params[k]
 
     if 'Units' in out.keys() and key != 'coord':
         out['Units'] = 'ms'
@@ -585,4 +585,4 @@ def to_json(path, shape, desc, key, **kwargs):
         if COORDS is not None else COORDS
 
     with open(path, 'w') as file:
-        json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coord, **kwargs), file)
+        json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coord, **params), file)
