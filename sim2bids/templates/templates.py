@@ -58,7 +58,14 @@ file_desc = {
     'spikes': 'The is the sparse format for storing spikes (txn matrix).',
     'raster': 'This is the spike raster (txn matrix).',
     'emp': 'This is the time series of the empirical data (txn matrix)',
-    'events': 'This is the matrix of strings to annotate time series (txn matrix).'
+    'events': 'This is the matrix of strings to annotate time series (txn matrix).',
+
+    # ====================================
+    #           OTHER FOLDERS
+    # ====================================
+    'param': 'These are the parameters for the {} model.',
+    'eq':  'These are the equations to simulate the time series with the {} model.',
+    'code': 'The source code to reproduce results.'
 }
 
 centres = {'multi-unique': ['These are the region labels which are the same for all individuals',
@@ -96,8 +103,9 @@ struct = {
 
 
 def populate_dict(dict1, shape, desc, coords=None, **kwargs):
-    dict1['NumberOfRows'] = shape[0]
-    dict1['NumberOfColumns'] = shape[1]
+    if shape:
+        dict1['NumberOfRows'] = shape[0]
+        dict1['NumberOfColumns'] = shape[1]
     dict1['Description'] = desc
 
     if coords:
