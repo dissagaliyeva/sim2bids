@@ -196,7 +196,8 @@ def rename_files(name, new_ext, ext, paths):
                         return
 
                     try:
-                        os.rename(file, file.replace(name, f'{name.replace("." + ext, "")}_{new_ext}' + '.txt'))
+                        # os.rename(file, file.replace(name, f'{name.replace("." + ext, "")}_{new_ext}' + '.txt'))
+                        os.rename(file, file.replace(name, f'{new_ext}' + '.txt'))
                     except FileExistsError:
                         pn.state.notifications.error(f'File {new_ext} already exists!')
                     else:
