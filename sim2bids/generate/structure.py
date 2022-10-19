@@ -308,11 +308,11 @@ def check_folders(path):
         if not os.path.exists(p):
             os.mkdir(p)
 
-    read = os.path.join(path, 'README.txt')
-    part = os.path.join(path, 'participants.tsv')
-    desc = os.path.join(path, 'dataset_description.json')
-    chgs = os.path.join(path, 'CHANGES.txt')
-
-    for p in [read, part, desc, chgs]:
-        if not os.path.exists(p):
-            Path(p).touch()
+    # read = os.path.join(path, 'README.txt')
+    # part = os.path.join(path, 'participants.tsv')
+    # desc = os.path.join(path, 'dataset_description.json')
+    # chgs = os.path.join(path, 'CHANGES.txt')
+    #
+    # for p in [read, part, desc, chgs]:
+    #     if not os.path.exists(p):
+    #         Path(p).touch()
