@@ -1,0 +1,151 @@
+<?xml version="1.0" ?>
+<Lems xmlns="http://www.neuroml.org/lems/0.7.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/lems/0.7.6 https://raw.githubusercontent.com/LEMS/LEMS/development/Schemas/LEMS/LEMS_v0.7.6.xsd">
+    <Dimension i="-1" l="3" m="1" name="voltage" t="-3"/>
+    <Dimension name="time" t="1"/>
+    <Dimension i="1" name="current"/>
+    <ComponentType name="hindmarshRose">
+        <Parameter dimension="none" name="a1"/>
+        <Parameter dimension="none" name="a2"/>
+        <Parameter dimension="none" name="a3"/>
+        <Parameter dimension="none" name="b1"/>
+        <Parameter dimension="none" name="b2"/>
+        <Parameter dimension="none" name="b3"/>
+        <Parameter dimension="none" name="c1"/>
+        <Parameter dimension="none" name="c2"/>
+        <Parameter dimension="none" name="c3"/>
+        <Parameter dimension="none" name="d1"/>
+        <Parameter dimension="none" name="d2"/>
+        <Parameter dimension="none" name="d3"/>
+        <Parameter dimension="none" name="e1"/>
+        <Parameter dimension="none" name="e2"/>
+        <Parameter dimension="none" name="e3"/>
+        <Parameter dimension="none" name="f1"/>
+        <Parameter dimension="none" name="f2"/>
+        <Parameter dimension="none" name="f3"/>
+        <Parameter dimension="none" name="IE1"/>
+        <Parameter dimension="none" name="IE2"/>
+        <Parameter dimension="none" name="IE3"/>
+        <Parameter dimension="none" name="II1"/>
+        <Parameter dimension="none" name="II2"/>
+        <Parameter dimension="none" name="II3"/>
+        <Parameter dimension="none" name="r"/>
+        <Parameter dimension="none" name="s"/>
+        <Parameter dimension="none" name="m1"/>
+        <Parameter dimension="none" name="m2"/>
+        <Parameter dimension="none" name="m3"/>
+        <Parameter dimension="none" name="n1"/>
+        <Parameter dimension="none" name="n2"/>
+        <Parameter dimension="none" name="n3"/>
+        <Parameter dimension="none" name="K11"/>
+        <Parameter dimension="none" name="K12"/>
+        <Parameter dimension="none" name="K21"/>
+        <Parameter dimension="none" name="h1"/>
+        <Parameter dimension="none" name="h2"/>
+        <Parameter dimension="none" name="h3"/>
+        <Parameter dimension="none" name="p1"/>
+        <Parameter dimension="none" name="p2"/>
+        <Parameter dimension="none" name="p3"/>
+        <Parameter dimension="none" name="A11"/>
+        <Parameter dimension="none" name="A12"/>
+        <Parameter dimension="none" name="A13"/>
+        <Parameter dimension="none" name="A21"/>
+        <Parameter dimension="none" name="A22"/>
+        <Parameter dimension="none" name="A23"/>
+        <Parameter dimension="none" name="A31"/>
+        <Parameter dimension="none" name="A32"/>
+        <Parameter dimension="none" name="A33"/>
+        <Parameter dimension="none" name="B11"/>
+        <Parameter dimension="none" name="B12"/>
+        <Parameter dimension="none" name="B13"/>
+        <Parameter dimension="none" name="B21"/>
+        <Parameter dimension="none" name="B22"/>
+        <Parameter dimension="none" name="B23"/>
+        <Parameter dimension="none" name="B31"/>
+        <Parameter dimension="none" name="B32"/>
+        <Parameter dimension="none" name="B33"/>
+        <Parameter dimension="none" name="C11"/>
+        <Parameter dimension="none" name="C12"/>
+        <Parameter dimension="none" name="C13"/>
+        <Parameter dimension="none" name="C21"/>
+        <Parameter dimension="none" name="C22"/>
+        <Parameter dimension="none" name="C23"/>
+        <Parameter dimension="none" name="C31"/>
+        <Parameter dimension="none" name="C32"/>
+        <Parameter dimension="none" name="C33"/>
+        <Constant dimension="time" name="SEC" value="S"/>
+        <Exposure dimension="none" name="zeta1"/>
+        <Exposure dimension="none" name="zeta2"/>
+        <Exposure dimension="none" name="zeta3"/>
+        <Exposure dimension="none" name="eta1"/>
+        <Exposure dimension="none" name="eta2"/>
+        <Exposure dimension="none" name="eta3"/>
+        <Exposure dimension="none" name="tau1"/>
+        <Exposure dimension="none" name="tau2"/>
+        <Exposure dimension="none" name="tau3"/>
+        <Exposure dimension="none" name="alpha1"/>
+        <Exposure dimension="none" name="alpha2"/>
+        <Exposure dimension="none" name="alpha3"/>
+        <Exposure dimension="none" name="beta1"/>
+        <Exposure dimension="none" name="beta2"/>
+        <Exposure dimension="none" name="beta3"/>
+        <Exposure dimension="none" name="gamma1"/>
+        <Exposure dimension="none" name="gamma2"/>
+        <Exposure dimension="none" name="gamma3"/>
+        <Dynamics>
+          <StateVariable dimension="none" exposure="zeta1" name="zeta1"/>
+          <StateVariable dimension="none" exposure="zeta2" name="zeta2"/>
+          <StateVariable dimension="none" exposure="zeta3" name="zeta3"/>
+          <StateVariable dimension="none" exposure="eta1" name="eta1"/>
+          <StateVariable dimension="none" exposure="eta2" name="eta2"/>
+          <StateVariable dimension="none" exposure="eta3" name="eta3"/>
+          <StateVariable dimension="none" exposure="tau1" name="tau1"/>
+          <StateVariable dimension="none" exposure="tau2" name="tau2"/>
+          <StateVariable dimension="none" exposure="tau3" name="tau3"/>
+          <StateVariable dimension="none" exposure="alpha1" name="alpha1"/>
+          <StateVariable dimension="none" exposure="alpha2" name="alpha2"/>
+          <StateVariable dimension="none" exposure="alpha3" name="alpha3"/>
+          <StateVariable dimension="none" exposure="beta1" name="beta1"/>
+          <StateVariable dimension="none" exposure="beta2" name="beta2"/>
+          <StateVariable dimension="none" exposure="beta3" name="beta3"/>
+          <StateVariable dimension="none" exposure="gamma1" name="gamma1"/>
+          <StateVariable dimension="none" exposure="gamma2" name="gamma2"/>
+          <StateVariable dimension="none" exposure="gamma3" name="gamma3"/>
+          <DerivedVariable name="P1" value="eta1 - a1 * zeta1^3 + b1 * zeta1^2 + K11 * ( A11 * zeta1 + A12 * zeta2 + A13 * zeta3 - zeta1 ) - K12 * (B11 * alpha1 + B12 * alpha2 + B13 * alpha3- zeta1) + IE1"/>
+          <DerivedVariable name="P2" value="eta2 - a2 * zeta2^3 + b2 * zeta2^2 + K11 * ( A21 * zeta1 + A22 * zeta2 + A23 * zeta3 - zeta2 ) - K12 * (B11 * alpha1 + B12 * alpha2 + B13 * alpha3- zeta2) + IE2"/>
+          <DerivedVariable name="P3" value="eta3 - a3 * zeta3^3 + b3 * zeta3^2 + K11 * ( A31 * zeta1 + A32 * zeta2 + A33 * zeta3 - zeta3 ) - K12 * (B11 * alpha1 + B12 * alpha2 + B13 * alpha3- zeta3) + IE3"/>
+          <DerivedVariable name="Q1" value="c1 - d1 * zeta1^2 -eta1"/>
+          <DerivedVariable name="Q2" value="c2 - d2 * zeta2^2 -eta2"/>
+          <DerivedVariable name="Q3" value="c3 - d3 * zeta3^2 -eta3"/>
+          <DerivedVariable name="R1" value="r * S * zeta1 - r * tau1 - m1"/>
+          <DerivedVariable name="R2" value="r * S * zeta2 - r * tau2 - m2"/>
+          <DerivedVariable name="R3" value="r * S * zeta3 - r * tau3 - m3"/>
+          <DerivedVariable name="PI1" value="beta1 - e1 * alpha1^3 + f1 * alpha1^2 + K21 * ( C11 * zeta1 + C12 * zeta2 + C13 * zeta3 - alpha1 ) + II1"/>
+          <DerivedVariable name="PI2" value="beta2 - e2 * alpha2^3 + f2 * alpha2^2 + K21 * ( C21 * zeta1 + C22 * zeta2 + C23 * zeta3 - alpha2 ) + II2"/>
+          <DerivedVariable name="PI3" value="beta3 - e3 * alpha3^3 + f3 * alpha3^2 + K21 * ( C31 * zeta1 + C32 * zeta2 + C33 * zeta3 - alpha3 ) + II3"/>
+          <DerivedVariable name="QI1" value="h1 - p1 * alpha1^2 - beta1"/>
+          <DerivedVariable name="QI2" value="h2 - p2 * alpha2^2 - beta2"/>
+          <DerivedVariable name="QI3" value="h3 - p3 * alpha3^2 - beta3"/>
+          <DerivedVariable name="RI1" value="r * S * alpha1 - r * gamma1 - n1"/>
+          <DerivedVariable name="RI2" value="r * S * alpha2 - r * gamma2 - n2"/>
+          <DerivedVariable name="RI3" value="r * S * alpha3 - r * gamma3 - n3"/>
+          <TimeDerivative value="(P1-tau1) / SEC" variable="zeta1"/>
+          <TimeDerivative value="(P2-tau2) / SEC" variable="zeta2"/>
+          <TimeDerivative value="(P3-tau3) / SEC" variable="zeta3"/>
+          <TimeDerivative value="Q1/ SEC" variable="eta1"/>
+          <TimeDerivative value="Q2/ SEC" variable="eta2"/>
+          <TimeDerivative value="Q3/ SEC" variable="eta3"/>
+          <TimeDerivative value="R1 / SEC" variable="tau1"/>
+          <TimeDerivative value="R2 / SEC" variable="tau2"/>
+          <TimeDerivative value="R3 / SEC" variable="tau3"/>
+          <TimeDerivative value="(PI1-eta1) / SEC" variable="alpha1"/>
+          <TimeDerivative value="(PI2-eta2) / SEC" variable="alpha2"/>
+          <TimeDerivative value="(PI3-eta3) / SEC" variable="alpha3"/>
+          <TimeDerivative value="QI1/ SEC" variable="beta1"/>
+          <TimeDerivative value="QI2/ SEC" variable="beta2"/>
+          <TimeDerivative value="QI3/ SEC" variable="beta3"/>
+          <TimeDerivative value="RI1 / SEC" variable="gamma1"/>
+          <TimeDerivative value="RI2 / SEC" variable="gamma2"/>
+          <TimeDerivative value="RI3 / SEC" variable="gamma3"/>
+        </Dynamics>
+      </ComponentType>
+</Lems>
