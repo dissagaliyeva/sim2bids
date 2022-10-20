@@ -22,7 +22,7 @@ def set_params(model_name, conversion_name='default', rhythm=None, **kwargs):
 
     # verify model names and rhythms
     assert model_name in MODELS, f'Please select one of the accepted models: {join(MODELS)}'
-    assert rhythm.lower() in RHYTHMS, f'Please select one of the accepted rhythms: {join(RHYTHMS)}'
+    assert rhythm in RHYTHMS, f'Please select one of the accepted rhythms: {join(RHYTHMS)}'
 
     # check output structure and create folders if necessary
     structure.check_folders(app.OUTPUT)

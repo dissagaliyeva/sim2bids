@@ -574,10 +574,11 @@ def to_json(path, shape, desc, key, **kwargs):
         'Network': NETWORK if NETWORK else None
     }
 
-    params += kwargs
+    if kwargs:
+        params += kwargs
 
     for k in params.keys():
-        if k in out.keys():
+        if k in temp.struct[key]['required'] or k in temp.struct[key]['recommend']:
             out[k] = params[k]
 
     if 'Units' in out.keys() and key != 'coord':
@@ -588,4 +589,4 @@ def to_json(path, shape, desc, key, **kwargs):
         if COORDS is not None else COORDS
 
     with open(path, 'w') as file:
-        json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coord, **params), file)
+        json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coord), file)
