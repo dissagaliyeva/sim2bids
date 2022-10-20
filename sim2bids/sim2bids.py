@@ -8,7 +8,7 @@ import param
 
 from sim2bids import utils
 from sim2bids.app import app, utils as app_utils
-from sim2bids.templates import user_guide as ug
+from sim2bids.templates import user_guide as ug, templates
 from sim2bids.validate import validate
 
 
@@ -284,6 +284,8 @@ class ViewResults(param.Parameterized):
                     name = inp.name.split(' ')[1]
                     content[name] = inp.value
 
+            update_files(content)
+
             # save values
             with open(self.file, 'w') as f:
                 json.dump(content, f)
@@ -320,6 +322,29 @@ class UserGuide(param.Parameterized):
 
     def view(self):
         return pn.Column(self.user_guide, self.text, scroll=True, height=600)
+
+
+def update_files(content):
+    to_ignore = [*templates.required, 'Units', 'ModelEq', 'ModelParam']
+
+    for file in get_files():
+        # get keys for the existing json file in the output folder
+        file_json = json.load(open(file))
+
+        # get the folder name to get the 'recommended' fields
+        folder = os.path.basename(os.path.dirname(file))
+        keys = templates.struct.get(folder, None)
+
+        # filter out only json files
+        if keys:
+            for k, v in content.items():
+                if (k in keys['required'] or k in keys['recommend']) and content[k] and \
+                        (file_json[k] is None or file_json[k] != content[k]) and k not in to_ignore:
+                    file_json[k] = content[k]
+
+        # save new fields
+        with open(file, 'w') as f:
+            json.dump(file_json, f)
 
 
 def get_files(path=app.OUTPUT, ftype='.json'):
