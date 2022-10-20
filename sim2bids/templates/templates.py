@@ -19,7 +19,7 @@ file_desc = {
     # MORE COMMON
     'times': 'These are the time steps of the simulated time series (nx1 vector).',
     'bold_times': 'These are the time steps of the simulated BOLD time series (nx1 vector).',
-    'areas': 'This is the estimated vector each region’s area in mm^2 (nx1 vector).',
+    'areas': 'This is the estimated vector each region\'s area in mm^2 (nx1 vector).',
     'cortical': 'This is the vector that distinguishes cortical (1) from subcortical (0) regions (nx1 vector).',
     'normals': 'These are the average orientation of the region represented in the connectivity matrix (nx3 matrix).',
     'hemisphere': 'The vector that distinguishes right (1) from left (0) hemisphere (nx1 vector).',

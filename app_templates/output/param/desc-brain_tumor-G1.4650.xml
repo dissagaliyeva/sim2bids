@@ -1,6 +1,0 @@
-<?xml version="1.0" ?>
-<Lems xmlns="http://www.neuroml.org/lems/0.7.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/lems/0.7.6 https://raw.githubusercontent.com/LEMS/LEMS/development/Schemas/LEMS/LEMS_v0.7.6.xsd">
-  <ComponentType name="global_parameters" description="">
-    <Constant name="G" value="1.465"/>
-  </ComponentType>
-</Lems>

@@ -18,20 +18,34 @@ from sim2bids.preprocess import prepare_inputs as prepare
 from sim2bids.convert import convert, mat
 from sim2bids.templates import templates as temp
 from sim2bids.app import utils
+from sim2bids.generate import models
+
+# =========================================
+#        DO NOT CHANGE THESE VALUES
+# =========================================
 
 # define global variables
 SID = None
-DESC = 'default'  # short description that identifies input data
-INPUT = 'inputs'  # placeholder to store preprocessed input files
 INPUT_TRANSFERRED = False
-OUTPUT = 'output'  # output folder to store conversions
 CENTRES = False  # whether centres.txt|nodes.txt|labels.txt were found
 MULTI_INPUT = False  # whether input files include single- or multi-subjects
 ALL_FILES = None  # list of all file paths (gets supplemented in subjects.py)
 CODE = None  # path to python code if exists
 SESSIONS = False
 H5_CONTENT = dict()
+
+# =========================================
+#        CUSTOMIZABLE WITH USER INPUT
+# =========================================
+
+OUTPUT = 'output'  # output folder to store conversions
+DESC = 'default'  # short description that identifies input data
+INPUT = 'inputs'  # placeholder to store preprocessed input files
+
+# model specific inputs
 MODEL_NAME = None
+MODEL_PARAMS = None
+RHYTHMS = None
 SoftwareVersion = None
 SoftwareRepository = None
 SoftwareName = None
@@ -106,14 +120,19 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
+    print(subs)
+
     # only save conversions if 'save' is True
-    if save and subs is not None:
+    if save and subs:
         # save conversions
         save_output(subs)
         save_missing(path, files)
 
+        if MODEL_NAME and MODEL_PARAMS:
+            models.set_params(MODEL_NAME, DESC, RHYTHMS, **MODEL_PARAMS)
+
         # save code
-        if CODE is not None:
+        if CODE:
             save_code()
 
         supply_extra_files()
@@ -148,7 +167,6 @@ def save_missing(path, files):
     missing = [get_path(p) for p in os.listdir(path) if not os.path.isdir(get_path(p))]
 
     for file in missing:
-        print(f'missing: {file}')
         name = os.path.basename(str(file)).split('.')[0]
         file = str(file)
 
@@ -159,7 +177,21 @@ def save_missing(path, files):
             convert.save_files(dict(desc=DESC, name=name), f'{OUTPUT}/coord', f,
                                type='coord', centres=True, desc=temp.centres['single'])
         elif 'participants' in file or 'CHANGES' in file or 'description' in file or 'README' in file:
-            shutil.copy(file, os.path.join(OUTPUT, file + '.txt'))
+            shutil.copy(file, OUTPUT)
+            f = os.path.join(OUTPUT, os.path.basename(file))
+            if '.' not in file:
+                os.rename(f, f + '.txt')
+
+
+            # if file.endswith('.json'):
+            #     f = json.load(open(file))
+            #     with open(os.path.join(OUTPUT, os.path.basename(file).split('.')[0] + '.json'), 'w') as f2:
+            #         json.dump(f, f2)
+            # else:
+            #
+                # f = open(file).readlines()
+                # with open(os.path.join(OUTPUT, os.path.basename(file).split('.')[0] + '.txt'), 'w') as f2:
+                #     f2.write(''.join(f))
 
 
 def save_output(subs):
@@ -211,7 +243,7 @@ def save_output(subs):
                 name = 'wd'
             elif 'centres' == k_lower:
                 name = 'centres'
-            elif 'fc' in k_lower:
+            elif 'fc' in k_lower or 'emp_fc' in k_lower or 'map' in k_lower:
                 name = 'spatial'
             elif 'times' in k_lower:
                 name = 'times'
@@ -424,18 +456,19 @@ def check_output():
 def supply_extra_files():
     # add standard text to txt files in output folder's root level
     files = ['CHANGES', 'README', 'dataset_description']
-    descr = ['None so far.', f'Simulation output for {MODEL_NAME} model.', f'BIDSVersion: {SoftwareVersion}']
 
-    for idx in range(len(files)):
-        path = os.path.join(OUTPUT, files[idx])
-        if not os.path.exists(path):
-            if idx == 2:
-                with open(path, 'w') as f:
-                    json.dump({'Name': f'Simulation output for {MODEL_NAME} model.',
-                               'BIDSVersion': {SoftwareVersion}}, f)
-            else:
-                with open(path, 'w') as f:
-                    f.write(descr[idx])
+    # missing = [x.split('.')[0] for x in os.listdir(OUTPUT) if x.split('.')[0] in files]
+    missed = lambda x: x.split('.')[0] in ['CHANGES', 'README', 'dataset_description']
+    missing = [x for x in files if not missed(x) and not os.path.isdir(os.path.join(OUTPUT, x))]
+
+    for idx, file in enumerate(missing):
+        if file != 'dataset_description':
+            desc = 'None so far.' if file == 'CHANGES' else f'Simulation output for {MODEL_NAME} model.'
+            with open(os.path.join(OUTPUT, file + '.txt'), 'w') as f:
+                f.write(desc)
+        else:
+            with open(os.path.join(OUTPUT, file + '.json'), 'w') as f:
+                json.dump({'BIDSVersion': SoftwareVersion}, f)
 
     if not os.path.exists(os.path.join(OUTPUT, 'participants.tsv')):
         df = pd.DataFrame(columns=['participant_id', 'species', 'age', 'sex', 'handedness', 'strain', 'strain_rrid'],
@@ -459,6 +492,7 @@ def check_json():
             if file.endswith('json'):
                 path = os.path.join(root, file)
                 json_file = json.load(open(path))
+                coords = None
 
                 if convert.IGNORE_CENTRE:
                     lvl = '../' * (level - 1)
