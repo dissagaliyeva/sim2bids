@@ -31,7 +31,7 @@ def rm_tree(path: str = '../output'):
     except OSError:
         os.remove(path)
 
-    print('Removed all test files...')
+    print('Removed all files...')
 
 
 def get_selector(name):
