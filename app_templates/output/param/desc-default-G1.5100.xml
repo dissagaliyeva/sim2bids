@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<Lems xmlns="http://www.neuroml.org/lems/0.7.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/lems/0.7.6 https://raw.githubusercontent.com/LEMS/LEMS/development/Schemas/LEMS/LEMS_v0.7.6.xsd">
+  <Component id="101" type="reduced_wong_wang" k="1.5100000000000002"/>
+</Lems>
