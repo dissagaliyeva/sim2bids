@@ -563,15 +563,18 @@ def to_json(path, shape, desc, key, **kwargs):
         struct = temp.struct[key]
         out.update({x: '' for x in struct['required']})
 
-    params = {'ModelEq': f'../eq/desc-{app.DESC}_eq.xml',
-              'ModelParam': f'../param/desc-{app.DESC}_param.xml',
-              'SourceCode': f'../code/desc-{app.DESC}_code.py' if app.CODE else None,
-              'SoftwareVersion': app.SoftwareVersion if app.SoftwareVersion else None,
-              'SoftwareRepository': app.SoftwareRepository if app.SoftwareRepository else None,
-              'SourceCodeVersion': app.SoftwareVersion if app.SoftwareVersion else None,
-              'SoftwareName': app.SoftwareName if app.SoftwareName else None,
-              'Network': NETWORK if NETWORK else None
-              }
+    params = {
+        'ModelEq': f'../eq/desc-{app.DESC}_eq.xml',
+        'ModelParam': f'../param/desc-{app.DESC}_param.xml',
+        'SourceCode': f'../code/desc-{app.DESC}_code.py' if app.CODE else None,
+        'SoftwareVersion': app.SoftwareVersion if app.SoftwareVersion else None,
+        'SoftwareRepository': app.SoftwareRepository if app.SoftwareRepository else None,
+        'SourceCodeVersion': app.SoftwareVersion if app.SoftwareVersion else None,
+        'SoftwareName': app.SoftwareName if app.SoftwareName else None,
+        'Network': NETWORK if NETWORK else None
+    }
+
+    params += kwargs
 
     for k in params.keys():
         if k in out.keys():

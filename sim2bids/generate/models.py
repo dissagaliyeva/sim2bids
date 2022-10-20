@@ -1,7 +1,7 @@
 import os
 import json
 import shutil
-import numpy as np
+
 import lems.api as lems
 from sim2bids.templates import model_params
 from sim2bids.generate import structure
@@ -10,19 +10,39 @@ from sim2bids.convert import convert
 from sim2bids.templates import templates
 
 
+MODELS = ['reduced_wong_wang', 'hindmarsh_rose', 'generic2doscillator']
+RHYTHMS = ['alpha', 'beta', 'delta', 'gamma', 'theta', None]
+
+
+def set_params(model_name, conversion_name='default', rhythm=None, **kwargs):
+    # set the default name for the conversion
+    app.DESC = conversion_name
+
+    join = lambda x: ', '.join(x)
+
+    # verify model names and rhythms
+    assert model_name in MODELS, f'Please select one of the accepted models: {join(MODELS)}'
+    assert rhythm.lower() in RHYTHMS, f'Please select one of the accepted rhythms: {join(RHYTHMS)}'
+
+    # check output structure and create folders if necessary
+    structure.check_folders(app.OUTPUT)
+
+    # instantiate a model class
+    model = Model(model_name, rhythm, **kwargs)
+
+    # set new parameters and save them in 'param' and 'eq' folders
+    model.set_params()
+
+
 class Model:
-    def __init__(self, model_name, rhythms=None, **kwargs):
+    def __init__(self, model_name, rhythms, **kwargs):
         self.model_name = model_name
-        self.possible_params = kwargs
         self.params = self.get_params()
+        self.rhythms = rhythms
+        self.possible_params = kwargs
 
         # pylems model parameters
         self.id = 1
-
-        # check output structure and create folders if necessary
-        structure.check_folders(app.OUTPUT)
-
-        self.set_params()
 
     def get_params(self):
         if self.model_name == 'reduced_wong_wang':
@@ -55,9 +75,11 @@ class Model:
 
         # copy the default equations xml file
         path = os.path.join(app.OUTPUT, 'eq', f'desc-{app.DESC}_eq.xml')
-        shutil.copy(xml, path)
-        convert.to_json(path.replace('xml', 'json'), shape=None,
-                        desc=templates.file_desc['eq'].format(self.model_name.upper()), key='eq')
+
+        if not os.path.exists(path):
+            shutil.copy(xml, path)
+            convert.to_json(path.replace('xml', 'json'), shape=None,
+                            desc=templates.file_desc['eq'].format(self.model_name.upper()), key='eq')
 
         # save params
         # TODO: ADD DIFFERENT RHYTHMS TRAVERSAL
@@ -65,11 +87,11 @@ class Model:
         # iterate over values
         for value in v:
             path = os.path.join(app.OUTPUT, 'param', f'desc-{app.DESC}-{k}{str(format(value, ".4f"))}.xml')
-            save_json(path, self.add_components(dict(k=float(value))), use_json=False)
+            save_json(path, self.get_model(dict(k=float(value))), use_json=False)
             convert.to_json(path.replace('xml', 'json'), shape=None,
                             desc=templates.file_desc['param'].format(self.model_name.upper()), key='param')
 
-    def add_components(self, value):
+    def get_model(self, value):
         # instantiate a LEMS model
         model = lems.Model()
 
@@ -86,7 +108,8 @@ def save_json(path, model=None, use_json=True):
     if model:
         model.export_to_file(path)
 
-    with open(path, 'w') as f:
-        if use_json:
+    if use_json:
+        with open(path, 'w') as f:
             json.dump(model, f)
+
 
