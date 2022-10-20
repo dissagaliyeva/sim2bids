@@ -111,7 +111,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     #     INPUT_TRANSFERRED = True
     #
     # if isinstance(INPUT, str):
-    #     print(INPUT)
     #     path, files = INPUT, os.listdir(INPUT)
 
     # whether to generate layout
@@ -119,8 +118,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         # if no subjects are passed, define them
         if subs is None:
             subs = subjects.Files(path, files).subs
-
-    print(subs)
 
     # only save conversions if 'save' is True
     if save and subs:
