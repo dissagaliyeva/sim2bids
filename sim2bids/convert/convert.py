@@ -133,8 +133,9 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
         save_centres(sub, file, ses, folders)
 
     # get folder location for spatial
-    elif name in ['spatial', 'fc']:
-        desc = temp.file_desc[subjects.accepted(sub['name'], return_accepted=True)]
+    elif name in ['spatial', 'fc', 'map']:
+        desc = temp.file_desc['spatial_map'] if 'map' in sub['name'] \
+               else temp.file_desc[subjects.accepted(sub['name'], return_accepted=True)]
 
         if ses is None:
             folder = folders[2]
@@ -563,23 +564,23 @@ def to_json(path, shape, desc, key, **kwargs):
         struct = temp.struct[key]
         out.update({x: '' for x in struct['required']})
 
-    params = {
-        'ModelEq': f'../eq/desc-{app.DESC}_eq.xml',
-        'ModelParam': f'../param/desc-{app.DESC}_param.xml',
-        'SourceCode': f'../code/desc-{app.DESC}_code.py' if app.CODE else None,
-        'SoftwareVersion': app.SoftwareVersion if app.SoftwareVersion else None,
-        'SoftwareRepository': app.SoftwareRepository if app.SoftwareRepository else None,
-        'SourceCodeVersion': app.SoftwareVersion if app.SoftwareVersion else None,
-        'SoftwareName': app.SoftwareName if app.SoftwareName else None,
-        'Network': NETWORK if NETWORK else None
-    }
+        params = {
+            'ModelEq': f'../eq/desc-{app.DESC}_eq.xml',
+            'ModelParam': f'../param/desc-{app.DESC}_param.xml',
+            'SourceCode': f'../code/desc-{app.DESC}_code.py' if app.CODE else None,
+            'SoftwareVersion': app.SoftwareVersion if app.SoftwareVersion else None,
+            'SoftwareRepository': app.SoftwareRepository if app.SoftwareRepository else None,
+            'SourceCodeVersion': app.SoftwareVersion if app.SoftwareVersion else None,
+            'SoftwareName': app.SoftwareName if app.SoftwareName else None,
+            'Network': NETWORK if NETWORK else None
+        }
 
-    if kwargs:
-        params += kwargs
+        if kwargs:
+            params += kwargs
 
-    for k in params.keys():
-        if k in temp.struct[key]['required'] or k in temp.struct[key]['recommend']:
-            out[k] = params[k]
+        for k in params.keys():
+            if k in temp.struct[key]['required'] or k in temp.struct[key]['recommend']:
+                out[k] = params[k]
 
     if 'Units' in out.keys() and key != 'coord':
         out['Units'] = 'ms'

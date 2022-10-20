@@ -42,6 +42,7 @@ class Files:
         self.ses_found = False
 
         # traverse folders
+        prep.reset_index()
         self.traverse_files()
 
     def check_input(self):
@@ -59,7 +60,6 @@ class Files:
     def traverse_files(self):
         # if the whole folder is passed, open that folder
         path, files, changed = self.path, self.files, False
-        prep.reset_index()
 
         if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])) and files[0] not in ['ses-preop',
                                                                                                 'ses-postop']:
@@ -77,8 +77,12 @@ class Files:
                     sid = self.create_sid_sub()
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
             else:
+                print('FILES:', files)
                 for file in files:
-                    sid = self.create_sid_sub()
+                    sid = None
+                    if os.path.isdir(os.path.join(path, file)):
+                        sid = self.create_sid_sub()
+                        print('SID @82:', sid)
 
                     # Step 5: get all content
                     if os.path.isdir(os.path.join(path, file)):
@@ -88,11 +92,14 @@ class Files:
 
                     # Step 6: traverse ses-preop if present
                     if 'ses-preop' in all_files:
+                        print('SID @92:', sid)
                         self.save_sessions('ses-preop', all_files, sid, os.path.join(path, file))
 
                     # Step 7: traverse ses-postop if present
                     if 'ses-postop' in all_files:
+                        print('SID @97:', sid)
                         self.save_sessions('ses-postop', all_files, sid, os.path.join(path, file))
+
 
                     if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
                         if os.path.basename(path) == file:
@@ -116,8 +123,10 @@ class Files:
             self.ses_found = True
             app.SESSIONS = True
             if sid not in self.subs.keys():
+                print('SID @123', sid)
                 self.subs[sid] = OrderedDict()
             if ses not in self.subs[sid].keys():
+                print('SID @126', sid, end='\n\n\n\n')
                 self.subs[sid][ses] = OrderedDict()
 
             self.subs[sid][ses].update(prepare_subs(utils.get_content(path, ses), sid))
@@ -340,6 +349,12 @@ def accepted(name, return_accepted=False):
                 if return_accepted:
                     return accept
                 return True, 'emp_fc'
+
+            if accept == 'fc' and len(name.split('_')) > 1:
+                if return_accepted:
+                    return accept
+                return False
+
             if accept != 'ts':
                 if return_accepted:
                     return accept

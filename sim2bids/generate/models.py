@@ -87,16 +87,21 @@ class Model:
         # iterate over values
         for value in v:
             path = os.path.join(app.OUTPUT, 'param', f'desc-{app.DESC}-{k}{str(format(value, ".4f"))}.xml')
-            save_json(path, self.get_model(dict(k=float(value))), use_json=False)
+            save_json(path, self.get_model(k, float(value)), use_json=False)
             convert.to_json(path.replace('xml', 'json'), shape=None,
                             desc=templates.file_desc['param'].format(self.model_name.upper()), key='param')
 
-    def get_model(self, value):
+    def get_model(self, k, v):
         # instantiate a LEMS model
         model = lems.Model()
 
-        # supply values
-        model.add(lems.Component(id_=self.id, type_=self.model_name, **value))
+        if k == 'G':
+            # create a nested G constant inside global parameters ComponentType
+            ct = lems.ComponentType(name='global_parameters')
+            ct.add(lems.Constant(name=k, value=v))
+
+            # append the structure to the model
+            model.add(ct)
 
         # increase the id value
         self.id += 1
