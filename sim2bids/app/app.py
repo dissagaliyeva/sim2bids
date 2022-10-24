@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import panel as pn
 import pylems_py2xml
+import lems.api as lems
 
 # import local packages
 import sim2bids.utils
@@ -19,20 +20,6 @@ from sim2bids.convert import convert, mat
 from sim2bids.templates import templates as temp
 from sim2bids.app import utils
 from sim2bids.generate import models
-
-# =========================================
-#        DO NOT CHANGE THESE VALUES
-# =========================================
-
-# define global variables
-SID = None
-INPUT_TRANSFERRED = False
-CENTRES = False  # whether centres.txt|nodes.txt|labels.txt were found
-MULTI_INPUT = False  # whether input files include single- or multi-subjects
-ALL_FILES = None  # list of all file paths (gets supplemented in subjects.py)
-CODE = None  # path to python code if exists
-SESSIONS = False
-H5_CONTENT = dict()
 
 # =========================================
 #        CUSTOMIZABLE WITH USER INPUT
@@ -51,6 +38,20 @@ SoftwareRepository = None
 SoftwareName = None
 COND_SPEED = 'cspeed'
 GLB_COUP_SF = 'csf'
+
+# =========================================
+#        DO NOT CHANGE THESE VALUES
+# =========================================
+
+# define global variables
+SID = None
+INPUT_TRANSFERRED = False
+CENTRES = False  # whether centres.txt|nodes.txt|labels.txt were found
+MULTI_INPUT = False  # whether input files include single- or multi-subjects
+ALL_FILES = None  # list of all file paths (gets supplemented in subjects.py)
+CODE = None  # path to python code if exists
+SESSIONS = False
+H5_CONTENT = dict()
 
 # store different time series accounting for 'times'
 TIMES = []
@@ -122,8 +123,11 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     # only save conversions if 'save' is True
     if save and subs:
         # save conversions
-        save_output(subs)
         save_missing(path, files)
+        save_output(subs)
+
+        if utils.RHYTHMS:
+            save_params()
 
         if MODEL_NAME and MODEL_PARAMS:
             models.set_params(MODEL_NAME, DESC, RHYTHMS, **MODEL_PARAMS)
@@ -154,6 +158,40 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     return None
 
 
+def save_params():
+    global MODEL_NAME
+
+    # verify path exists
+    path = os.path.join(OUTPUT, 'param')
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+    for rhythm, params in utils.RHYTHMS.items():
+        if len(params) > 0:
+            for param in params:
+                model = save_model(param)
+                p = os.path.join(path, f'desc-{DESC}_{rhythm}_{param[0]}_G{param[1]}.xml')
+                model.export_to_file(p)
+
+                if MODEL_NAME is None and CODE:
+                    utils.infer_model()
+                    print('MODEL_NAME', MODEL_NAME)
+                if MODEL_NAME is None:
+                    MODEL_NAME = ''
+
+                convert.to_json(p.replace('xml', 'json'), shape=None, key='param',
+                                desc=f'These are the global parameters for the {MODEL_NAME} model.')
+
+
+def save_model(param):
+    model = lems.Model()
+    ct = lems.ComponentType(name='global_parameters')
+    ct.add(lems.Constant(name='global_speed', value=param[0].replace('speed', '')))
+    ct.add(lems.Constant(name='global_coupling', value=param[1]))
+    model.add(ct)
+    return model
+
+
 def save_missing(path, files):
     global CODE
 
@@ -179,16 +217,12 @@ def save_missing(path, files):
             if '.' not in file:
                 os.rename(f, f + '.txt')
 
+    # check for equations and parameters
+    # get model name
+    # model_name = 'hindmarsh_rose' if MODEL_NAME == 'SJHM3D' else 'reduced_wong_wang'
 
-            # if file.endswith('.json'):
-            #     f = json.load(open(file))
-            #     with open(os.path.join(OUTPUT, os.path.basename(file).split('.')[0] + '.json'), 'w') as f2:
-            #         json.dump(f, f2)
-            # else:
-            #
-                # f = open(file).readlines()
-                # with open(os.path.join(OUTPUT, os.path.basename(file).split('.')[0] + '.txt'), 'w') as f2:
-                #     f2.write(''.join(f))
+    # for k, v in subjects.RHYTHMS_PARAMS.items():
+    #     models.set_params(model_name, DESC, **dict(k=v))
 
 
 def save_output(subs):
@@ -343,10 +377,10 @@ def save_code():
     shutil.copy(CODE, path)
     supply_dict('code', os.path.join(path.replace('py', 'json')))
 
-    # save JSON files
-    pylems_py2xml.main.XML(inp=path, output_path=os.path.join(OUTPUT, 'param'), suffix=DESC, app=True)
-    MODEL_NAME = utils.get_model()
-    transfer_xml()
+    # # save JSON files
+    # pylems_py2xml.main.XML(inp=path, output_path=os.path.join(OUTPUT, 'param'), suffix=DESC, app=True)
+    # MODEL_NAME = utils.get_model()
+    # transfer_xml()
 
 
 def transfer_xml():

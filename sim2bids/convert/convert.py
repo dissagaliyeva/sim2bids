@@ -134,8 +134,9 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
     # get folder location for spatial
     elif name in ['spatial', 'fc', 'map']:
-        desc = temp.file_desc['spatial_map'] if 'map' in sub['name'] \
-               else temp.file_desc[subjects.accepted(sub['name'], return_accepted=True)]
+        fname = subjects.accepted(sub['name'], True)
+        desc = temp.file_desc['spatial_map'] if 'map' in fname \
+               else temp.file_desc[subjects.accepted(fname, return_accepted=True)]
 
         if ses is None:
             folder = folders[2]
@@ -184,7 +185,8 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
                         save_files(sub, folder, file, type='default', centres=True, desc=temp.centres['multi-unique'])
                 else:
                     if IGNORE_CENTRE or not app.MULTI_INPUT:
-                        save_files(sub, folder, file, type='other', desc=temp.file_desc[sub['name']])
+                        print(sub['name'])
+                        save_files(sub, folder, file, type='other', desc=temp.file_desc[subjects.accepted(sub['name'], True)])
                     else:
                         accepted = subjects.get_name(sub['name'])
                         save_files(sub, folder, file, type='default', desc=temp.file_desc[accepted])

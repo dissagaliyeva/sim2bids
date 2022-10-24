@@ -3,6 +3,7 @@ Helper functions for app.py
 """
 
 import os
+import re
 import shutil
 
 import h5py
@@ -14,6 +15,11 @@ from sim2bids.app import app
 from sim2bids.generate import subjects as subj, zip_traversal as z
 from sim2bids.convert import mat
 from sim2bids.preprocess import preprocess
+from sim2bids.generate import utils as gen_utils
+
+
+ACCEPTED_RHYTHMS = ['alpha', 'delta', 'theta', 'gamma', 'beta']
+RHYTHMS = dict()
 
 
 def recursive_walk(path: str, basename: bool = False) -> list:
@@ -40,6 +46,9 @@ def recursive_walk(path: str, basename: bool = False) -> list:
             # ignore checkpoints
             if '.ipynb_checkpoints' in file:
                 continue
+
+            # find rhythms
+            find_rhythm(os.path.join(root, file))
 
             # extract files from zip folder
             if file.endswith('.zip'):
@@ -133,6 +142,7 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 
         # combine path
         file_path = os.path.join(path, file)
+        find_rhythm(file_path)
 
         # # check whether the selection is a directory
         if os.path.isdir(file_path):
@@ -158,22 +168,25 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
             if basename:
                 # rename `tract_lengths` to `distances`
                 contents.append(os.path.basename(file))
-                # if subj.accepted(file):
-                #     contents.append(os.path.basename(file))
-                # else:
-                #     TO_RENAME.append(os.path.basename(file))
             else:
                 contents.append(file)
-                # if subj.accepted(file):
-                #     contents.append(file)
-                # else:
-                #     TO_RENAME.append(file)
+
         # if code is found, save its location
         elif ext == 'py':
             app.CODE = os.path.join(path, file)
 
     # return contents
     return contents
+
+
+def find_rhythm(path):
+    for rhythm in ACCEPTED_RHYTHMS:
+        if rhythm in path:
+            minutes = re.findall(r'[0-9]+min', path)
+            if minutes:
+                RHYTHMS[rhythm + '_' + minutes[0]] = []
+                return
+            RHYTHMS[rhythm] = []
 
 
 def rename_tract_lengths(file: str) -> str:
@@ -238,3 +251,17 @@ def get_model():
     for file in files:
         if file.startswith('model-'):
             return file.split('_')[0].split('-')[-1]
+
+
+def infer_model():
+    content = gen_utils.open_file(app.CODE)
+    model = re.findall(r'(?:hindmarsh|wongwang|oscillator)', ''.join(content), flags=re.IGNORECASE)
+
+    if model:
+        model = model[0].lower()
+        if 'hindmarsh' in model:
+            app.MODEL_NAME = 'HindmarshRose'
+        elif 'wongwang' in model:
+            app.MODEL_NAME = 'ReducedWongWang'
+        elif 'oscillator' in model:
+            app.MODEL_NAME = 'Generic2dOscillator'
