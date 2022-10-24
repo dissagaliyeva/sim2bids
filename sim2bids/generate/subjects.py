@@ -15,6 +15,9 @@ from sim2bids.app import utils
 
 GLOBAL_FILES = []
 
+# collect rhythms, speeds, and global coupling
+# RHYTHMS_PARAMS = dict(alpha=[], beta=[], gamma=[], delta=[], theta=[])
+
 
 class Files:
     def __init__(self, path, files):
@@ -215,11 +218,6 @@ def prepare_subs(file_paths, sid):
         if name == 'tract_lengths.txt':
             name = 'distances.txt'
 
-        # if not os.path.exists(file_path) and 'distances' in file_path:
-        #     if os.path.exists(file_path.replace('distances', 'tract_lengths')):
-        #         os.replace(file_path.replace('distances', 'tract_lengths'), file_path)
-        #     else:
-        #         continue
 
         # rename tract_lengths to distances in the physical folder location
         if 'tract_lengths' in file_path:
@@ -243,7 +241,8 @@ def prepare_subs(file_paths, sid):
                 os.remove(file_path)
                 continue
 
-            name = os.path.basename(file_path).split('.')[0]
+            # name = os.path.basename(file_path).split('.')[0]
+            name = get_name(file_path)
 
             subs[name] = {
                 'name': name,
@@ -275,7 +274,7 @@ def prepare_subs(file_paths, sid):
     return subs
 
 
-def get_name(path):
+def get_name(path, return_rhythm=False):
     # get file's basename (=without root directory)
     base = os.path.basename(path)
 
@@ -296,6 +295,13 @@ def get_name(path):
             if len(g_temp) > 0:
                 g = g_temp[0].replace('csf', '').strip()
 
+                if 'min' in path:
+                    name = s + '_' + re.findall(r'[0-9]+min', path)[0]
+                else:
+                    name = s
+
+                utils.RHYTHMS[name].append((speed, g))
+
     name = accepted(base.split('.')[0])
 
     if name is False:
@@ -303,7 +309,7 @@ def get_name(path):
 
     if series is not None and speed is not None and g is not None:
         return f'{series}-{speed}-G{g}-{name[-1]}'
-    elif series is not None and speed is None and g is None:
+    elif series is not None and speed is None and g is None and return_rhythm:
         return f'{series}'
 
     if name[-1] in ['weight', 'distance', 'tract_length', 'delay', 'speed',
@@ -327,11 +333,11 @@ def accepted(name, return_accepted=False):
                 if len(split) == 2:
                     if return_accepted:
                         return accept
-                    return True, split[-2] + '_' + split[-1]
+                    return True, split[0] + '_' + split[1]
                 if len(split) >= 3:
                     if return_accepted:
                         return accept
-                    return True, split[-3] + '_' + split[-2] + '_' + split[-1]
+                    return True, '_'.join([split[i] for i in range(len(split))])
 
                 if return_accepted:
                     return accept
