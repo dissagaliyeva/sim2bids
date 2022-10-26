@@ -36,6 +36,7 @@ RHYTHMS = None
 SoftwareVersion = None
 SoftwareRepository = None
 SoftwareName = None
+SoftwareCode = 'MISSING'
 COND_SPEED = 'cspeed'
 GLB_COUP_SF = 'csf'
 
@@ -52,18 +53,19 @@ ALL_FILES = None  # list of all file paths (gets supplemented in subjects.py)
 CODE = None  # path to python code if exists
 SESSIONS = False
 H5_CONTENT = dict()
+MISSING = []
 
 # store different time series accounting for 'times'
 TIMES = []
 
 # define all accepted files
-ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speed',                     # Network (net)
+ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speeds',                     # Network (net)
             'nodes', 'labels', 'centre', 'area', 'hemisphere', 'cortical',               # Coordinates (coord)
-            'orientation', 'average_orientation', 'normal', 'times', 'vertices',        # Coordinates (coord)
+            'orientation', 'average_orientation', 'normal', 'times', 'bold_ts', 'vertices',        # Coordinates (coord)
             'faces', 'vnormal', 'fnormal', 'sensor', 'volume', 'map',                   # Coordinates (coord)
             'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',                         # Coordinates (coord)
             'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event',               # Timeseries (ts)
-            'emp', 'bold_ts', 'bold_times', 'hrf'                                             # Timeseries (ts)
+            'emp', 'bold_times', 'hrf'                                             # Timeseries (ts)
             'emp_fc', 'fc']                                                                       # Spatial (spatial)
 
 TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',  # folder "net"
@@ -104,6 +106,8 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     """
     global MODEL_NAME, INPUT, INPUT_TRANSFERRED
 
+    # preprocess_input(path, files)
+
     # # call the preprocessing pipeline that standardizes the input folder
     # result = prepare.preprocess(path, files, INPUT)
     #
@@ -120,17 +124,23 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
 
+    # print(MISSING)
+
     # only save conversions if 'save' is True
     if save and subs:
-        # save conversions
-        save_missing(path, files)
         save_output(subs)
 
         if utils.RHYTHMS:
             save_params()
 
-        if MODEL_NAME and MODEL_PARAMS:
-            models.set_params(MODEL_NAME, DESC, RHYTHMS, **MODEL_PARAMS)
+        if MISSING:
+            save_missing(path, MISSING)
+        else:
+            # save conversions
+            save_missing(path, files)
+
+        # if MODEL_NAME and MODEL_PARAMS:
+        #     models.set_params(MODEL_NAME, DESC, RHYTHMS, **MODEL_PARAMS)
 
         # save code
         if CODE:
@@ -158,6 +168,36 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     return None
 
 
+def preprocess_input(path, input_files):
+    to_preprocess = {}
+
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if file in input_files:
+                continue
+
+            if file.endswith('mat') and 'csf' not in root and 'cspeed' not in root and root != path:
+                if root not in to_preprocess:
+                    to_preprocess[root] = []
+                to_preprocess[root].append(file)
+
+    for root, content in to_preprocess.items():
+        for c in content:
+            cspeed = re.findall(r'speed_[0-9]+', c)[0].replace('speed_', '')
+            csf = re.findall(r'csf_[0-9\.]+', c)[0].replace('csf_', '')
+
+            path = os.path.join(root, f'cspeed{cspeed}')
+            if not os.path.exists(path):
+                os.mkdir(path)
+
+            path = os.path.join(path, f'csf {csf}')
+            if not os.path.exists(path):
+                os.mkdir(path)
+
+            # copy file
+            shutil.move(os.path.join(root, c), path)
+
+
 def save_params():
     global MODEL_NAME
 
@@ -175,7 +215,6 @@ def save_params():
 
                 if MODEL_NAME is None and CODE:
                     utils.infer_model()
-                    print('MODEL_NAME', MODEL_NAME)
                 if MODEL_NAME is None:
                     MODEL_NAME = ''
 
@@ -195,8 +234,11 @@ def save_model(param):
 def save_missing(path, files):
     global CODE
 
-    if len(files) == 1 and os.path.isdir(path, files[0]):
+    if len(files) == 1 and os.path.isdir(os.path.join(path, files[0])):
         path = os.path.join(path, files[0])
+
+    if not os.path.exists(OUTPUT):
+        os.mkdir(OUTPUT)
 
     get_path = lambda x: Path(os.path.join(path, x))
     missing = [get_path(p) for p in os.listdir(path) if not os.path.isdir(get_path(p))]
@@ -208,21 +250,26 @@ def save_missing(path, files):
         if file.endswith('.py'):
             CODE = file
         elif 'centre' in file:
+
+            if not os.path.exists(os.path.join(OUTPUT, 'coord')):
+                os.mkdir(os.path.join(OUTPUT, 'coord'))
+
             f = convert.open_file(os.path.join(path, file), subjects.find_separator(os.path.join(path, file)))
             convert.save_files(dict(desc=DESC, name=name), f'{OUTPUT}/coord', f,
                                type='coord', centres=True, desc=temp.centres['single'])
+
         elif 'participants' in file or 'CHANGES' in file or 'description' in file or 'README' in file:
-            shutil.copy(file, OUTPUT)
-            f = os.path.join(OUTPUT, os.path.basename(file))
-            if '.' not in file:
-                os.rename(f, f + '.txt')
+            if not os.path.exists(os.path.join(OUTPUT, os.path.basename(file).replace('.txt', '') + '.txt')):
+                shutil.copy(file, OUTPUT)
 
-    # check for equations and parameters
-    # get model name
-    # model_name = 'hindmarsh_rose' if MODEL_NAME == 'SJHM3D' else 'reduced_wong_wang'
 
-    # for k, v in subjects.RHYTHMS_PARAMS.items():
-    #     models.set_params(model_name, DESC, **dict(k=v))
+
+                # f = os.path.join(OUTPUT, os.path.basename(file))
+                #
+                # if '.' not in file:
+                #     os.rename(f, f + '.txt')
+            # else:
+                # print('exists')
 
 
 def save_output(subs):
@@ -377,10 +424,13 @@ def save_code():
     shutil.copy(CODE, path)
     supply_dict('code', os.path.join(path.replace('py', 'json')))
 
-    # # save JSON files
-    # pylems_py2xml.main.XML(inp=path, output_path=os.path.join(OUTPUT, 'param'), suffix=DESC, app=True)
-    # MODEL_NAME = utils.get_model()
-    # transfer_xml()
+    if MODEL_NAME and MODEL_PARAMS:
+        if MODEL_NAME == 'HindmarshRose':
+            model = 'hindmarsh_rose'
+        elif MODEL_NAME == 'ReducedWongWang':
+            model = 'reduced_wong_wang'
+
+        models.set_params(model, DESC, MODEL_PARAMS)
 
 
 def transfer_xml():
@@ -513,6 +563,18 @@ def supply_extra_files():
 
         df.to_csv(os.path.join(OUTPUT, 'participants.tsv'), index=None, sep='\t')
 
+    if not os.path.exists(os.path.join(OUTPUT, 'participants.json')):
+        with open(os.path.join(OUTPUT, 'dataset_description.json'), 'w') as f:
+
+            if MODEL_NAME:
+                json.dump({'Name': f'Simulation output for {MODEL_NAME} model.',
+                           'BIDSVersion': SoftwareVersion}, f)
+            elif MODEL_NAME is None and SoftwareVersion:
+                json.dump({'Name': 'Simulation output.',
+                           'Version': SoftwareVersion}, f)
+            else:
+                json.dump({'Name': 'Simulation output'})
+
 
 def check_json():
     for root, dirs, files in os.walk(OUTPUT):
@@ -525,43 +587,44 @@ def check_json():
                 json_file = json.load(open(path))
                 coords = None
 
-                if convert.IGNORE_CENTRE:
-                    lvl = '../' * (level - 1)
-                    coords = [f'{lvl}coord/desc-{DESC}_labels.json', f'{lvl}coord/desc-{DESC}_nodes.json']
-                else:
-                    if 'sub-' in path:
-                        if 'coord' in root:
-                            coords = None
-                        else:
-                            sub = re.findall(r'sub-[0-9]+', path)[0]
-                            coords = [f'../coord/{sub}_desc-{DESC}_labels.json',
-                                      f'../coord/{sub}_desc-{DESC}_nodes.json']
-
-                # check if CoordRows and CoordColumns exist
-                if 'CoordsRows' in json_file.keys():
-                    # remove CoordRows and CoordColumns from nodes/labels
-                    if 'nodes' in file or 'labels' in file or coords is None:
-                        del json_file['CoordsRows']
+                # remove CoordsRows|CoordsColumns from times files
+                if 'times' in path:
+                    if 'CoordsRows' in json_file.keys():
                         del json_file['CoordsColumns']
+                        del json_file['CoordsRows']
+                else:
+                    if 'eq' in file or 'param' in file or 'code' in file:
+                        json_file['SourceCode'] = '../code/desc-default_code.py' if SoftwareRepository is None else SoftwareRepository
+
+                    if convert.IGNORE_CENTRE or os.path.exists(os.path.join(OUTPUT, 'coord')):
+                        lvl = '../' * (level - 1)
+                        coords = [f'{lvl}coord/desc-{DESC}_labels.json', f'{lvl}coord/desc-{DESC}_nodes.json']
                     else:
-                        json_file['CoordsRows'] = coords
-                        json_file['CoordsColumns'] = coords
+                        lvl = '../' * level
+                        if 'sub-' in path:
+                            if 'coord' in root:
+                                coords = None
+                            else:
+                                sub = re.findall(r'sub-[0-9]+', path)[0]
 
-                    # save changes
-                    with open(path, 'w') as f:
-                        json.dump(json_file, f)
+                                if os.path.exists(os.path.join(OUTPUT, 'coord', f'desc-{DESC}_nodes.json')):
+                                    coords = [f'{lvl}coord/desc-{DESC}_labels.json',
+                                              f'{lvl}coord/desc-{DESC}_nodes.json']
+                                else:
+                                    coords = [f'{lvl}coord/{sub}_desc-{DESC}_labels.json',
+                                              f'{lvl}coord/{sub}_desc-{DESC}_nodes.json']
 
-    # for file in utils.get_content(OUTPUT, os.listdir(OUTPUT)):
-    #     if file.endswith('json'):
-    #         f = json.load(open(file))
-    #         if convert.COORDS is not None and 'CoordsRows' in f.keys() and f['CoordsRows'] == '':
-    #             if 'coord' in file:
-    #                 coords = [convert.COORDS[0].replace('json', 'tsv'), convert.COORDS[1].replace('json', 'tsv')]
-    #                 f['CoordsRows'] = coords
-    #                 f['CoordsColumns'] = coords
-    #             else:
-    #                 f['CoordsRows'] = convert.COORDS
-    #                 f['CoordsColumns'] = convert.COORDS
-    #
-    #         with open(file, 'w') as f2:
-    #             json.dump(f, f2)
+                    # check if CoordRows and CoordColumns exist
+                    if 'CoordsRows' in json_file.keys():
+                        # remove CoordRows and CoordColumns from nodes/labels
+                        if 'nodes' in file or 'labels' in file or coords is None:
+                            del json_file['CoordsRows']
+                            del json_file['CoordsColumns']
+                        else:
+                            json_file['CoordsRows'] = coords
+                            json_file['CoordsColumns'] = coords
+
+                # save changes
+                with open(path, 'w') as f:
+                    json.dump(json_file, f)
+

@@ -104,8 +104,6 @@ class Files:
                             self.subs[sid] = prepare_subs(utils.get_content(path.replace(file, ''), file), sid)
                         else:
                             self.subs[sid] = prepare_subs(utils.get_content(path, file), sid)
-
-
         else:
             # check if there are no folders inside
             sid = self.create_sid_sub()
@@ -186,6 +184,10 @@ def prepare_subs(file_paths, sid):
     subs = {}
 
     for file_path in file_paths:
+        if 'CHANGES' in file_path or 'participants' in file_path or 'README' in file_path:
+            app.MISSING.append(file_path)
+            continue
+
         name = get_filename(file_path)
 
         if file_path.endswith('.h5'):
@@ -217,7 +219,6 @@ def prepare_subs(file_paths, sid):
         # rename tract_lengths to distances
         if name == 'tract_lengths.txt':
             name = 'distances.txt'
-
 
         # rename tract_lengths to distances in the physical folder location
         if 'tract_lengths' in file_path:
@@ -327,7 +328,7 @@ def accepted(name, return_accepted=False):
         if accept in name:
             if accept == 'ts' or accept == 'times':
                 if accept == 'ts':
-                    if len(name) != 2 or '_ts' not in name:
+                    if '_ts' not in name:
                         return False
                 split = name.split('_')
                 if len(split) == 2:

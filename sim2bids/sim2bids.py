@@ -106,6 +106,7 @@ class MainArea(param.Parameterized):
             # check files for preprocessing step
             utils.reset_values()
             path = self.text_input.value
+            app.preprocess_input(path, selected)
             self.to_rename = validate.filter(app_utils.get_content(path, selected, basename=True))
             self.to_rename_path = validate.filter(app_utils.get_content(path, selected), self.to_rename)
 

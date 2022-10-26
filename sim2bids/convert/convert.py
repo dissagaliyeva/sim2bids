@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from collections import OrderedDict
 
 import pandas as pd
@@ -136,7 +137,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     elif name in ['spatial', 'fc', 'map']:
         fname = subjects.accepted(sub['name'], True)
         desc = temp.file_desc['spatial_map'] if 'map' in fname \
-               else temp.file_desc[subjects.accepted(fname, return_accepted=True)]
+               else temp.file_desc[subjects.accepted(fname, return_accepted=True)].format(sub['sid'])
 
         if ses is None:
             folder = folders[2]
@@ -151,7 +152,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
     # get folder location for time series
     elif name in ['ts']:
-        desc = temp.file_desc['ts'] if name == 'ts' else temp.file_desc['bold'].format(sub['sid'].replace('sub-', ''))
+        desc = temp.file_desc['ts'].format(sub['sid']) if name == 'ts' else temp.file_desc['bold'].format(sub['sid'].replace('sub-', ''))
         save_files(sub, folders[-1], file, type='default', ftype='ts', desc=desc)
 
     elif name == 'times':
@@ -279,11 +280,26 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
     """
     global COORDS
 
+    name = sub['name'].replace('.txt', '')
+
     if type == 'default':
-        json_file = os.path.join(folder, DEFAULT_TEMPLATE.format(sub['sid'], sub['desc'], sub['name'], 'json'))
+        # if ftype in ['ts', 'times']:
+        #     rhythm = re.findall(r'(alpha|beta|theta|gamma|delta)', sub['path'])
+        #
+        #     if rhythm:
+        #         cspeed = re.findall(r'cspeed[0-9\.]+', sub['path'])[0].replace('c', '')
+        #         csf = re.findall(r'csf\s[0-9\.]+', sub['path'])[0].replace('csf ', 'G')
+        #
+        #         json_file = os.path.join(folder, DEFAULT_TEMPLATE.\
+        #                                  format(sub['sid'], f'{sub["desc"]}_{rhythm[0]}-{cspeed}-{csf}', name, 'json'))
+        #     else:
+        #         json_file = os.path.join(folder, DEFAULT_TEMPLATE.format(sub['sid'], sub['desc'], name, 'json'))
+
+        json_file = os.path.join(folder, DEFAULT_TEMPLATE.format(sub['sid'], sub['desc'], name, 'json'))
         tsv_file = json_file.replace('json', 'tsv')
+
     else:
-        json_file = os.path.join(folder, COORD_TEMPLATE.format(sub['desc'], sub['name'], 'json'))
+        json_file = os.path.join(folder, COORD_TEMPLATE.format(sub['desc'], name, 'json'))
         tsv_file = json_file.replace('json', 'tsv')
 
     # Save 'centres.txt' as 'nodes.txt' and 'labels.txt'. This will require breaking the
@@ -496,7 +512,7 @@ def open_text(path, sep):
         return pd.read_csv(path, header=None, index_col=None)
 
     try:
-        f = pd.read_csv(path, sep=sep, header=None, index_col=False)
+        f = pd.read_csv(path, sep=sep, header=None, index_col=None)
     except pd.errors.EmptyDataError:
         return ''
     except ValueError:
@@ -557,6 +573,8 @@ def to_json(path, shape, desc, key, **kwargs):
     -------
 
     """
+    global NETWORK
+
     if key not in ['param', 'eq', 'code']:
         out = OrderedDict({x: '' for x in temp.required})
     else:
@@ -569,13 +587,38 @@ def to_json(path, shape, desc, key, **kwargs):
         params = {
             'ModelEq': f'../eq/desc-{app.DESC}_eq.xml',
             'ModelParam': f'../param/desc-{app.DESC}_param.xml',
-            'SourceCode': f'../code/desc-{app.DESC}_code.py' if app.CODE else None,
+            'SourceCode': f'../code/desc-{app.DESC}_code.py' if app.SoftwareCode != 'MISSING' else 'MISSING',
             'SoftwareVersion': app.SoftwareVersion if app.SoftwareVersion else None,
             'SoftwareRepository': app.SoftwareRepository if app.SoftwareRepository else None,
             'SourceCodeVersion': app.SoftwareVersion if app.SoftwareVersion else None,
             'SoftwareName': app.SoftwareName if app.SoftwareName else None,
             'Network': NETWORK if NETWORK else None
         }
+
+        if 'eq' not in path or 'param' not in path or 'code' not in path:
+            sub = re.findall(r'sub-[0-9]+', path)
+            network = None
+
+            if 'times' in path or '_ts' in path and os.path.exists(os.path.join(app.OUTPUT, 'coord')):
+                if 'CoordsRows' in out.keys():
+                    del out['CoordsRows']
+                    del out['CoordsColumns']
+
+
+            if sub:
+                network = [f'../net/{sub[0]}_{app.DESC}_weights.json', f'../net/{sub[0]}_{app.DESC}_distances.json']
+
+            if 'ses-' in path:
+                params['ModelEq'] = '../../' + params['ModelEq']
+                params['ModelParam'] = '../../' + params['ModelParam']
+                params['SourceCode'] = '../../' + params['SourceCode']
+            else:
+                params['ModelEq'] = '../' + params['ModelEq']
+                params['ModelParam'] = '../' + params['ModelParam']
+                params['SourceCode'] = '../' + params['SourceCode']
+
+            if network:
+                params['Network'] = network
 
         if kwargs:
             params += kwargs
@@ -584,7 +627,7 @@ def to_json(path, shape, desc, key, **kwargs):
             if k in temp.struct[key]['required'] or k in temp.struct[key]['recommend']:
                 out[k] = params[k]
 
-    if 'Units' in out.keys() and key != 'coord':
+    if 'Units' in out.keys():
         out['Units'] = 'ms'
 
     # point coord files to nodes/labels TSV files instead

@@ -14,7 +14,7 @@ sys.path.append('')
 TVB_MODELS = {
     'SJHM3D': {
         'name': 'hindmarsh_rose',
-        'desc': 'These are the equations to simulate the time series with the'
+        'desc': 'These are the equations to simulate the time series with the '
                 'Stefanescu-Jirsa 3D (reduced Hindmarsh-Rose model) model.',
         'params': dict(r=[0.006], a=[1.], b=[3.], c=[1.], d=[5.], s=[1.], xo=[-1.6], K11=[0.5],
                        K12=[0.1], K21=[0.15], sigma=[0.3], mu=[3.3], x_1=[-1.6], A_ik=None,
