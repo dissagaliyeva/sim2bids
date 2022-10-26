@@ -63,7 +63,7 @@ file_desc = {
     # ====================================
     #           OTHER FOLDERS
     # ====================================
-    'param': 'These are the parameters for the {} model.',
+    'param': 'These are the {} parameters for the {} model.',
     'eq':  'These are the equations to simulate the time series with the {} model.',
     'code': 'The source code to reproduce results.'
 }
@@ -98,7 +98,6 @@ struct = {
          'Funding', 'EthicsApprovals', 'ReferencesAndLinks', 'DatasetDOI', 'GeneratedBy', 'SourceDatasets']},
     'participants': {'required': ['participant_id'], 'recommend': ['species', 'age', 'sex', 'handedness', 'strain',
                                                                    'strain_rrid']}
-
 }
 
 

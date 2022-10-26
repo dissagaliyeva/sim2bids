@@ -144,6 +144,9 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
         file_path = os.path.join(path, file)
         find_rhythm(file_path)
 
+        if 'CHANGES' in file or 'participants' in file or 'README' in file:
+            app.MISSING.append(file_path)
+
         # # check whether the selection is a directory
         if os.path.isdir(file_path):
             # if true, traverse its content and append results

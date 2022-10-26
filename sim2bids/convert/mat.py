@@ -15,7 +15,7 @@ from sim2bids.generate import subjects
 def save_mat(sub, og_path, extract=False):
     file = traverse_file(sub['path'])
     root = os.path.dirname(sub['path'])
-    multi_folder, extracted = og_path == root, False
+    multi_folder = og_path == root
 
     if extract:
         new_files = []
@@ -42,20 +42,22 @@ def save_mat(sub, og_path, extract=False):
                     minutes = re.findall(r'[0-9]+min', sub['path'])
                     name = f'{name}_{minutes[0]}' if len(minutes) > 0 else name
 
-                    if multi_folder:
+                    if name == 'arr':
+                        ext = os.path.basename(sub['path']).split('.')[-1]
+                        name = os.path.basename(sub['path']).replace('.', '').replace(ext, '') + '_ts'
 
+                    if multi_folder:
                         path = os.path.join(os.path.join(root, sub['sid']), name + '.txt')
                     else:
                         path = os.path.join(root, name + '.txt')
 
                     if not os.path.exists(path):
-                        extracted = True
                         new_files.append(name + '.txt')
                         pd.DataFrame(f).to_csv(path, index=None, header=None, sep='\t')
 
-            if extracted:
-                # delete mat file
-                os.remove(sub['path'])
+        if os.path.exists(sub['path']):
+            # delete mat file
+            os.remove(sub['path'])
 
         return new_files
 
