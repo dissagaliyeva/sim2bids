@@ -142,6 +142,13 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 
         # combine path
         file_path = os.path.join(path, file)
+
+        if file.endswith('.m') or file.endswith('.R'):
+            if app.CODE is None:
+                app.CODE = []
+            app.CODE.append(file_path)
+            continue
+
         find_rhythm(file_path)
 
         if 'CHANGES' in file or 'participants' in file or 'README' in file:

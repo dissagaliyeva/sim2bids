@@ -4,6 +4,8 @@ import re
 import shutil
 
 import lems.api as lems
+import numpy as np
+
 from sim2bids.templates import model_params
 from sim2bids.generate import structure
 from sim2bids.app import app
@@ -31,7 +33,7 @@ def set_params(model_name, conversion_name='default', rhythm=None, **kwargs):
     # check output structure and create folders if necessary
     structure.check_folders(app.OUTPUT)
 
-    if app.CODE is None:
+    if app.CODE is None or isinstance(app.CODE, list):
         # instantiate a model class
         model = NoCodeModel(model_name, rhythm, **kwargs)
 
@@ -79,7 +81,7 @@ class NoCodeModel:
             if self.rhythm:
                 self.param_desc = templates.file_desc['param'].format(self.rhythm, 'ReducedWongWang')
             else:
-                self.param_desc = templates.file_desc['param'].format('', 'ReducedWongWang')
+                self.param_desc = templates.file_desc['param'].format('global', 'ReducedWongWang')
 
             self.abbreviation = 'RWW'
             return model_params.reduced_wong_wang
@@ -91,7 +93,7 @@ class NoCodeModel:
             if self.rhythm:
                 self.param_desc = templates.file_desc['param'].format(self.rhythm, 'HindmarshRose')
             else:
-                self.param_desc = templates.file_desc['param'].format('', 'HindmarshRose')
+                self.param_desc = templates.file_desc['param'].format('global', 'HindmarshRose')
 
             self.abbreviation = 'SJHM3D'
             return model_params.hindmarsh_rose
@@ -103,7 +105,7 @@ class NoCodeModel:
             if self.rhythm:
                 self.param_desc = templates.file_desc['param'].format(self.rhythm, 'Generic2dOscillator')
             else:
-                self.param_desc = templates.file_desc['param'].format('', 'Generic2dOscillator')
+                self.param_desc = templates.file_desc['param'].format('global', 'Generic2dOscillator')
 
             self.abbreviation = 'G2DOS'
             return model_params.g2dos
@@ -146,10 +148,10 @@ class NoCodeModel:
 
         if self.rhythm:
             model.add(lems.Component(id_=f'{self.rhythm}_times', type_=self.abbreviation, **self.params))
-            path = os.path.join(app.OUTPUT, 'param', f'desc-{app.DESC}_{self.rhythm}_param.xml')
+            path = os.path.join(app.OUTPUT, 'param', f'{self.rhythm}_param.xml')
         else:
-            path = os.path.join(app.OUTPUT, 'param', f'desc-{app.DESC}_param.xml')
-            model.add(lems.Component(id=self.model_name, type=self.abbreviation, **self.params))
+            path = os.path.join(app.OUTPUT, 'param', f'param.xml')
+            model.add(lems.Component(id_=self.model_name, type_=self.abbreviation, **self.params))
 
         if not os.path.exists(path):
             model.export_to_file(path)
@@ -163,19 +165,22 @@ class NoCodeModel:
 
     def save_params(self, k, v):
         # iterate over values
-        if isinstance(v, list) and k != 'variables_of_interest':
+        if (isinstance(v, list) or isinstance(v, np.ndarray)) and k != 'variables_of_interest':
             self.save_list_params(k, v)
 
-    def save_list_params(self, k, v, desc=None):
+    def save_list_params(self, k, v):
         for value in v:
             if self.rhythm:
                 path = os.path.join(app.OUTPUT, 'param',
-                                    f'desc-{app.DESC}-{self.rhythm}-{k}{str(format(value, ".3f"))}.xml')
+                                    f'{self.rhythm}-{k}{str(format(value, ".3f"))}.xml')
             else:
-                path = os.path.join(app.OUTPUT, 'param', f'desc-{app.DESC}-{k}{str(format(value, ".4f"))}.xml')
+                if isinstance(value, np.float) or isinstance(value, float):
+                    path = os.path.join(app.OUTPUT, 'param', f'{k}{format(value, ".3f")}.xml')
+                else:
+                    path = os.path.join(app.OUTPUT, 'param', f'{k}{format(value, ".3f")}.xml')
 
             save_json(path, self.get_model(k, v), use_json=False)
-            convert.to_json(path.replace('xml', 'json'), shape=None, desc=desc, key='param')
+            convert.to_json(path.replace('xml', 'json'), shape=None, desc=self.param_desc, key='param')
 
     def get_model(self, k, v):
         # instantiate a LEMS model
@@ -184,7 +189,7 @@ class NoCodeModel:
         if k == 'G':
             # create a nested G constant inside global parameters ComponentType
             ct = lems.ComponentType(name='global_parameters')
-            ct.add(lems.Constant(name=k, value=v))
+            ct.add(lems.Constant(name=k, value=str(v)))
 
             # append the structure to the model
             model.add(ct)

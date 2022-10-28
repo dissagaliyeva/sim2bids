@@ -10,8 +10,8 @@ from sim2bids.generate import subjects
 import sim2bids.templates.templates as temp
 
 # define naming conventions
-DEFAULT_TEMPLATE = '{}_desc-{}_{}.{}'
-COORD_TEMPLATE = 'desc-{}_{}.{}'
+DEFAULT_TEMPLATE = '{}_{}.{}'
+COORD_TEMPLATE = '{}.{}'
 
 # set to true if centres.txt (nodes and labels) are the same
 # for all files. In that case, store only one copy of the files
@@ -121,7 +121,12 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             folder = folders[2]
 
         # get description for weights or distances
-        desc = temp.file_desc['weights'] if 'weights' in sub['name'] else temp.file_desc['distances']
+        if 'scthran' in sub['name'].lower():
+            desc = temp.file_desc['weights'].format('thresholded ')
+        elif 'scnot' in sub['name'].lower():
+            desc = temp.file_desc['weights'].format('')
+        else:
+            desc = temp.file_desc['distances']
 
         if 'content' in sub.keys():
             save_files(sub, folder, sub['content'], ftype='wd')
@@ -185,12 +190,20 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
                     else:
                         save_files(sub, folder, file, type='default', centres=True, desc=temp.centres['multi-unique'])
                 else:
-                    if IGNORE_CENTRE or not app.MULTI_INPUT:
-                        print(sub['name'])
-                        save_files(sub, folder, file, type='other', desc=temp.file_desc[subjects.accepted(sub['name'], True)])
+                    accepted = subjects.get_name(sub['name'], True)
+                    if IGNORE_CENTRE and 'ses' in folder:
+                        save_files(sub, folder, file, type='default', desc=temp.file_desc[accepted])
+                    elif IGNORE_CENTRE and 'ses' not in folder and app.SESSIONS:
+                        save_files(sub, folder, file, type='other', desc=temp.file_desc[accepted])
                     else:
                         accepted = subjects.get_name(sub['name'])
-                        save_files(sub, folder, file, type='default', desc=temp.file_desc[accepted])
+
+                        if IGNORE_CENTRE and 'sub' in folder:
+                            type_ = 'default'
+                        else:
+                            type_ = 'coord'
+
+                        save_files(sub, folder, file, type=type_, desc=temp.file_desc[accepted])
 
 
 def save_centres(sub, file, ses, folders, centre_name='centres'):
@@ -226,9 +239,9 @@ def save_centres(sub, file, ses, folders, centre_name='centres'):
 
         # save conversion results
         if IGNORE_CENTRE:
-            save_files(sub, folder, file, type='other', centres=True, desc=desc)
-        else:
             save_files(sub, folder, file, type='default', centres=True, desc=desc)
+        else:
+            save_files(sub, folder, file, type='other', centres=True, desc=desc)
 
 
 def save_h5(sub, folders, ses=None):
@@ -283,23 +296,11 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
     name = sub['name'].replace('.txt', '')
 
     if type == 'default':
-        # if ftype in ['ts', 'times']:
-        #     rhythm = re.findall(r'(alpha|beta|theta|gamma|delta)', sub['path'])
-        #
-        #     if rhythm:
-        #         cspeed = re.findall(r'cspeed[0-9\.]+', sub['path'])[0].replace('c', '')
-        #         csf = re.findall(r'csf\s[0-9\.]+', sub['path'])[0].replace('csf ', 'G')
-        #
-        #         json_file = os.path.join(folder, DEFAULT_TEMPLATE.\
-        #                                  format(sub['sid'], f'{sub["desc"]}_{rhythm[0]}-{cspeed}-{csf}', name, 'json'))
-        #     else:
-        #         json_file = os.path.join(folder, DEFAULT_TEMPLATE.format(sub['sid'], sub['desc'], name, 'json'))
-
-        json_file = os.path.join(folder, DEFAULT_TEMPLATE.format(sub['sid'], sub['desc'], name, 'json'))
+        json_file = os.path.join(folder, DEFAULT_TEMPLATE.format(sub['sid'], name, 'json'))
         tsv_file = json_file.replace('json', 'tsv')
 
     else:
-        json_file = os.path.join(folder, COORD_TEMPLATE.format(sub['desc'], name, 'json'))
+        json_file = os.path.join(folder, COORD_TEMPLATE.format(name, 'json'))
         tsv_file = json_file.replace('json', 'tsv')
 
     # Save 'centres.txt' as 'nodes.txt' and 'labels.txt'. This will require breaking the
@@ -331,12 +332,12 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         to_tsv(nodes.replace('json', 'tsv'), content.iloc[:, 1:])
     else:
         if ftype == 'coord':
-            to_json(json_file.lower(), shape=content.shape, key='coord', desc=desc)
-            to_tsv(tsv_file.lower(), content)
+            to_json(json_file, shape=content.shape, key='coord', desc=desc)
+            to_tsv(tsv_file, content)
         else:
             # otherwise, save files as usual
-            to_json(json_file.lower(), shape=content.shape, key=ftype, desc=desc)
-            to_tsv(tsv_file.lower(), content)
+            to_json(json_file, shape=content.shape, key=ftype, desc=desc)
+            to_tsv(tsv_file, content)
 
 
 def check_centres(name='centres'):
@@ -355,26 +356,32 @@ def check_centres(name='centres'):
     # get all centres files
     centres = get_specific(name)
 
-    # get the first element
-    file = open_file(centres[0], subjects.find_separator(centres[0]))
+    if len(centres) == 1:
+        return True
 
-    # define set literal
-    same = {}
+    if centres:
+        # get the first element
+        file = open_file(centres[0], subjects.find_separator(centres[0]))
 
-    # iterate over centres
-    for centre in centres[1:]:
-        # append to the set literal whether the contents of the first element
-        # are the same with the rest
-        same.update(file == open_file(centre, subjects.find_separator(centre)))
+        # define set literal
+        same = {}
 
-    # check if set literal contains only one element
-    if len(same) == 1:
-        if bool(same):
-            # if files are the same, return True
-            return True
-        # False otherwise
+        # iterate over centres
+        for centre in centres[1:]:
+            # append to the set literal whether the contents of the first element
+            # are the same with the rest
+            same.update(file == open_file(centre, subjects.find_separator(centre)))
+
+        # check if set literal contains only one element
+        if len(same) == 1:
+            if bool(same):
+                # if files are the same, return True
+                return True
+            # False otherwise
+            return False
         return False
-    return False
+
+    return None
 
 
 def get_specific(filetype: str, constraint: str = None) -> list:
@@ -584,10 +591,51 @@ def to_json(path, shape, desc, key, **kwargs):
         struct = temp.struct[key]
         out.update({x: '' for x in struct['required']})
 
+    # ===========================================================
+    #                     TAKE CARE OF COORDS
+    # ===========================================================
+    coord = None
+
+    if 'CoordsRows' in out.keys():
+        if app.SESSIONS and IGNORE_CENTRE:
+            coord = ['../../../coord/nodes.json', '../../../coord/labels.json']
+        elif app.SESSIONS and not IGNORE_CENTRE:
+            coord = ['../coord/nodes.json', '../coord/labels.json']
+        elif not app.SESSIONS and IGNORE_CENTRE:
+            coord = ['../../coord/nodes.json', '../../coord/labels.json']
+        else:
+            coord = ['../coord/nodes.json', '../coord/labels.json']
+
+    if key != 'wd':
+
+        # ===========================================================
+        #                     TAKE CARE OF EQUATIONS
+        # ===========================================================
+
+        if 'ModelEq' in out.keys() or 'ModelEq' in temp.struct[key]['recommend']:
+            if 'param' in path or 'code' in path:
+                out['ModelEq'] = '../eq/eq.xml'
+            else:
+                if app.SESSIONS:
+                    out['ModelEq'] = '../../../eq/eq.xml'
+                else:
+                    out['ModelEq'] = '../../eq/eq.xml'
+
+        # ===========================================================
+        #                     TAKE CARE OF PARAMETERS
+        # ===========================================================
+
+        if 'ModelParam' in out.keys() or 'ModelParam' in temp.struct[key]['recommend']:
+            if 'eq' in path or 'code' in path:
+                out['ModelParam'] = '../param/param.xml'
+            else:
+                if app.SESSIONS:
+                    out['ModelParam'] = '../../../param/param.xml'
+                else:
+                    out['ModelParam'] = '../../param/param.xml'
+
         params = {
-            'ModelEq': f'../eq/desc-{app.DESC}_eq.xml',
-            'ModelParam': f'../param/desc-{app.DESC}_param.xml',
-            'SourceCode': f'../code/desc-{app.DESC}_code.py' if app.SoftwareCode != 'MISSING' else 'MISSING',
+            'SourceCode': app.SoftwareCode,
             'SoftwareVersion': app.SoftwareVersion if app.SoftwareVersion else None,
             'SoftwareRepository': app.SoftwareRepository if app.SoftwareRepository else None,
             'SourceCodeVersion': app.SoftwareVersion if app.SoftwareVersion else None,
@@ -599,23 +647,8 @@ def to_json(path, shape, desc, key, **kwargs):
             sub = re.findall(r'sub-[0-9]+', path)
             network = None
 
-            if 'times' in path or '_ts' in path and os.path.exists(os.path.join(app.OUTPUT, 'coord')):
-                if 'CoordsRows' in out.keys():
-                    del out['CoordsRows']
-                    del out['CoordsColumns']
-
-
             if sub:
                 network = [f'../net/{sub[0]}_{app.DESC}_weights.json', f'../net/{sub[0]}_{app.DESC}_distances.json']
-
-            if 'ses-' in path:
-                params['ModelEq'] = '../../' + params['ModelEq']
-                params['ModelParam'] = '../../' + params['ModelParam']
-                params['SourceCode'] = '../../' + params['SourceCode']
-            else:
-                params['ModelEq'] = '../' + params['ModelEq']
-                params['ModelParam'] = '../' + params['ModelParam']
-                params['SourceCode'] = '../' + params['SourceCode']
 
             if network:
                 params['Network'] = network
@@ -629,10 +662,6 @@ def to_json(path, shape, desc, key, **kwargs):
 
     if 'Units' in out.keys():
         out['Units'] = 'ms'
-
-    # point coord files to nodes/labels TSV files instead
-    coord = COORDS if key != 'coord' else [COORDS[0].replace('json', 'tsv'), COORDS[1].replace('json', 'tsv')] \
-        if COORDS is not None else COORDS
 
     with open(path, 'w') as file:
         json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coord), file)
