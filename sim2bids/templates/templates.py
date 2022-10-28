@@ -1,11 +1,11 @@
-required = ['NumberOfRows', 'NumberOfColumns', 'CoordsRows', 'CoordsColumns', 'Description']
+required = ['NumberOfRows', 'NumberOfColumns', 'Description']
 
 file_desc = {
     # ====================================
     #             NETWORK FOLDER
     # ====================================
 
-    'weights': 'This is the SC representing the strength of connection between regions. Zeros represent unconnected '
+    'weights': 'This is the {}SC representing the strength of connection between regions. Zeros represent unconnected '
                'areas (nxn matrix).',
     'distances': 'These are the length of myelinated fibre tracts between regions (nxn matrix).',
     'delays': 'This is the matrix of time delays between regions in physical units, calculated by the following '
@@ -77,8 +77,8 @@ centres = {'multi-unique': ['These are the region labels which are the same for 
            }
 
 struct = {
-    'net': {'required': required, 'recommend': []},
-    'coord': {'required': ['Units'],
+    'net': {'required': required + ['CoordsRows', 'CoordsColumns'], 'recommend': []},
+    'coord': {'required': required + ['Units'],
               'recommend': ['AnatomicalLandmarkCoordinates', 'AnatomicalLandmarkCoordinateSystem',
                             'AnatomicalLandmarkCoordinateUnits',
                             'AnatomicalLandmarkCoordinateSystemDescription']},

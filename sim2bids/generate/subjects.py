@@ -6,14 +6,16 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+# import sim2bids
+
 from sim2bids.app import app
 from collections import OrderedDict
 import sim2bids.preprocess.preprocess as prep
 from sim2bids.convert import convert
 from sim2bids.app import utils
 
-
 GLOBAL_FILES = []
+
 
 # collect rhythms, speeds, and global coupling
 # RHYTHMS_PARAMS = dict(alpha=[], beta=[], gamma=[], delta=[], theta=[])
@@ -69,7 +71,10 @@ class Files:
             path = os.path.join(path, files[0])
             files = os.listdir(path)
 
-        # traverse multi-subject inputs
+        # ====================================================
+        #          TRAVERSE MULTI-SUBJECT INSTANCES
+        # ====================================================
+
         if app.MULTI_INPUT:
 
             # traverse multi-subject in one folder structure
@@ -81,9 +86,7 @@ class Files:
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
             else:
                 for file in files:
-                    sid = None
-                    if os.path.isdir(os.path.join(path, file)):
-                        sid = self.create_sid_sub()
+                    sid = self.get_sid(path, file)
 
                     # Step 5: get all content
                     if os.path.isdir(os.path.join(path, file)):
@@ -93,10 +96,12 @@ class Files:
 
                     # Step 6: traverse ses-preop if present
                     if 'ses-preop' in all_files:
+                        app.SESSIONS = True
                         self.save_sessions('ses-preop', all_files, sid, os.path.join(path, file))
 
                     # Step 7: traverse ses-postop if present
                     if 'ses-postop' in all_files:
+                        app.SESSIONS = True
                         self.save_sessions('ses-postop', all_files, sid, os.path.join(path, file))
 
                     if 'ses-preop' not in all_files and 'ses-postop' not in all_files:
@@ -113,6 +118,27 @@ class Files:
             if not self.ses_found:
                 self.create_sid_sub()
                 self.subs[sid] = prepare_subs(utils.get_content(path, files), sid)
+
+        # ==========================================
+        #               SAVE CLEAN SUBJECTS
+        # ==========================================
+
+        # create an empty dictionary to store clean subjects
+        subs = OrderedDict()
+
+        # iterate over created subjects and save only non-None instances
+        for k, v in self.subs.items():
+            if k:
+                subs[k] = v
+
+        self.subs = subs
+
+    def get_sid(self, path, file):
+        if os.path.isdir(os.path.join(path, file)):
+            if 'sub-' in file:
+                return file
+            else:
+                return self.create_sid_sub()
 
     def save_sessions(self, ses, files, sid, path):
         if ses in files:
@@ -228,8 +254,8 @@ def prepare_subs(file_paths, sid):
 
         # rename average_orientations to normals in both subject- and physical levels
         if 'orientation' in file_path or name == 'normal.txt':
-            new_path = file_path.replace('average_orientations', 'normals').\
-                                 replace('orientations', 'normals')
+            new_path = file_path.replace('average_orientations', 'normals'). \
+                replace('orientations', 'normals')
             os.replace(file_path, new_path)
             file_path = new_path
 
@@ -242,8 +268,13 @@ def prepare_subs(file_paths, sid):
                 os.remove(file_path)
                 continue
 
-            # name = os.path.basename(file_path).split('.')[0]
-            name = get_name(file_path)
+            if 'weights' in file_path:
+                if 'scthran' in file_path.lower():
+                    name = f'desc-SCthrAn_weights'
+                elif 'scnotthran' in file_path.lower():
+                    name = f'desc-SCnotthrAn_weights'
+            else:
+                name = get_name(file_path)
 
             subs[name] = {
                 'name': name,
@@ -385,7 +416,9 @@ def find_separator(path):
     except pd.errors.EmptyDataError:
         return 'remove'
     except pd.errors.ParserError:
-        print(path)
+        file = pd.DataFrame(np.loadtxt(path).tolist())
+        os.remove(path)
+        file.to_csv(path, header=None, index=None, sep='\t')
     else:
         # if cortical.txt, hemisphere.txt, or areas.txt are present, return '\n' delimiter
         if path.endswith('hemisphere.txt') or path.endswith('cortical.txt') or path.endswith('areas.txt') \
@@ -394,7 +427,7 @@ def find_separator(path):
             return '\n'
 
         # try with '\t'
-        trial =  pd.read_csv(path, header=None, sep='\t')
+        trial = pd.read_csv(path, header=None, sep='\t')
         if trial.shape[0] > 1 and trial.shape[1] > 1:
             return '\t'
 
