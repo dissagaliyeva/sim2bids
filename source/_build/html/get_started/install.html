@@ -105,6 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#get-the-package">Get the package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#provide-software-specific-information">Provide software-specific information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-the-app">Run the app</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#complete-script">Complete script</a></li>
 </ul>
 </li>
@@ -203,40 +204,81 @@
 <section id="provide-software-specific-information">
 <h3>Provide software-specific information<a class="headerlink" href="#provide-software-specific-information" title="Permalink to this heading"></a></h3>
 <p>This app aims to help you and future users reproduce the results of your simulations. Specify the required fields before
-running the app to make the process easier. The fields include:</p>
-<table class="docutils align-default" id="id1">
-<caption><span class="caption-text">Customizable fields</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
-<colgroup>
-<col style="width: 18.8%" />
-<col style="width: 31.2%" />
-<col style="width: 18.8%" />
-<col style="width: 31.2%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Field name</p></th>
-<th class="head"><p>Description</p></th>
-<th class="head"><p>Example</p></th>
-<th class="head"><p>Notes</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>MODEL_NAME</p></td>
-<td><p>Name of the model used in your simulation.</p></td>
-<td><p>app.MODEL_NAME = ‘ReducedWongWang’</p></td>
-<td><p>Currently accepted models: ReducedWongWang, HindmarshRose, and Generic2dOscillator. Please note that the fields <strong>are case-sensitive</strong>.</p></td>
-</tr>
-<tr class="row-odd"><td><p>MODEL_PARAMS</p></td>
-<td><p>Model parameters used in the code.</p></td>
-<td><p>app.MODEL_PARAMS = dict(G=np.arange(0.1, 2.0, 0.15), a=3.0)</p></td>
-<td><p>They are inferred from Python code with either no or one rhythm. Please see additional information if you have MATLAB/R code or multiple rhythms.</p></td>
-</tr>
-<tr class="row-even"><td><p>SoftwareVersion</p></td>
-<td><p>Version of the software you used (e.g, TheVirtualBrain)</p></td>
-<td><p>app.SoftwareVersion = 2.6</p></td>
-<td><p>Do not specify Python or any other programming language version.</p></td>
-</tr>
-</tbody>
-</table>
+running the app to make the process easier. Please note that the fields <strong>are case-sensitive</strong>:</p>
+<dl>
+<dt>MODEL_NAME</dt><dd><p>Name of the model used in your simulation. Currently accepted models: <em>ReducedWongWang</em>, <em>HindmarshRose</em>, and <em>Generic2dOscillator</em>. The models follow the same default values as specified in TheVirtualBrain.</p>
+<ul>
+<li><p><a class="reference external" href="https://docs.thevirtualbrain.org/api/tvb.contrib.scripts.models.html?highlight=reducedwongwang#module-tvb.contrib.scripts.models.reduced_wong_wang_exc_io">ReducedWongWang</a></p>
+<blockquote>
+<div><p>a=270.0, b=108.0, d=0.154, gamma=0.000641, tau_s=100.0, w=0.9, J_N=0.2609, I_o=0.3, G=2.0, sigma_noise=1.e-09, tau_rin=100</p>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://docs.thevirtualbrain.org/api/tvb.contrib.simulator.models.html?highlight=hindmarshrose#module-tvb.contrib.simulator.models.hindmarsh_rose">HindmarshRose</a></p>
+<blockquote>
+<div><p>r=0.001, a=1.0, b=3.0, c=1.0, d=5.0, s=1.0, x_1=-1.6</p>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://docs.thevirtualbrain.org/api/tvb.contrib.simulator.models.html?highlight=hindmarshrose#module-tvb.contrib.simulator.models.generic_2d_oscillator">Generic2dOscillator</a></p>
+<blockquote>
+<div><p>tau=1.25, a=1.05, b=0.2, omega=1.0, upsilon=1.0, gamma=1.0, eta=1.0</p>
+</div></blockquote>
+</li>
+</ul>
+<p><strong>Example</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">.</span><span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s1">&#39;ReducedWongWang&#39;</span>
+</pre></div>
+</div>
+</dd>
+<dt>MODEL_PARAMS</dt><dd><p>Model parameters used in the code. <strong>If you have a Python file with up to one rhythm, the app supplements parameters without assistance</strong>.</p>
+<p>Please manually specify model parameters if the code meets one of the following conditions:</p>
+<ul class="simple">
+<li><p>non-Python code (e.g., MATLAB, R, Julia)</p></li>
+<li><p>Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)</p></li>
+<li><p>Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15</p></li>
+</ul>
+<p>Example code for each cases above:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example 1: non-Python code</span>
+<span class="n">app</span><span class="o">.</span><span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s1">&#39;ReducedWongWang&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">MODEL_PARAMS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">3.</span><span class="p">,</span> <span class="n">G</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
+
+<span class="c1"># Example 2: Python code with more than one rhythm-specific parameters</span>
+<span class="n">app</span><span class="o">.</span><span class="n">MODEL_PARAMS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">3.</span><span class="p">),</span>
+                        <span class="n">delta</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">1.</span><span class="p">))</span>
+
+<span class="c1"># Example 3: Python code with a list of parameters</span>
+<span class="n">app</span><span class="o">.</span><span class="n">MODEL_PARAMS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">G</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>Here are some templates that you can use right after import statements. The list will keep getting updated as the app grows.</p>
+<dl>
+<dt><strong>TheVirtualBrain (TVB) users</strong></dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set required fields for current TVB version</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span> <span class="o">=</span> <span class="mf">2.6</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span> <span class="o">=</span> <span class="s1">&#39;TVB&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set required fields for older TVB versions, e.g. 1.5.10</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span> <span class="o">=</span> <span class="s1">&#39;1.5.10&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/the-virtual-brain/tvb-root/releases/tag/1.5.10&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span> <span class="o">=</span> <span class="s1">&#39;TVB&#39;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Please specify model parameters if your input code meets one of the following conditions:</p>
+<ul class="simple">
+<li><p>non-Python code (e.g., MATLAB, R, Julia)</p></li>
+<li><p>Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)</p></li>
+<li><p>Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15</p></li>
+</ul>
+</div>
+</section>
+<section id="run-the-app">
+<h3>Run the app<a class="headerlink" href="#run-the-app" title="Permalink to this heading"></a></h3>
 <p>There are two ways to run the app:</p>
 <dl>
 <dt><strong>Run locally</strong></dt><dd><p>When you run the app locally (=not on a server, cluster, or anything of the sort), the app creates a localhost page

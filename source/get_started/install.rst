@@ -36,50 +36,58 @@ Provide software-specific information
 =====================================
 
 This app aims to help you and future users reproduce the results of your simulations. Specify the required fields before
-running the app to make the process easier. The fields include:
+running the app to make the process easier. Please note that the fields **are case-sensitive**:
 
-.. list-table:: Customizable fields
-   :widths: 30 50 30 50
-   :header-rows: 1
+MODEL_NAME
+    Name of the model used in your simulation. Currently accepted models: *ReducedWongWang*, *HindmarshRose*, and *Generic2dOscillator*. The models follow the same default values as specified in TheVirtualBrain.
 
-   * - Field name
-     - Description
-     - Example
-     - Notes
-   * - MODEL_NAME
-     - Name of the model used in your simulation.
-     - app.MODEL_NAME = 'ReducedWongWang'
-     - Currently accepted models: ReducedWongWang, HindmarshRose, and Generic2dOscillator. Please note that the fields **are case-sensitive**.
-   * - MODEL_PARAMS
-     - Model parameters used in the code.
-     - app.MODEL_PARAMS = dict(G=np.arange(0.1, 2.0, 0.15), a=3.0)
-     - They are inferred from Python code with either no or one rhythm. Please see additional information if you have MATLAB/R code or multiple rhythms.
-   * - SoftwareVersion
-     - Version of the software you used (e.g, TheVirtualBrain)
-     - app.SoftwareVersion = 2.6
-     - Do not specify Python or any other programming language version.
+    * `ReducedWongWang <https://docs.thevirtualbrain.org/api/tvb.contrib.scripts.models.html?highlight=reducedwongwang#module-tvb.contrib.scripts.models.reduced_wong_wang_exc_io>`_
+
+        a=270.0, b=108.0, d=0.154, gamma=0.000641, tau_s=100.0, w=0.9, J_N=0.2609, I_o=0.3, G=2.0, sigma_noise=1.e-09, tau_rin=100
+
+    * `HindmarshRose <https://docs.thevirtualbrain.org/api/tvb.contrib.simulator.models.html?highlight=hindmarshrose#module-tvb.contrib.simulator.models.hindmarsh_rose>`_
+
+        r=0.001, a=1.0, b=3.0, c=1.0, d=5.0, s=1.0, x_1=-1.6
+
+    * `Generic2dOscillator <https://docs.thevirtualbrain.org/api/tvb.contrib.simulator.models.html?highlight=hindmarshrose#module-tvb.contrib.simulator.models.generic_2d_oscillator>`_
+
+        tau=1.25, a=1.05, b=0.2, omega=1.0, upsilon=1.0, gamma=1.0, eta=1.0
+
+    **Example**:
+
+    .. sourcecode:: python
+
+            app.MODEL_NAME = 'ReducedWongWang'
+
+MODEL_PARAMS
+    Model parameters used in the code. **If you have a Python file with up to one rhythm, the app supplements parameters without assistance**.
+
+    Please manually specify model parameters if the code meets one of the following conditions:
+
+    * non-Python code (e.g., MATLAB, R, Julia)
+
+    * Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)
+
+    * Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15
+
+    Example code for each cases above:
+
+    .. sourcecode:: python
+
+        # Example 1: non-Python code
+        app.MODEL_NAME = 'ReducedWongWang'
+        app.MODEL_PARAMS = dict(a=1., b=2., c=3., G=np.arange(0.1, 1., 0.15))
+
+        # Example 2: Python code with more than one rhythm-specific parameters
+        app.MODEL_PARAMS = dict(alpha=dict(a=1., b=3.),
+                                delta=dict(a=2., b=1.))
+
+        # Example 3: Python code with a list of parameters
+        app.MODEL_PARAMS = dict(G=np.arange(0.1, 1., 0.15))
 
 
 
 
-
-================   =============
-Name               Notes
-================   =============
-MODEL_NAME         Name of the model used in your simulation. Currently accepted models: ReducedWongWang, HindmarshRose, and Generic2dOscillator
-
-
-
-
-
-
-
-
-
-
-
-The main goal of data conversion is to include all information for reproducibility. Therefore, it's required to specify the software name,
-version, source code link. For the moment, we explicitly define these variables before starting the app.
 
 Here are some templates that you can use right after import statements. The list will keep getting updated as the app grows.
 
@@ -107,33 +115,6 @@ Here are some templates that you can use right after import statements. The list
     * Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)
 
     * Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15
-
-
-Currently, the app can traverse Python code for non-rhythmic parameters only. Supported models with default values as specified in TVB:
-
-* `ReducedWongWang <https://docs.thevirtualbrain.org/api/tvb.contrib.scripts.models.html?highlight=reducedwongwang#module-tvb.contrib.scripts.models.reduced_wong_wang_exc_io>`_
-
-
-
-* `HindmarshRose <https://docs.thevirtualbrain.org/api/tvb.contrib.simulator.models.html?highlight=hindmarshrose#module-tvb.contrib.simulator.models.hindmarsh_rose>`_
-
-* `Generic2dOscillator <https://docs.thevirtualbrain.org/api/tvb.contrib.simulator.models.html?highlight=hindmarshrose#module-tvb.contrib.simulator.models.generic_2d_oscillator>`_
-
-Please specify the parameters as in the examples below:
-
-.. sourcecode:: python
-
-    # Example 1: non-Python code
-    app.MODEL_NAME = 'ReducedWongWang'
-    app.MODEL_PARAMS = dict(a=1., b=2., c=3., G=np.arange(0.1, 1., 0.15))
-
-    # Example 2: Python code with more than one rhythm-specific parameters
-    app.MODEL_PARAMS = dict(alpha=dict(a=1., b=3.),
-                            delta=dict(a=2., b=1.))
-
-    # Example 3: Python code with a list of parameters
-    app.MODEL_PARAMS = dict(G=np.arange(0.1, 1., 0.15))
-
 
 Run the app
 ===========
