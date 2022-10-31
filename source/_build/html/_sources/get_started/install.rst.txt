@@ -38,7 +38,7 @@ Provide software-specific information
 This app aims to help you and future users reproduce the results of your simulations. Specify the required fields before
 running the app to make the process easier. Please note that the fields **are case-sensitive**:
 
-.. class:: custom_heading
+.. rst-class:: custom_heading
 
 MODEL_NAME
     Name of the model used in your simulation. Currently accepted models: *ReducedWongWang*, *HindmarshRose*, and *Generic2dOscillator*. The models follow the same default values as specified in TheVirtualBrain.
@@ -61,7 +61,7 @@ MODEL_NAME
 
             app.MODEL_NAME = 'ReducedWongWang'
 
-.. class:: custom_heading
+.. rst-class:: custom_heading
 
 MODEL_PARAMS
     Model parameters used in the code. **If you have a Python file with up to one rhythm, the app supplements parameters without assistance**.
