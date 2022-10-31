@@ -220,13 +220,19 @@ def prepare_subs(file_paths, sid):
             name = name.split('_')[0] + '.h5'
         else:
             name = name.split('.')[0]
-            # if 'bold' not in name or 'emp' not in name or 'times' not in name or 'orientation' not in name \
-            #     or 'weight' not in name:
-            #     name = name.split('_')[-2:] if '_' in name else name
+
         desc = app.DESC
 
         # get extensions
         ext = os.path.basename(file_path).split('.')[-1]
+
+        # check if file is a numpy array
+        if ext.endswith('npy'):
+            new_path = os.path.basename(file_path.replace(ext, '.txt'))
+            np.savetxt(os.path.join(os.path.dirname(file_path), new_path),
+                       np.load(file_path, allow_pickle=True))
+            os.remove(file_path)
+            file_path = new_path
 
         # check if file ends with CSV or dat, if true, change file
         # extension to plain TXT. It's necessary so that there's minimal
