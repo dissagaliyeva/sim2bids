@@ -9,7 +9,18 @@
   line-height: normal;
   background: #e7f2fa;
   color: #2980B9;
-  border-top: solid 3px #6ab0de;
   padding: 6px;
   position: relative;
 }
+
+/*.custom_heading {*/
+/*  display: table;*/
+/*  margin: 6px 0;*/
+/*  font-size: 90%;*/
+/*  line-height: normal;*/
+/*  background: #e7f2fa;*/
+/*  color: #2980B9;*/
+/*  border-top: solid 3px #6ab0de;*/
+/*  padding: 6px;*/
+/*  position: relative;*/
+/*}*/
