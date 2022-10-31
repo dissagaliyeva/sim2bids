@@ -28,6 +28,7 @@ Then, open up your notebook and import the following packages to set up the note
    import sim2bids
    import panel as pn
    from sim2bids.sim2bids import MainArea
+   from sim2bids.app import app
    pn.extension('tabulator', 'ace', 'jsoneditor', 'ipywidgets', sizing_mode='stretch_width', notifications=True)
 
 
@@ -35,26 +36,52 @@ Provide software-specific information
 =====================================
 
 The main goal of data conversion is to include all information for reproducibility. Therefore, it's required to specify the software name,
-version, and source code link. For the moment, we explicitly define these variables before starting the app.
+version, source code link. For the moment, we explicitly define these variables before starting the app.
 
 Here are some templates that you can use right after import statements. The list will keep getting updated as the app grows.
 
 **TheVirtualBrain (TVB) users**
   .. sourcecode:: python
 
-      # set required fields
-      sim2bids.app.app.SoftwareVersion = 2.6
-      sim2bids.app.app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6'
-      sim2bids.app.app.SoftwareName = 'TVB'
+      # set required fields for current TVB version
+      app.SoftwareVersion = 2.6
+      app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6'
+      app.SoftwareName = 'TVB'
 
 
-**MATLAB users**
   .. sourcecode:: python
 
-      # set required fields
-      sim2bids.app.app.SoftwareVersion = 'R2022b'
-      sim2bids.app.app.SoftwareRepository = 'https://www.mathworks.com'
-      sim2bids.app.app.SoftwareName = 'MATLAB'
+      # set required fields for older TVB versions, e.g. 1.5
+      app.SoftwareVersion = 2.6
+      app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/1.5.10'
+      app.SoftwareName = 'TVB'
+
+.. note::
+    Please specify model parameters if you meet one or more of the following conditions:
+    * non-Python code (e.g., MATLAB, R, Julia)
+    * Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)
+    * Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15
+
+    Currently, the app can traverse Python code for one rhythmic parameters only. Supported models with default values as specified in TVB:
+    * ReducedWongWang
+    * HindmarshRose
+    * Generic2dOscillator
+
+    This can be done with the following commands:
+
+    .. sourcecode:: python
+
+        # Example 1: non-Python code
+        app.MODEL_NAME = 'ReducedWongWang'
+        app.MODEL_PARAMS = dict(a=1., b=2., c=3., G=np.arange(0.1, 1., 0.15))
+
+        # Example 2: Python code with more than one rhythm-specific parameters
+        app.MODEL_PARAMS = dict(alpha=dict(a=1., b=3.),
+                                delta=dict(a=2., b=1.))
+
+        # Example 3: Python code with a list of parameters
+        app.MODEL_PARAMS = dict(G=np.arange(0.1, 1., 0.15))
+
 
 Run the app
 ===========

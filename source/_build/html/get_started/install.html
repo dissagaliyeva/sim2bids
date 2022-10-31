@@ -196,6 +196,7 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sim2bids</span>
 <span class="kn">import</span> <span class="nn">panel</span> <span class="k">as</span> <span class="nn">pn</span>
 <span class="kn">from</span> <span class="nn">sim2bids.sim2bids</span> <span class="kn">import</span> <span class="n">MainArea</span>
+<span class="kn">from</span> <span class="nn">sim2bids.app</span> <span class="kn">import</span> <span class="n">app</span>
 <span class="n">pn</span><span class="o">.</span><span class="n">extension</span><span class="p">(</span><span class="s1">&#39;tabulator&#39;</span><span class="p">,</span> <span class="s1">&#39;ace&#39;</span><span class="p">,</span> <span class="s1">&#39;jsoneditor&#39;</span><span class="p">,</span> <span class="s1">&#39;ipywidgets&#39;</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="s1">&#39;stretch_width&#39;</span><span class="p">,</span> <span class="n">notifications</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -203,24 +204,47 @@
 <section id="provide-software-specific-information">
 <h3>Provide software-specific information<a class="headerlink" href="#provide-software-specific-information" title="Permalink to this heading"></a></h3>
 <p>The main goal of data conversion is to include all information for reproducibility. Therefore, it’s required to specify the software name,
-version, and source code link. For the moment, we explicitly define these variables before starting the app.</p>
+version, source code link. For the moment, we explicitly define these variables before starting the app.</p>
 <p>Here are some templates that you can use right after import statements. The list will keep getting updated as the app grows.</p>
 <dl>
-<dt><strong>TheVirtualBrain (TVB) users</strong></dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set required fields</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span> <span class="o">=</span> <span class="mf">2.6</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6&#39;</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span> <span class="o">=</span> <span class="s1">&#39;TVB&#39;</span>
+<dt><strong>TheVirtualBrain (TVB) users</strong></dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set required fields for current TVB version</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span> <span class="o">=</span> <span class="mf">2.6</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/the-virtual-brain/tvb-root/releases/tag/2.6&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span> <span class="o">=</span> <span class="s1">&#39;TVB&#39;</span>
 </pre></div>
 </div>
-</dd>
-<dt><strong>MATLAB users</strong></dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set required fields</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span> <span class="o">=</span> <span class="s1">&#39;R2022b&#39;</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span> <span class="o">=</span> <span class="s1">&#39;https://www.mathworks.com&#39;</span>
-<span class="n">sim2bids</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span> <span class="o">=</span> <span class="s1">&#39;MATLAB&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set required fields for older TVB versions, e.g. 1.5</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareVersion</span> <span class="o">=</span> <span class="mf">2.6</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareRepository</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/the-virtual-brain/tvb-root/releases/tag/1.5.10&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">SoftwareName</span> <span class="o">=</span> <span class="s1">&#39;TVB&#39;</span>
 </pre></div>
 </div>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please specify model parameters if you meet one or more of the following conditions:
+* non-Python code (e.g., MATLAB, R, Julia)
+* Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)
+* Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15</p>
+<p>Currently, the app can traverse Python code for one rhythmic parameters only. Supported models with default values as specified in TVB:
+* ReducedWongWang
+* HindmarshRose
+* Generic2dOscillator</p>
+<p>This can be done with the following commands:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example 1: non-Python code</span>
+<span class="n">app</span><span class="o">.</span><span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s1">&#39;ReducedWongWang&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">MODEL_PARAMS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">3.</span><span class="p">,</span> <span class="n">G</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
+
+<span class="c1"># Example 2: Python code with more than one rhythm-specific parameters</span>
+<span class="n">app</span><span class="o">.</span><span class="n">MODEL_PARAMS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">3.</span><span class="p">),</span>
+                        <span class="n">delta</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">1.</span><span class="p">))</span>
+
+<span class="c1"># Example 3: Python code with a list of parameters</span>
+<span class="n">app</span><span class="o">.</span><span class="n">MODEL_PARAMS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">G</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
 </section>
 <section id="run-the-app">
 <h3>Run the app<a class="headerlink" href="#run-the-app" title="Permalink to this heading"></a></h3>
