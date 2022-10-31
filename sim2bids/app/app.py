@@ -143,7 +143,7 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if CODE:
             save_code()
 
-        supply_extra_files()
+        global_files.add_global_files()
         check_output()
         pn.state.notifications.success(f'{OUTPUT} folder is ready!')
 
@@ -185,7 +185,7 @@ def preprocess_input(path, input_files):
                 cspeed = cspeed[0].replace('speed_', '')
                 csf = re.findall(r'csf_[0-9\.]+', c)[0].replace('csf_', '')
 
-                path = os.path.join(root, f'cspeed{cspeed}')
+                path = os.path.join(root, f'{COND_SPEED}{cspeed}')
                 if not os.path.exists(path):
                     os.mkdir(path)
 
@@ -195,7 +195,6 @@ def preprocess_input(path, input_files):
 
                 # copy file
                 shutil.move(os.path.join(root, c), path)
-
 
 
 def save_params():
@@ -545,66 +544,66 @@ def check_output():
                     os.replace(os.path.join(path, file), os.path.join(path, file.replace(match, '').strip('_')))
 
 
-def supply_extra_files():
-    # add standard text to txt files in output folder's root level
-    files = ['CHANGES', 'README', 'dataset_description']
-
-    for file in files:
-        path = os.path.join(OUTPUT, file)
-
-        if not os.path.exists(path) and (not os.path.exists(path + '.txt') or not os.path.exists(path + '.json')):
-            if file != 'dataset_description':
-                desc = 'None so far.' if file == 'CHANGES' else f'Simulation output for {MODEL_NAME} model.'
-                with open(os.path.join(OUTPUT, file + '.txt'), 'w') as f:
-                    f.write(desc)
-            else:
-                with open(os.path.join(OUTPUT, file + '.json'), 'w') as f:
-                    description = OrderedDict()
-                    description.update({x: '' for x in temp.struct['dataset_description']['required']})
-                    description.update({x: '' for x in temp.struct['dataset_description']['recommend']})
-                    description['ReferencesAndLinks'] = []
-
-                    description['Name'] = DESC
-                    description['BIDSVersion'] = 1.7
-
-                    if SoftwareCode != 'MISSING':
-                        description['ReferencesAndLinks'].append(SoftwareCode)
-                    if SoftwareRepository:
-                        description['ReferencesAndLinks'].append(SoftwareRepository)
-
-                    json.dump(description, f)
-
-    # =============================================================================
-    #                         TAKE CARE OF THE PARTICIPANTS
-    # =============================================================================
-
-    if not os.path.exists(os.path.join(OUTPUT, 'participants.tsv')):
-        df = pd.DataFrame(columns=['participant_id', 'species', 'age', 'sex', 'handedness', 'strain', 'strain_rrid'],
-                          index=None)
-        files = os.listdir(OUTPUT)
-
-        for file in files:
-            if file.startswith('sub-'):
-                df = df.append({'participant_id': file}, ignore_index=True)
-                df.replace(np.NaN, 'n/a', inplace=True)
-
-        df.to_csv(os.path.join(OUTPUT, 'participants.tsv'), index=None, sep='\t')
-
-    else:
-        global_files.add_global_files()
-
-    # if not os.path.exists(os.path.join(OUTPUT, 'participants.json')):
-
-
-        # with open(os.path.join(OUTPUT, 'participants.json'), 'w') as f:
-        #     if MODEL_NAME:
-        #         json.dump({'Name': f'Simulation output for {MODEL_NAME} model.',
-        #                    'BIDSVersion': 1.7}, f)
-        #     elif MODEL_NAME is None and SoftwareVersion:
-        #         json.dump({'Name': 'Simulation output.',
-        #                    'Version': SoftwareVersion}, f)
-        #     else:
-        #         json.dump({'Name': 'Simulation output'}, f)
+# def supply_extra_files():
+#     # add standard text to txt files in output folder's root level
+#     files = ['CHANGES', 'README', 'dataset_description']
+#
+#     for file in files:
+#         path = os.path.join(OUTPUT, file)
+#
+#         if not os.path.exists(path) and (not os.path.exists(path + '.txt') or not os.path.exists(path + '.json')):
+#             if file != 'dataset_description':
+#                 desc = 'None so far.' if file == 'CHANGES' else f'Simulation output for {MODEL_NAME} model.'
+#                 with open(os.path.join(OUTPUT, file + '.txt'), 'w') as f:
+#                     f.write(desc)
+#             else:
+#                 with open(os.path.join(OUTPUT, file + '.json'), 'w') as f:
+#                     description = OrderedDict()
+#                     description.update({x: '' for x in temp.struct['dataset_description']['required']})
+#                     description.update({x: '' for x in temp.struct['dataset_description']['recommend']})
+#                     description['ReferencesAndLinks'] = []
+#
+#                     description['Name'] = DESC
+#                     description['BIDSVersion'] = 1.7
+#
+#                     if SoftwareCode != 'MISSING':
+#                         description['ReferencesAndLinks'].append(SoftwareCode)
+#                     if SoftwareRepository:
+#                         description['ReferencesAndLinks'].append(SoftwareRepository)
+#
+#                     json.dump(description, f)
+#
+#     # =============================================================================
+#     #                         TAKE CARE OF THE PARTICIPANTS
+#     # =============================================================================
+#
+#     if not os.path.exists(os.path.join(OUTPUT, 'participants.tsv')):
+#         df = pd.DataFrame(columns=['participant_id', 'species', 'age', 'sex', 'handedness', 'strain', 'strain_rrid'],
+#                           index=None)
+#         files = os.listdir(OUTPUT)
+#
+#         for file in files:
+#             if file.startswith('sub-'):
+#                 df = df.append({'participant_id': file}, ignore_index=True)
+#                 df.replace(np.NaN, 'n/a', inplace=True)
+#
+#         df.to_csv(os.path.join(OUTPUT, 'participants.tsv'), index=None, sep='\t')
+#
+#     else:
+#         global_files.add_global_files()
+#
+#     # if not os.path.exists(os.path.join(OUTPUT, 'participants.json')):
+#
+#
+#         # with open(os.path.join(OUTPUT, 'participants.json'), 'w') as f:
+#         #     if MODEL_NAME:
+#         #         json.dump({'Name': f'Simulation output for {MODEL_NAME} model.',
+#         #                    'BIDSVersion': 1.7}, f)
+#         #     elif MODEL_NAME is None and SoftwareVersion:
+#         #         json.dump({'Name': 'Simulation output.',
+#         #                    'Version': SoftwareVersion}, f)
+#         #     else:
+#         #         json.dump({'Name': 'Simulation output'}, f)
 
 
 # def check_json():
