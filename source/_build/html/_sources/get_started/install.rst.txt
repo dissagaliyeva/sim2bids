@@ -51,13 +51,13 @@ Here are some templates that you can use right after import statements. The list
 
   .. sourcecode:: python
 
-      # set required fields for older TVB versions, e.g. 1.5
-      app.SoftwareVersion = 2.6
+      # set required fields for older TVB versions, e.g. 1.5.10
+      app.SoftwareVersion = '1.5.10'
       app.SoftwareRepository = 'https://github.com/the-virtual-brain/tvb-root/releases/tag/1.5.10'
       app.SoftwareName = 'TVB'
 
-.. note::
-    Please specify model parameters if you meet one or more of the following conditions:
+.. warning::
+    Please specify model parameters if you meet one of the following conditions:
 
     * non-Python code (e.g., MATLAB, R, Julia)
 
@@ -65,28 +65,29 @@ Here are some templates that you can use right after import statements. The list
 
     * Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15
 
-    Currently, the app can traverse Python code for one rhythmic parameters only. Supported models with default values as specified in TVB:
 
-    * ReducedWongWang
+Currently, the app can traverse Python code for non-rhythmic parameters only. Supported models with default values as specified in TVB:
 
-    * HindmarshRose
+* `ReducedWongWang <https://docs.thevirtualbrain.org/api/tvb.contrib.scripts.models.html?highlight=reducedwongwang#module-tvb.contrib.scripts.models.reduced_wong_wang_exc_io>`_
 
-    * Generic2dOscillator
+* `HindmarshRose <https://docs.thevirtualbrain.org/api/tvb.contrib.simulator.models.html?highlight=hindmarshrose#module-tvb.contrib.simulator.models.hindmarsh_rose>`_
 
-    This can be done with the following commands:
+* `Generic2dOscillator <https://docs.thevirtualbrain.org/api/tvb.contrib.simulator.models.html?highlight=hindmarshrose#module-tvb.contrib.simulator.models.generic_2d_oscillator>`_
 
-    .. sourcecode:: python
+Please specify the parameters as in the examples below:
 
-        # Example 1: non-Python code
-        app.MODEL_NAME = 'ReducedWongWang'
-        app.MODEL_PARAMS = dict(a=1., b=2., c=3., G=np.arange(0.1, 1., 0.15))
+.. sourcecode:: python
 
-        # Example 2: Python code with more than one rhythm-specific parameters
-        app.MODEL_PARAMS = dict(alpha=dict(a=1., b=3.),
-                                delta=dict(a=2., b=1.))
+    # Example 1: non-Python code
+    app.MODEL_NAME = 'ReducedWongWang'
+    app.MODEL_PARAMS = dict(a=1., b=2., c=3., G=np.arange(0.1, 1., 0.15))
 
-        # Example 3: Python code with a list of parameters
-        app.MODEL_PARAMS = dict(G=np.arange(0.1, 1., 0.15))
+    # Example 2: Python code with more than one rhythm-specific parameters
+    app.MODEL_PARAMS = dict(alpha=dict(a=1., b=3.),
+                            delta=dict(a=2., b=1.))
+
+    # Example 3: Python code with a list of parameters
+    app.MODEL_PARAMS = dict(G=np.arange(0.1, 1., 0.15))
 
 
 Run the app
