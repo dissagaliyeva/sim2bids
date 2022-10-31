@@ -2,6 +2,7 @@ import json
 import os.path
 from collections import OrderedDict
 
+import numpy as np
 import pandas as pd
 
 from sim2bids.app import app
@@ -22,7 +23,7 @@ def add_global_files():
     write_file('CHANGES', FILE_DESCRIPTIONS['CHANGES'])
 
     # create README file if not present
-    if app.MODEL_NAME:
+    if app.MODEL_NAME is not None:
         write_file('README', FILE_DESCRIPTIONS['README'].format(f' for {app.MODEL_NAME} model'))
     else:
         write_file('README', FILE_DESCRIPTIONS['README'].format(''))
@@ -42,6 +43,18 @@ def add_global_files():
 
     # create participants.[tsv|json] file if not present
     check_participants()
+
+    if not os.path.exists(os.path.join(app.OUTPUT, 'participants.tsv')):
+        df = pd.DataFrame(columns=['participant_id', 'species', 'age', 'sex', 'handedness', 'strain', 'strain_rrid'],
+                          index=None)
+        files = os.listdir(app.OUTPUT)
+
+        for file in files:
+            if file.startswith('sub-'):
+                df = df.append({'participant_id': file}, ignore_index=True)
+                df.replace(np.NaN, 'n/a', inplace=True)
+
+        df.to_csv(os.path.join(app.OUTPUT, 'participants.tsv'), index=None, sep='\t')
 
 
 def write_file(file, content, use_json=False):
