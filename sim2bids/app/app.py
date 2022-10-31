@@ -15,11 +15,10 @@ import lems.api as lems
 import sim2bids.utils
 from sim2bids.generate import structure, subjects
 from sim2bids.preprocess import preprocess as prep
-from sim2bids.preprocess import prepare_inputs as prepare
 from sim2bids.convert import convert, mat
 from sim2bids.templates import templates as temp
 from sim2bids.app import utils
-from sim2bids.generate import models
+from sim2bids.generate import models, global_files
 
 # =========================================
 #        CUSTOMIZABLE WITH USER INPUT
@@ -140,15 +139,11 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
             # save conversions
             save_missing(path, files)
 
-        # if MODEL_NAME and MODEL_PARAMS:
-        #     models.set_params(MODEL_NAME, DESC, RHYTHMS, **MODEL_PARAMS)
-
         # save code
         if CODE:
             save_code()
 
         supply_extra_files()
-        # check_json()
         check_output()
         pn.state.notifications.success(f'{OUTPUT} folder is ready!')
 
@@ -579,20 +574,9 @@ def supply_extra_files():
 
                     json.dump(description, f)
 
-
-
-    # missing = [x.split('.')[0] for x in os.listdir(OUTPUT) if x.split('.')[0] in files]
-    # missed = lambda x: x.split('.')[0] in ['CHANGES', 'README', 'dataset_description']
-    # missing = [x for x in files if not missed(x) and not os.path.isdir(os.path.join(OUTPUT, x))]
-
-    # for idx, file in enumerate(missing):
-    #     if file != 'dataset_description':
-    #         desc = 'None so far.' if file == 'CHANGES' else f'Simulation output for {MODEL_NAME} model.'
-    #         with open(os.path.join(OUTPUT, file + '.txt'), 'w') as f:
-    #             f.write(desc)
-    #     else:
-    #         with open(os.path.join(OUTPUT, file + '.json'), 'w') as f:
-    #             json.dump({'BIDSVersion': SoftwareVersion}, f)
+    # =============================================================================
+    #                         TAKE CARE OF THE PARTICIPANTS
+    # =============================================================================
 
     if not os.path.exists(os.path.join(OUTPUT, 'participants.tsv')):
         df = pd.DataFrame(columns=['participant_id', 'species', 'age', 'sex', 'handedness', 'strain', 'strain_rrid'],
@@ -606,16 +590,21 @@ def supply_extra_files():
 
         df.to_csv(os.path.join(OUTPUT, 'participants.tsv'), index=None, sep='\t')
 
-    if not os.path.exists(os.path.join(OUTPUT, 'participants.json')):
-        with open(os.path.join(OUTPUT, 'participants.json'), 'w') as f:
-            if MODEL_NAME:
-                json.dump({'Name': f'Simulation output for {MODEL_NAME} model.',
-                           'BIDSVersion': 1.7}, f)
-            elif MODEL_NAME is None and SoftwareVersion:
-                json.dump({'Name': 'Simulation output.',
-                           'Version': SoftwareVersion}, f)
-            else:
-                json.dump({'Name': 'Simulation output'}, f)
+    else:
+        global_files.add_global_files()
+
+    # if not os.path.exists(os.path.join(OUTPUT, 'participants.json')):
+
+
+        # with open(os.path.join(OUTPUT, 'participants.json'), 'w') as f:
+        #     if MODEL_NAME:
+        #         json.dump({'Name': f'Simulation output for {MODEL_NAME} model.',
+        #                    'BIDSVersion': 1.7}, f)
+        #     elif MODEL_NAME is None and SoftwareVersion:
+        #         json.dump({'Name': 'Simulation output.',
+        #                    'Version': SoftwareVersion}, f)
+        #     else:
+        #         json.dump({'Name': 'Simulation output'}, f)
 
 
 # def check_json():
