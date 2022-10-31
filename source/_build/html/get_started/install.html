@@ -223,14 +223,18 @@ version, source code link. For the moment, we explicitly define these variables 
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Please specify model parameters if you meet one or more of the following conditions:
-* non-Python code (e.g., MATLAB, R, Julia)
-* Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)
-* Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15</p>
-<p>Currently, the app can traverse Python code for one rhythmic parameters only. Supported models with default values as specified in TVB:
-* ReducedWongWang
-* HindmarshRose
-* Generic2dOscillator</p>
+<p>Please specify model parameters if you meet one or more of the following conditions:</p>
+<ul class="simple">
+<li><p>non-Python code (e.g., MATLAB, R, Julia)</p></li>
+<li><p>Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)</p></li>
+<li><p>Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15</p></li>
+</ul>
+<p>Currently, the app can traverse Python code for one rhythmic parameters only. Supported models with default values as specified in TVB:</p>
+<ul class="simple">
+<li><p>ReducedWongWang</p></li>
+<li><p>HindmarshRose</p></li>
+<li><p>Generic2dOscillator</p></li>
+</ul>
 <p>This can be done with the following commands:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example 1: non-Python code</span>
 <span class="n">app</span><span class="o">.</span><span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s1">&#39;ReducedWongWang&#39;</span>

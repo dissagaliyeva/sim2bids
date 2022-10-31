@@ -58,13 +58,19 @@ Here are some templates that you can use right after import statements. The list
 
 .. note::
     Please specify model parameters if you meet one or more of the following conditions:
+
     * non-Python code (e.g., MATLAB, R, Julia)
+
     * Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)
+
     * Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15
 
     Currently, the app can traverse Python code for one rhythmic parameters only. Supported models with default values as specified in TVB:
+
     * ReducedWongWang
+
     * HindmarshRose
+
     * Generic2dOscillator
 
     This can be done with the following commands:
