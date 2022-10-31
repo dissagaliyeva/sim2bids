@@ -35,6 +35,49 @@ Then, open up your notebook and import the following packages to set up the note
 Provide software-specific information
 =====================================
 
+This app aims to help you and future users reproduce the results of your simulations. Specify the required fields before
+running the app to make the process easier. The fields include:
+
+.. list-table:: Customizable fields
+   :widths: 30 50 30 50
+   :header-rows: 1
+
+   * - Field name
+     - Description
+     - Example
+     - Notes
+   * - MODEL_NAME
+     - Name of the model used in your simulation.
+     - app.MODEL_NAME = 'ReducedWongWang'
+     - Currently accepted models: ReducedWongWang, HindmarshRose, and Generic2dOscillator. Please note that the fields **are case-sensitive**.
+   * - MODEL_PARAMS
+     - Model parameters used in the code.
+     - app.MODEL_PARAMS = dict(G=np.arange(0.1, 2.0, 0.15), a=3.0)
+     - They are inferred from Python code with either no or one rhythm. Please see additional information if you have MATLAB/R code or multiple rhythms.
+   * - SoftwareVersion
+     - Version of the software you used (e.g, TheVirtualBrain)
+     - app.SoftwareVersion = 2.6
+     - Do not specify Python or any other programming language version.
+
+
+
+
+
+================   =============
+Name               Notes
+================   =============
+MODEL_NAME         Name of the model used in your simulation. Currently accepted models: ReducedWongWang, HindmarshRose, and Generic2dOscillator
+
+
+
+
+
+
+
+
+
+
+
 The main goal of data conversion is to include all information for reproducibility. Therefore, it's required to specify the software name,
 version, source code link. For the moment, we explicitly define these variables before starting the app.
 
@@ -57,7 +100,7 @@ Here are some templates that you can use right after import statements. The list
       app.SoftwareName = 'TVB'
 
 .. warning::
-    Please specify model parameters if you meet one of the following conditions:
+    Please specify model parameters if your input code meets one of the following conditions:
 
     * non-Python code (e.g., MATLAB, R, Julia)
 
@@ -69,6 +112,8 @@ Here are some templates that you can use right after import statements. The list
 Currently, the app can traverse Python code for non-rhythmic parameters only. Supported models with default values as specified in TVB:
 
 * `ReducedWongWang <https://docs.thevirtualbrain.org/api/tvb.contrib.scripts.models.html?highlight=reducedwongwang#module-tvb.contrib.scripts.models.reduced_wong_wang_exc_io>`_
+
+
 
 * `HindmarshRose <https://docs.thevirtualbrain.org/api/tvb.contrib.simulator.models.html?highlight=hindmarshrose#module-tvb.contrib.simulator.models.hindmarsh_rose>`_
 
