@@ -29,14 +29,17 @@ def add_global_files():
         write_file('README', FILE_DESCRIPTIONS['README'].format(''))
 
     # create dataset_description file if not present
-    dataset = get_components('dataset_description')
+    dataset = OrderedDict()
     dataset['Name'] = app.DESC
     dataset['BIDSVersion'] = FILE_DESCRIPTIONS['BIDSVersion']
+    dataset['ReferencesAndLinks'] = []
 
     if app.SoftwareCode != 'MISSING':
         dataset['ReferencesAndLinks'].append(app.SoftwareCode)
     if app.SoftwareRepository:
         dataset['ReferencesAndLinks'].append(app.SoftwareRepository)
+    if app.SoftwareName == 'TVB':
+        dataset['ReferencesAndLinks'].append(f'tvb-framework-{app.SoftwareVersion}')
 
     # save participants file
     write_file('participants.json', dataset, use_json=True)

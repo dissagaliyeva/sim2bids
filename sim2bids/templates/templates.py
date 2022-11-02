@@ -77,8 +77,8 @@ centres = {'multi-unique': ['These are the region labels which are the same for 
            }
 
 struct = {
-    'net': {'required': required + ['CoordsRows', 'CoordsColumns'], 'recommend': []},
-    'coord': {'required': required + ['Units'],
+    'net': {'required': required, 'recommend': []},
+    'coord': {'required': required,
               'recommend': ['AnatomicalLandmarkCoordinates', 'AnatomicalLandmarkCoordinateSystem',
                             'AnatomicalLandmarkCoordinateUnits',
                             'AnatomicalLandmarkCoordinateSystemDescription']},
