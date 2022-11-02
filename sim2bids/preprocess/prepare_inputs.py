@@ -60,7 +60,6 @@ def transfer_files(content, matches, path, input_path):
             result = subjects.get_name(file)
 
             if isinstance(result, str):
-                print(os.path.join(input_path, str(sid), result + '.txt'), end='\n\n')
                 shutil.copy(file, os.path.join(input_path, str(sid), result + '.txt'))
 
     # transfer global files

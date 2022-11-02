@@ -80,8 +80,6 @@ def recursive_walk(path: str, basename: bool = False) -> list:
                     app.MODEL_NAME = 'G2DOS'
 
             # rename tract_lengths to distances
-            if 'tract_length' in files:
-                file = rename_tract_lengths(file)
 
             # save file name
             if basename:
@@ -173,7 +171,7 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 
         # check if it's among the accepted extensions
         if ext in app.ACCEPTED_EXT:
-            file = rename_tract_lengths(file_path)
+            file = file_path
 
             if basename:
                 # rename `tract_lengths` to `distances`
@@ -199,8 +197,8 @@ def find_rhythm(path):
             RHYTHMS[rhythm] = []
 
 
-def rename_tract_lengths(file: str) -> str:
-    return file.replace('tract_lengths', 'distances')
+# def rename_tract_lengths(file: str) -> str:
+#     return file.replace('tract_lengths', 'distances')
 
 
 def get_files():
