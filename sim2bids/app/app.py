@@ -4,6 +4,7 @@ import re
 import shutil
 from collections import OrderedDict
 from pathlib import Path
+from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd
@@ -12,6 +13,8 @@ import pylems_py2xml
 import lems.api as lems
 
 # import local packages
+import requests
+
 import sim2bids.utils
 from sim2bids.generate import structure, subjects
 from sim2bids.preprocess import preprocess as prep
@@ -105,18 +108,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     """
     global MODEL_NAME, INPUT, INPUT_TRANSFERRED
 
-    # preprocess_input(path, files)
-
-    # # call the preprocessing pipeline that standardizes the input folder
-    # result = prepare.preprocess(path, files, INPUT)
-    #
-    # if result is not None:
-    #     INPUT = result
-    #     INPUT_TRANSFERRED = True
-    #
-    # if isinstance(INPUT, str):
-    #     path, files = INPUT, os.listdir(INPUT)
-
     # whether to generate layout
     if layout:
         # if no subjects are passed, define them
@@ -141,6 +132,7 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 
         # save code
         if CODE:
+            utils.infer_model()
             save_code()
 
         global_files.add_global_files()
@@ -406,27 +398,44 @@ def save_code():
     -------
 
     """
-    global MODEL_NAME
 
-    model = None
+    utils.infer_model()
 
-    if MODEL_NAME and MODEL_PARAMS:
-        if MODEL_NAME == 'HindmarshRose':
-            model = 'hindmarsh_rose'
-        elif MODEL_NAME == 'ReducedWongWang':
-            model = 'reduced_wong_wang'
-        elif MODEL_NAME == 'Generic2dOscillator':
-            model = 'generic2doscillator'
+    path = 'https://github.com/the-virtual-brain/tvb-root/archive/refs/tags/{}.zip'
+
+    if SoftwareName == 'TVB':
+        if SoftwareVersion == 1.5:
+            path = path.replace(SoftwareVersion, '1.5.10')
+        elif SoftwareVersion:
+            path = path.format(str(SoftwareVersion))
+
+        req = requests.get(path)
+
+        if req.status_code == 200:
+            path = os.path.join(OUTPUT, 'code', f'tvb-framework-{SoftwareVersion}.zip')
+            with open(path, 'wb') as output:
+                output.write(req.content)
+            with ZipFile(path, 'r') as file:
+                file.extractall(path=os.path.join(OUTPUT, 'code'))
+
+            os.remove(path)
+            path = os.path.join(OUTPUT, 'code', f'tvb-root-{SoftwareVersion}')
+            os.rename(path, path.replace('root', 'framework'))
+
+        else:
+            pn.state.notifications.error('Please check the TVB version!', duration=5000)
 
     if isinstance(CODE, str) and CODE.endswith('.py'):
-        template, model = f'code.py', None
+        template = f'code.py'
         path = os.path.join(OUTPUT, 'code', template)
 
         shutil.copy(CODE, path)
         supply_dict('code', os.path.join(path.replace('py', 'json')))
 
-        if model:
-            models.set_params(model, DESC, MODEL_PARAMS)
+        if MODEL_PARAMS:
+            models.set_params(DESC, rhythm=None, **MODEL_PARAMS)
+        else:
+            models.set_params(DESC, rhythm=None)
 
     elif isinstance(CODE, list):
         for code in CODE:
@@ -439,8 +448,7 @@ def save_code():
             convert.to_json(os.path.join(OUTPUT, 'code', desc.replace(ext, 'json')), None,
                             temp.file_desc['code'], 'code')
 
-            if model:
-                models.set_params(model, DESC, None, **MODEL_PARAMS)
+            models.set_params(DESC, None, **MODEL_PARAMS)
 
 
 def transfer_xml():

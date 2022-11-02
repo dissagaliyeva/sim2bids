@@ -582,6 +582,8 @@ def to_json(path, shape, desc, key, **kwargs):
     """
     global NETWORK
 
+    print('file:', path)
+
     if key not in ['param', 'eq', 'code']:
         out = OrderedDict({x: '' for x in temp.required})
     else:
@@ -596,7 +598,7 @@ def to_json(path, shape, desc, key, **kwargs):
     # ===========================================================
     coord = None
 
-    if 'CoordsRows' in out.keys():
+    if 'CoordsRows' in out.keys() or key in ['wd', 'ts', 'spatial']:
         if app.SESSIONS and IGNORE_CENTRE:
             coord = ['../../../coord/nodes.json', '../../../coord/labels.json']
         elif app.SESSIONS and not IGNORE_CENTRE:
@@ -635,7 +637,7 @@ def to_json(path, shape, desc, key, **kwargs):
                     out['ModelParam'] = '../../param/param.xml'
 
         params = {
-            'SourceCode': app.SoftwareCode,
+            'SourceCode': f'/tvb-framework-{app.SoftwareVersion}' if app.SoftwareCode == 'MISSING' else app.SoftwareCode,
             'SoftwareVersion': app.SoftwareVersion if app.SoftwareVersion else None,
             'SoftwareRepository': app.SoftwareRepository if app.SoftwareRepository else None,
             'SourceCodeVersion': app.SoftwareVersion if app.SoftwareVersion else None,
@@ -661,7 +663,10 @@ def to_json(path, shape, desc, key, **kwargs):
                 out[k] = params[k]
 
     if 'Units' in out.keys():
-        out['Units'] = 'ms'
+        if key == 'wd' or key == 'coord':
+            out['Units'] = ''
+        else:
+            out['Units'] = 'ms'
 
     with open(path, 'w') as file:
         json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coord), file)
