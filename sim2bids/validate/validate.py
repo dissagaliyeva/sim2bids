@@ -50,36 +50,10 @@ def validate(unique_files, paths, input_path, input_files):
             elif value == 'skip':
                 remove_files(name, paths)
             else:
-                rename_files(name, value, ext, paths)
+                rename_files(name, value, paths)
 
-            # if subj.accepted(name):
-            #     # to_rename.append(value)
-            #
-            #     if verify_weights(name):
-            #         rename_files(name, value, paths)
-            # elif value == 'weights & nodes':
-            #     result = verify_weights_nodes(name, paths)
-            #
-            #     if isinstance(result, bool):
-            #         pass
-            #     elif isinstance(result, list):
-            #         extract_files(name, result[1], result[-1], paths)
-            #
-            # # if the selection's value is "skip", remove the file from input folder
-            # elif value == 'skip':
-            #     remove_files(name, paths)
-            # elif value == 'map':
-            #     if ext in ['csv', 'dat', 'txt']:
-            #         rename_files(name, 'map', paths)
-            # elif value == 'ts':
-            #     if ext in ['csv', 'dat', 'txt']:
-            #         rename_files(name, 'ts', paths)
-            # elif value == 'fc':
-            #     rename_files(name, 'fc', paths)
+    pn.state.notifications.success('Preprocessing finished!')
 
-    # let users know that files were successfully renamed
-    # if len(to_rename) == len(RENAMED):
-    #     pn.state.notifications.success('Renamed all files!')
 
 def rename_weights(name, ext, paths, input_path, input_files):
     """
@@ -113,6 +87,8 @@ def rename_weights(name, ext, paths, input_path, input_files):
                             os.rename(f, f.replace(name, f'weights_{name}'))
                         except FileExistsError:
                             return
+        else:
+            rename_files(name, 'weights', paths=paths)
 
 
 def get_files(paths, file_name, constraint, search1dir=False):
@@ -180,7 +156,7 @@ def get_nodes(arr: list) -> list:
     return all_nodes
 
 
-def rename_files(name, new_ext, ext, paths):
+def rename_files(name, new_ext, paths):
     global RENAMED
     new_ext = new_ext.replace('.', '').lower()
 

@@ -48,7 +48,6 @@ def transfer_files(content, matches, path, input_path):
         sid += 1
 
         files = get_files(content, match)
-        print('files, line 49:', files, end='\n\n')
 
         # create directory if doesn't exist
         p = os.path.join(input_path, str(sid))
@@ -56,13 +55,9 @@ def transfer_files(content, matches, path, input_path):
         if not os.path.exists(p):
             os.mkdir(p)
 
-
-
         for file in files:
             transferred.append(file)
             result = subjects.get_name(file)
-
-            print('result:', result)
 
             if isinstance(result, str):
                 print(os.path.join(input_path, str(sid), result + '.txt'), end='\n\n')
@@ -72,9 +67,7 @@ def transfer_files(content, matches, path, input_path):
     for file in list(set(content).difference(transferred)):
         shutil.copy(file, input_path)
 
-    print('all mat files:', mat_files)
     # extract content from matlab files
     for k, v in mat_files.items():
-        print('mat file:', k, v, end='\n\n')
         mat.save_mat(mat_files[k], os.path.dirname(mat_files[k]['path']), extract=True)
 
