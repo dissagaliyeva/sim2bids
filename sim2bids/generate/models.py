@@ -271,7 +271,6 @@ class CreateModel:
         # if there are multiple rhythms, raise a notification and error asking to
         # supplement values manually
         if len(self.rhythms) > 1 and app.MODEL_PARAMS is None:
-            print(self.rhythms)
             pn.state.notifications.error('Code contains multiple rhythms. Please specify values for each')
             return
 

@@ -126,9 +126,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 
         if MISSING:
             save_missing(path, MISSING)
-        else:
-            # save conversions
-            save_missing(path, files)
 
         # save code
         if CODE:

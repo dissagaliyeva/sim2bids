@@ -106,7 +106,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
     # check if centres should be ignored. If so, immediately break
     # the function. Otherwise, continue iteration.
-    if IGNORE_CENTRE and name == 'centres':
+    if IGNORE_CENTRE is True and name == 'centres' and os.path.exists(os.path.join(app.OUTPUT, 'coord', 'nodes.txt')):
         return
 
     # read file contents
@@ -135,7 +135,7 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             save_files(sub, folder, file, desc=desc, ftype='wd')
 
     # get folder location for centres
-    elif name == 'centres' and 'centres' in sub['name']:
+    elif name == 'centres':
         save_centres(sub, file, ses, folders)
 
     # get folder location for spatial
@@ -581,8 +581,6 @@ def to_json(path, shape, desc, key, **kwargs):
 
     """
     global NETWORK
-
-    print('file:', path)
 
     if key not in ['param', 'eq', 'code']:
         out = OrderedDict({x: '' for x in temp.required})

@@ -214,6 +214,8 @@ def prepare_subs(file_paths, sid):
             app.MISSING.append(file_path)
             continue
 
+        file_path = check_name(file_path)
+
         name = get_filename(file_path)
 
         if file_path.endswith('.h5'):
@@ -247,8 +249,6 @@ def prepare_subs(file_paths, sid):
                        np.load(file_path, allow_pickle=True))
             os.remove(file_path)
             file_path = new_path
-
-        file_path = check_name(file_path)
 
         if not file_path.endswith('txt'):
             continue
@@ -307,7 +307,7 @@ def check_name(path):
         new_path = path.replace(basename, 'normals.txt')
 
     if path != new_path:
-        os.renames(path, new_path)
+        os.rename(path, new_path)
 
     return new_path
 
