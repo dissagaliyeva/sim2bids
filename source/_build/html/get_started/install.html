@@ -203,8 +203,15 @@
 </section>
 <section id="provide-software-specific-information">
 <h3>Provide software-specific information<a class="headerlink" href="#provide-software-specific-information" title="Permalink to this heading"></a></h3>
-<p>This app aims to help you and future users reproduce the results of your simulations. Specify the required fields before
-running the app to make the process easier. Please note that the fields <strong>are case-sensitive</strong>:</p>
+<p>This app aims to help you and future users reproduce the results of your simulations. Specify the required fields before running
+the app to make the process easier. <strong>Please pay attention to these fields *only if* input code meets the following conditions</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>non-Python code (e.g., MATLAB, R, Julia)</p></li>
+<li><p>Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)</p></li>
+<li><p>Python code with a list of parameters, e.g., G values from 0.1 to 1.0 with a step of 0.15</p></li>
+</ul>
+</div></blockquote>
 <dl class="custom-heading">
 <dt>MODEL_NAME</dt><dd><p>Name of the model used in your simulation. Currently accepted models: <em>ReducedWongWang</em>, <em>HindmarshRose</em>, and <em>Generic2dOscillator</em>. The models follow the same default values as specified in TheVirtualBrain.</p>
 <ul>
@@ -232,12 +239,6 @@ running the app to make the process easier. Please note that the fields <strong>
 </dl>
 <dl class="custom-heading">
 <dt>MODEL_PARAMS</dt><dd><p>Model parameters used in the code. <strong>If you have a Python file with up to one rhythm, the app supplements parameters without assistance</strong>.</p>
-<p>Please manually specify model parameters if the code meets one of the following conditions:</p>
-<ul class="simple">
-<li><p>non-Python code (e.g., MATLAB, R, Julia)</p></li>
-<li><p>Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)</p></li>
-<li><p>Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15</p></li>
-</ul>
 <p>Example code for each cases above:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example 1: non-Python code</span>
 <span class="n">app</span><span class="o">.</span><span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s1">&#39;ReducedWongWang&#39;</span>

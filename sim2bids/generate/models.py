@@ -65,11 +65,11 @@ class NoCodeModel:
         # ==================================================================
 
         # COMMENT OUT THESE LINES OF CODE IF YOU'RE USING A LOCAL VERSION OF THE APP
-        self.xml_path = os.path.join(f'../sim2bids/models/{self.model_name}.xml')
+        # self.xml_path = os.path.join(f'../sim2bids/models/{self.model_name}.xml')
 
         # UNCOMMENT THESE LINES OF CODE IF YOU'RE USING LOCAL VERSION OF THE APP
-        # here = os.path.dirname(os.path.abspath(__file__))
-        # self.xml_path = os.path.join(here, 'models', self.model_name + '.xml')
+        here = os.path.dirname(os.path.abspath(__file__))
+        self.xml_path = os.path.join(here, 'models', self.model_name + '.xml')
 
         self.get_params()
 
@@ -118,8 +118,8 @@ class NoCodeModel:
                 self.save_params(k, v)
 
         if self.changed:
-            paths = [os.path.join(app.OUTPUT, 'param', f'desc-{app.DESC}_{self.rhythm}_param.xml'),
-                     os.path.join(app.OUTPUT, 'eq', f'desc-{app.DESC}_{self.rhythm}_eq.xml')]
+            paths = [os.path.join(app.OUTPUT, 'param', f'{self.rhythm}_param.xml'),
+                     os.path.join(app.OUTPUT, 'eq', f'{self.rhythm}_eq.xml')]
 
             # remove existing files
             for idx in range(len(paths)):
@@ -135,9 +135,9 @@ class NoCodeModel:
     def save_eq(self):
         # copy the default equations xml file
         if self.rhythm:
-            path = os.path.join(app.OUTPUT, 'eq', f'desc-{app.DESC}_{self.rhythm}_eq.xml')
+            path = os.path.join(app.OUTPUT, 'eq', f'{self.rhythm}_eq.xml')
         else:
-            path = os.path.join(app.OUTPUT, 'eq', f'desc-{app.DESC}_eq.xml')
+            path = os.path.join(app.OUTPUT, 'eq', f'eq.xml')
 
         if not os.path.exists(path):
             shutil.copy(self.xml_path, path)
@@ -256,6 +256,7 @@ class CreateModel:
         # check if multiple rhythms are present
         content = open_file(self.input_path)
         rhythms = list(set(re.findall(r'(alpha|beta|delta|gamma|theta)', content)))
+
 
         # if there are multiple rhythms, raise a notification and error asking to
         # supplement values manually

@@ -226,14 +226,6 @@ def prepare_subs(file_paths, sid):
         # get extensions
         ext = os.path.basename(file_path).split('.')[-1]
 
-        # check if file is a numpy array
-        if ext.endswith('npy'):
-            new_path = os.path.basename(file_path.replace(ext, '.txt'))
-            np.savetxt(os.path.join(os.path.dirname(file_path), new_path),
-                       np.load(file_path, allow_pickle=True))
-            os.remove(file_path)
-            file_path = new_path
-
         # check if file ends with CSV or dat, if true, change file
         # extension to plain TXT. It's necessary so that there's minimal
         # number of "if" statements in the future traversals
@@ -248,22 +240,15 @@ def prepare_subs(file_paths, sid):
                 # set the new path
                 file_path = new_path
 
-        # rename tract_lengths to distances
-        if name == 'tract_lengths.txt':
-            name = 'distances.txt'
-
-        # rename tract_lengths to distances in the physical folder location
-        if 'tract_lengths' in file_path:
-            new_path = file_path.replace('tract_lengths', 'distances')
-            os.replace(file_path, new_path)
+        # check if file is a numpy array
+        if ext.endswith('npy'):
+            new_path = os.path.basename(file_path.replace(ext, '.txt'))
+            np.savetxt(os.path.join(os.path.dirname(file_path), new_path),
+                       np.load(file_path, allow_pickle=True))
+            os.remove(file_path)
             file_path = new_path
 
-        # rename average_orientations to normals in both subject- and physical levels
-        if 'orientation' in file_path or name == 'normal.txt':
-            new_path = file_path.replace('average_orientations', 'normals'). \
-                replace('orientations', 'normals')
-            os.replace(file_path, new_path)
-            file_path = new_path
+        file_path = check_name(file_path)
 
         if not file_path.endswith('txt'):
             continue
@@ -310,6 +295,21 @@ def prepare_subs(file_paths, sid):
                     convert.NETWORK = list(set(convert.NETWORK))
 
     return subs
+
+
+def check_name(path):
+    basename = os.path.basename(path)
+    new_path = path
+
+    if 'tract_lengths' in basename:
+        new_path = path.replace(basename, 'distances.txt')
+    elif 'orientation' in basename:
+        new_path = path.replace(basename, 'normals.txt')
+
+    if path != new_path:
+        os.renames(path, new_path)
+
+    return new_path
 
 
 def get_name(path, return_rhythm=False):

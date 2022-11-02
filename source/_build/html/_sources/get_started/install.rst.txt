@@ -35,8 +35,14 @@ Then, open up your notebook and import the following packages to set up the note
 Provide software-specific information
 =====================================
 
-This app aims to help you and future users reproduce the results of your simulations. Specify the required fields before
-running the app to make the process easier. Please note that the fields **are case-sensitive**:
+This app aims to help you and future users reproduce the results of your simulations. Specify the required fields before running
+the app to make the process easier. **Please pay attention to these fields *only if* input code meets the following conditions**:
+
+    * non-Python code (e.g., MATLAB, R, Julia)
+
+    * Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)
+
+    * Python code with a list of parameters, e.g., G values from 0.1 to 1.0 with a step of 0.15
 
 .. rst-class:: custom_heading
 
@@ -65,14 +71,6 @@ MODEL_NAME
 
 MODEL_PARAMS
     Model parameters used in the code. **If you have a Python file with up to one rhythm, the app supplements parameters without assistance**.
-
-    Please manually specify model parameters if the code meets one of the following conditions:
-
-    * non-Python code (e.g., MATLAB, R, Julia)
-
-    * Python code with more than one rhythm-specific parameters (e.g., separate parameters for alpha and delta rhythms)
-
-    * Python code with a list of parameters (for parameter exploration), e.g., G values from 0.1 to 1.0 with a step of 0.15
 
     Example code for each cases above:
 
