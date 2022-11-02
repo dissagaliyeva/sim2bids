@@ -57,7 +57,7 @@ file_desc = {
     'noise': 'This is the noise time series (txn matrix).',
     'spikes': 'The is the sparse format for storing spikes (txn matrix).',
     'raster': 'This is the spike raster (txn matrix).',
-    'emp': 'This is the time series of the empirical data (txn matrix)',
+    'emp': 'This is the time series of the empirical data (txn matrix).',
     'events': 'This is the matrix of strings to annotate time series (txn matrix).',
 
     # ====================================

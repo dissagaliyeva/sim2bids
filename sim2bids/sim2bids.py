@@ -15,7 +15,7 @@ from sim2bids.validate import validate
 JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
 UNITS = ['s', 'm', 'ms', 'degrees', 'radians']
-OPTIONS = ['App 101', 'Preprocess data', 'Supported files', 'Functionality', 'BEP034']
+OPTIONS = ['App 101', 'Preprocess data', 'BEP034']
 REQUIRED = None
 AUTOFILL = True
 
@@ -54,10 +54,6 @@ class MainArea(param.Parameterized):
     checkbox_group = pn.widgets.CheckBoxGroup(value=['Traverse subfolders', 'Autocomplete columns'],
                                               options=checkbox_options,
                                               margin=(-20, 10, 0, 10))
-
-    # rhythms = pn.Column('#### Specify rhythms', pn.widgets.CheckBoxGroup(
-    #     value=[], options=['Alpha', 'Beta', 'Delta', 'Gamma', 'Theta'],
-    #     inline=True, margin=(-10, 0, 0, 10)))
 
     speed = pn.Column('#### Specify `conduction speed` folder name',
                       pn.widgets.TextInput(value=app.COND_SPEED, margin=(-10, 0, 0, 0)))
@@ -184,14 +180,16 @@ class MainArea(param.Parameterized):
             ('Select Files', pn.Column(pn.pane.Markdown(GET_STARTED),
                                        self.text_input,
                                        self.cross_select,
-                                       pn.Row(
-                                           pn.Param(self, parameters=['gen_struct'],
-                                                    show_name=False,
-                                                    widgets={'gen_struct': {'button_type': 'primary'}}),
-                                           pn.Param(self, parameters=['gen_btn'],
-                                                    show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}),
-                                           sizing_mode='stretch_width', margin=(50, 0, 0, 0)
-                                       ),
+                                       pn.Param(self, parameters=['gen_btn'],
+                                                show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}),
+                                       # pn.Row(
+                                       #     pn.Param(self, parameters=['gen_struct'],
+                                       #              show_name=False,
+                                       #              widgets={'gen_struct': {'button_type': 'primary'}}),
+                                       #     pn.Param(self, parameters=['gen_btn'],
+                                       #              show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}),
+                                       #     sizing_mode='stretch_width', margin=(50, 0, 0, 0)
+                                       # ),
                                        self.structure)),
             ('Preprocess Data', self.rename_files),
             ('View Results', ViewResults().view()),
@@ -201,22 +199,20 @@ class MainArea(param.Parameterized):
 
         sidebar = pn.Column(
             '## Settings',
-            '#### Provide input path',
-            self.input_path,
             '#### Provide output path',
             self.output_path,
-            '#### Provide short description (max 30 chars)',
-            self.desc,
-            '#### Select additional settings',
-            self.checkbox_group,
-            '#### Specify simulation information',
-            self.speed, self.global_coupling
+            # '#### Provide short description (max 30 chars)',
+            # self.desc,
+            # '#### Select additional settings',
+            # self.checkbox_group,
+            # # '#### Specify simulation information',
+            # self.speed, self.global_coupling
         )
 
         return pn.template.MaterialTemplate(
             title='Preprocess | Transform | Download',
-            sidebar=sidebar,
-            site='INCF',
+            # sidebar=sidebar,
+            site='sim2bids',
             main=main,
             header_background='#4488c4'
         )
@@ -312,9 +308,7 @@ class UserGuide(param.Parameterized):
         super().__init__(**params)
         self.map = {OPTIONS[0]: ug.how_to_use,
                     OPTIONS[1]: ug.preprocess,
-                    OPTIONS[2]: ug.supported,
-                    OPTIONS[3]: ug.functionality,
-                    OPTIONS[4]: ug.bep034}
+                    OPTIONS[-1]: ug.bep034}
         self.text = pn.widgets.StaticText(value=self.map[OPTIONS[0]])
 
     @pn.depends('user_guide.value', watch=True)
@@ -322,7 +316,7 @@ class UserGuide(param.Parameterized):
         self.text.value = self.map[self.user_guide.value]
 
     def view(self):
-        return pn.Column(self.user_guide, self.text, scroll=True, height=600)
+        return pn.Column(self.user_guide, self.text, scroll=True, height=800)
 
 
 def update_files(content):
