@@ -113,9 +113,10 @@ class NoCodeModel:
     def set_params(self):
         self.change_params()
 
-        for k, v in self.possible_params.items():
-            if not isinstance(v, float):
-                self.save_params(k, v)
+        if self.possible_params:
+            for k, v in self.possible_params.items():
+                if not isinstance(v, float):
+                    self.save_params(k, v)
 
         if self.changed:
             paths = [os.path.join(app.OUTPUT, 'param', f'{self.rhythm}_param.xml'),
