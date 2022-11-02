@@ -1,0 +1,2 @@
+oscilator = models.ReducedSetHindmarshRose(r=[0.006], a=[1.0], b=[3.0], c=[1.0], d=[5.0], s=[4.0], xo=[-1.6], K11=[0.5], K12=[0.1], K21=[0.15], sigma=[0.3], mu=[2.2], variables_of_interest=["xi","alpha"])
+oscilator.configure()
