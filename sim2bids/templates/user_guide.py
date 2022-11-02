@@ -1,4 +1,5 @@
 alt = """<br>
+<h2>How to use the app?</h2>
 Using the app was created to ease your computational simulation conversion! Before passing your files to the
 conversion tool, make sure to <strong>run the preprocessing pipeline beforehand</strong>. We know that manually
 renaming your files is too time-consuming and, let’s be honest, annoying! Please run the cell under "Preprocess data"
@@ -16,13 +17,13 @@ input folder to verify files exist.
 Select files you want to appert. You have three options:
 
 <center><h4>Go back one level and select the whole folder containing the files</h4></center>
-<center><img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/folder.gif" width="70%"/><br></center>
+<center><img src="https://raw.githubusercontent.com/dissagaliyeva/sim2bids/main/source/_static/user_guide/folder.gif" width="70%"/><br></center>
 
 <center><h4>Select all files one-by-one</h4></center>
-<center><img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/one-by-one.gif" width="70%"/><br></center>
+<center><img src="https://raw.githubusercontent.com/dissagaliyeva/sim2bids/main/source/_static/user_guide/one-by-one.gif" width="70%"/><br></center>
 
 <center><h4>Select-scroll the files</h4></center>
-<center><img src="https://raw.githubusercontent.com/dissagaliyeva/incf/main/static/user_guide/select-scroll.gif" width="70%"/><br></center>
+<center><img src="https://raw.githubusercontent.com/dissagaliyeva/sim2bids/main/source/_static/user_guide/select-scroll.gif" width="70%"/><br></center>
 
 <h3>Step 3: Check out preliminary results</h3>
 Check out the automatically generated folder structure. Don't worry, no files are generated at this stage.
@@ -33,35 +34,10 @@ structure as minimal as possible. For more information, check out "BEP034" above
 <h3>Step 4: Verify settings parameters </h3>
 There are several settings on the left-hand side that you might consider crucial. Here's the explanation of each:
 
-<ul>
-    <li><strong>Provide output path</strong></li>
+<strong>Provide output path</strong>
     By default, the app stores all conversion output in the local folder (on the same level as "requirements.txt"). In case
     you want to change the destination, simply provide a new path. If the folder doesn't exist, the app creates it ;)
 
-    <li><strong>Provide a short description (max 30 chars)</strong></li>
-    Here you can give the description to your files that will distinguish each simulation; it will be used in all of
-    the files! For example, if you leave the description as "default", the files are going to look like this:
-    <pre><code>
-    |__ 1/
-        |__ coord/
-            |__ sub-01_desc-default_areas.json
-            |__ sub-01_desc-default_areas.tsv
-            .
-            .
-            .
-    </code></pre>
-
-    <li><strong>Select additional settings</strong></li>
-    <ul>
-        <li><strong>Traverse folders</strong></li>
-        By default, all folders get traversed. For example, if you pass in a folder that has sub-folders, the app
-        traverses the sub-folders as well. If you don't want that behavior, simply click on the checkbox.
-        <li><strong>Autocomplete columns</strong></li>
-        After file conversion, you will be able to see the generated JSON and TSV files in the "View Results" tab.
-        If you specify the REQUIRED or RECOMMENDED fields, say, for "weights", then all the other "weights"
-        files will inherit the same information. Columns "NumberOfRows" and "NumberOfColumns" won't be affected.
-    </ul>
-</ul>
 
 <h3>Step 5: Generate the files! </h3>
 If you’re happy with the possible structure and sure about the settings, click "Generate Files" button.
@@ -74,7 +50,122 @@ If you’re happy with the possible structure and sure about the settings, click
 
 how_to_use = alt
 
-preprocess = alt
+preprocess = """
+<h2>Preprocessing pipeline</h2>
+
+Since we name our files differently (and not always perfectly), the app simplifies the process by letting you click on
+existing variations the app supports. There's an option to skip the file as well! If you do select such an option,
+<strong>beware that they will be deleted!</strong>
+
+<h3>How to use the preprocessing pipeline</h3>
+<ul>
+    <li>First, select the folder you want to convert. <strong>Do not press on <code>Generate Files</code> button yet!</strong></li>
+    <li>Go to <code>Preprocess Data</code> tab. You should see a list of files ready to be renamed. Select what the accepted file structure from the list. </li>
+    <li>Once you're done, click on `Rename Files` button.</li>
+</ul>
+
+You can now check out the results in your folder. 
+
+<h3>Accepted files</h3>
+
+Here's the list of accepted files that the app understands:
+
+<strong>Network (<code>net</code> folder)</strong>
+<ul>
+<li>weights (<strong>REQUIRED</strong>)</li>
+This is the SC representing the strength of the connection between regions. Zeros represent unconnected areas (nxn matrix).
+<li>distances (RECOMMENDED)</li>
+These are the length of myelinated fibre tracts between regions in mm (nxn matrix).
+<li>delays (OPTIONAL)</li>
+This is the matrix of time delays between regions in physical units, calculated by the following formula: delays = distances / speed (nxn matrix).      
+<li>speeds (OPTIONAL)</li>
+This is a single number or matrix of conduction speeds for the myelinated fibre tracts between regions (nxn matrix). 
+</ul>
+
+<strong>Coordinates (<code>coord</code> folder)</strong>
+<ul>
+<li>centres (RECOMMENDED)</li>
+NOTE: consists of nodes (nx1 vector) and labels (nx3 matrix) in that order. 
+    <ul>
+        <li>nodes</li>
+            These are the region labels (e.g., lh_bankssts, lh_superiorfrontal) (nx1 vector).
+        <li>labels</li>
+            These are the 3d coordinate centres (nx3 matrix). 
+    </ul> 
+<li>times (RECOMMENDED)</li>
+These are the time steps of the simulated time series (nx1 vector).
+<li>bold_times (RECOMMENDED)</li>
+These are the time steps of the simulated BOLD time series (nx1 vector).
+<li>areas (OPTIONAL)</li>
+This is the estimated vector each region's area in mm^2 (nx1 vector).
+<li>cortical (OPTIONAL)</li>
+This is the vector that distinguishes cortical (1) from subcortical (0) regions (nx1 vector).
+<li>normals (OPTIONAL)</li>
+These are the average orientation of the region represented in the connectivity matrix (nx3 matrix).
+<li>hemisphere (OPTIONAL)</li>
+The vector that distinguishes right (1) from left (0) hemisphere (nx1 vector).
+<li>faces (OPTIONAL)</li>
+These are the faces of cortex surface triangulation.
+<li>vertices (OPTIONAL)</li>
+These are the vertices of cortex surface triangulation.
+<li>map (OPTIONAL)</li>
+This is the nxm matrix where the coordinates along rows are mapped to the coordinates along columns.
+<li>vnormals (OPTIONAL)</li>
+These are the vertices pf cortex surface triangulation (nx3 matrix).
+<li>fnormals (OPTIONAL)</li>
+These are the indices of face vertices (nx3 matrix).
+<li>sensors (OPTIONAL)</li>
+These are the cartesian coordinates of the sensors (nx3 matrix).
+<li>conv (OPTIONAL)</li>
+This is a projection matrix that is like a map bt applied as a convolution matrix.
+<li>volumes (OPTIONAL)</li>
+These are the spaces enclosed by 3d objects in m^3 (nx1 vector).
+<li>cartesian2d (OPTIONAL)</li>
+These are the generic 2D Cartesian coordinates (nx2 matrix).
+<li>cartesian3d (OPTIONAL)</li>
+These are the generic 3D Cartesian coordinates (nx3 matrix).
+<li>polar2d (OPTIONAL)</li>
+These are the generic 2D Polar coordinates (nx2 matrix).
+<li>polar3d (OPTIONAL)</li>
+These are the generic 3D Polar coordinates (nx3 matrix).
+</ul>
+
+<strong>Spatial (<code>spatial</code> folder)</strong>
+<ul>
+<li>emp_fc (RECOMMENDED)</li>
+This is the empirical FC matrix.
+<li>fc (RECOMMENDED)</li>
+This is the simulated FC matrix.
+<li>map (OPTIONAL)</li>
+These are the values projected to onto the surface, volumes or network graphs (nxm matrix).
+</ul>
+
+<strong>Time series (<code>ts</code> folder)</strong>
+<ul>
+<li>ts (RECOMMENDED)</li>
+This is the time series (txn matrix).
+<li>bold_ts (RECOMMENDED)</li>
+This is the time series with BOLD monitor (txn matrix).
+<li>hrf (OPTIONAL)</li>
+These are hemodynamic response functions (HRF). The neural time series are multiplied with a HRF in order to predict fMRI time series.
+<li>vars (OPTIONAL)</li>
+This is a (stable) variable time series (txn matrix).
+<li>stimuli (OPTIONAL)</li>
+This is a stimulation time series (txn matrix).
+<li>noise (OPTIONAL)</li>
+This is the noise time series (txn matrix).
+<li>spikes (OPTIONAL)</li>
+The is the sparse format for storing spikes (txn matrix).
+<li>raster (OPTIONAL)</li>
+This is the spike raster (txn matrix).
+<li>emp (OPTIONAL)</li>
+This is the time series of the empirical data (txn matrix).
+<li>events (OPTIONAL)</li>
+This is the matrix of strings to annotate time series (txn matrix).
+</ul>
+
+
+"""
 
 supported = alt
 
@@ -83,9 +174,6 @@ functionality = alt
 bep034 = """
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
-
-
-
                 <h1 id="computational-models"><a class="toclink" href="http://127.0.0.1:8000/en/stable/04-modality-specific-files/10-computational-models.html#computational-models">Computational Models</a></h1>
 <p>Support for computational models was developed as a
 <a href="https://docs.google.com/document/d/1NT1ERdL41oz3NibIFRyVQ2iR8xH-dKY-lRCB4eyVeRo/edit#heading=h.mqkmyp254xh6">BIDS Extension Proposal</a>. </p>
