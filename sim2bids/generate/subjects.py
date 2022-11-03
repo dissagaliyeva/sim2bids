@@ -228,6 +228,15 @@ def prepare_subs(file_paths, sid):
         # get extensions
         ext = os.path.basename(file_path).split('.')[-1]
 
+        # check if file is a numpy array
+        if ext.endswith('npy'):
+            new_path = os.path.basename(file_path.replace(ext, 'txt'))
+            file = np.load(file_path)
+            np.savetxt(os.path.join(os.path.dirname(file_path), new_path), file)
+            os.remove(file_path)
+
+            file_path = check_name(os.path.join(os.path.dirname(file_path), new_path))
+
         # check if file ends with CSV or dat, if true, change file
         # extension to plain TXT. It's necessary so that there's minimal
         # number of "if" statements in the future traversals
@@ -241,14 +250,6 @@ def prepare_subs(file_paths, sid):
 
                 # set the new path
                 file_path = new_path
-
-        # check if file is a numpy array
-        if ext.endswith('npy'):
-            new_path = os.path.basename(file_path.replace(ext, '.txt'))
-            np.savetxt(os.path.join(os.path.dirname(file_path), new_path),
-                       np.load(file_path, allow_pickle=True))
-            os.remove(file_path)
-            file_path = new_path
 
         if not file_path.endswith('txt'):
             continue

@@ -9,7 +9,17 @@ import sim2bids.preprocess.preprocess as prep
 import sim2bids.templates.templates as temp
 from sim2bids import sim2bids
 from sim2bids.convert import convert
+from sim2bids.generate import subjects
 
+
+def get_all_files(new_files, old_files, path):
+    all_files = new_files
+
+    for file in old_files:
+        if subjects.accepted(file):
+            all_files.append(os.path.join(path, file))
+
+    return all_files
 
 def reset_values():
     prep.reset_index()

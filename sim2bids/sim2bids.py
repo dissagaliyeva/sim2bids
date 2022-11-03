@@ -97,6 +97,8 @@ class MainArea(param.Parameterized):
             self.to_rename_path = []
             self.structure.value = []
             self.rename_files = pn.WidgetBox()
+            self.to_rename = None
+            self.to_rename_path = None
 
         if len(selected) > 0:
             # check files for preprocessing step
@@ -104,6 +106,7 @@ class MainArea(param.Parameterized):
             path = self.text_input.value
             app.preprocess_input(path, selected)
             self.to_rename = validate.filter(app_utils.get_content(path, selected, basename=True))
+            print(self.to_rename)
             self.to_rename_path = validate.filter(app_utils.get_content(path, selected), self.to_rename)
 
             if len(self.to_rename) > len(self.rename_files) + 1:
@@ -116,8 +119,13 @@ class MainArea(param.Parameterized):
             self.length = len(selected)
 
     def _generate_files(self, event=None):
-        _ = app.main(path=self.text_input.value, files=self.cross_select.value,
-                          subs=self.subjects, save=True, layout=True)
+        if validate.IS_RENAMED:
+            _ = app.main(path=self.text_input.value,
+                         files=utils.get_all_files(validate.RENAMED, self.cross_select.value, self.text_input.value),
+                         subs=self.subjects, save=True, layout=True)
+        else:
+            _ = app.main(path=self.text_input.value, files=self.cross_select.value,
+                              subs=self.subjects, save=True, layout=True)
         app.ALL_FILES = None
         utils.reset_values()
 
@@ -167,8 +175,10 @@ class MainArea(param.Parameterized):
             app.OUTPUT = output
 
     def _rename(self, event=None):
-
         validate.validate(self.rename_files, self.to_rename_path, self.text_input.value, self.cross_select.value)
+        self.rename_files = pn.WidgetBox()
+        self.to_rename = None
+        self.to_rename_path = None
 
     @pn.depends('desc.value', watch=True)
     def _change_desc(self):
