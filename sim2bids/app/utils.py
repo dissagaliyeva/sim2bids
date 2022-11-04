@@ -262,14 +262,15 @@ def get_model():
 
 
 def infer_model():
-    content = gen_utils.open_file(app.CODE)
-    model = re.findall(r'(?:hindmarsh|wongwang|oscillator)', ''.join(content), flags=re.IGNORECASE)
+    if isinstance(app.CODE, str):
+        content = gen_utils.open_file(app.CODE)
+        model = re.findall(r'(?:hindmarsh|wongwang|oscillator)', ''.join(content), flags=re.IGNORECASE)
 
-    if model:
-        model = model[0].lower()
-        if 'hindmarsh' in model:
-            app.MODEL_NAME = 'HindmarshRose'
-        elif 'wongwang' in model:
-            app.MODEL_NAME = 'ReducedWongWang'
-        elif 'oscillator' in model:
-            app.MODEL_NAME = 'Generic2dOscillator'
+        if model:
+            model = model[0].lower()
+            if 'hindmarsh' in model:
+                app.MODEL_NAME = 'HindmarshRose'
+            elif 'wongwang' in model:
+                app.MODEL_NAME = 'ReducedWongWang'
+            elif 'oscillator' in model:
+                app.MODEL_NAME = 'Generic2dOscillator'

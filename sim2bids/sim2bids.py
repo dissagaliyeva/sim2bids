@@ -121,7 +121,8 @@ class MainArea(param.Parameterized):
     def _generate_files(self, event=None):
         if validate.IS_RENAMED:
             _ = app.main(path=self.text_input.value,
-                         files=utils.get_all_files(validate.RENAMED, self.cross_select.value, self.text_input.value),
+                         files=validate.RENAMED,
+                         # files=utils.get_all_files(validate.RENAMED, self.cross_select.value, self.text_input.value),
                          subs=self.subjects, save=True, layout=True)
         else:
             _ = app.main(path=self.text_input.value, files=self.cross_select.value,

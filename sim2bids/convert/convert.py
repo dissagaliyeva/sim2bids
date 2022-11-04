@@ -17,6 +17,10 @@ COORD_TEMPLATE = '{}.{}'
 # for all files. In that case, store only one copy of the files
 # (json, tsv) in the main 'coord' folder, in the global scope
 IGNORE_CENTRE = False
+IGNORE_AREAS = False
+IGNORE_CORTICAL = False
+IGNORE_HEMISPHERE = False
+IGNORE_NORMALS = False
 
 # location of coord files (nodes and labels) in the scope of
 # converted files. This information is used to supplement JSON
@@ -99,10 +103,10 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event', 'emp'     # Timeseries (ts)
             'fc'                                                                    # Spatial (spatial)
     """
-    global IGNORE_CENTRE
+    global IGNORE_CENTRE, IGNORE_CORTICAL, IGNORE_AREAS, IGNORE_NORMALS, IGNORE_HEMISPHERE
 
-    if name == 'centres' and sub['name'] != 'centres':
-        name = 'coord'
+    # if name == 'centres' and sub['name'] not in ['nodes', 'labels']:
+    #     name = 'coord'
 
     # check if centres should be ignored. If so, immediately break
     # the function. Otherwise, continue iteration.
@@ -166,12 +170,15 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
     # get folder location for coordinates
     elif name == 'coord':
         # check nodes
-        if 'nodes' in sub['name'] and not IGNORE_CENTRE:
+        if ('nodes' in sub['name'] or 'labels' in sub['name']) and not IGNORE_CENTRE:
             if 'content' in sub.keys():
                 save_centres(sub, sub['content'], ses, folders, centre_name='nodes')
             else:
                 save_centres(sub, file, ses, folders, centre_name='nodes')
         else:
+            # set naming convention needed for conversion
+            type_ = 'default'
+
             # set appropriate output path depending on session and subject types
             if ses is not None:
                 folder = folders[4]
@@ -180,40 +187,94 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             else:
                 folder = os.path.join(app.OUTPUT, 'coord')
 
-            if 'content' in sub.keys():
-                save_files(sub, folder, file, type='default', centres=True)
+            # check contents of areas
+            if 'areas' in sub['path']:
+                if IGNORE_AREAS is True:
+                    return
+                IGNORE_AREAS = check_file('areas', sub, folder, file)
+
+            # check contents of cortical
+            elif 'cortical' in sub['path']:
+                if IGNORE_CORTICAL is True:
+                    return
+                IGNORE_CORTICAL = check_file('cortical', sub, folder, file)
+
+            # check contents of cortical
+            elif 'normals' in sub['path']:
+                if IGNORE_NORMALS is True:
+                    return
+                IGNORE_NORMALS = check_file('normals', sub, folder, file)
+
+            # check contents of cortical
+            elif 'hemisphere' in sub['path']:
+                if IGNORE_HEMISPHERE is True:
+                    return
+                IGNORE_HEMISPHERE = check_file('hemisphere', sub, folder, file)
             else:
-                # save conversion results
-                if 'centres' in sub['fname']:
-                    if IGNORE_CENTRE or not app.MULTI_INPUT:
-                        save_files(sub, folder, file, type='other', centres=True, desc=temp.centres['single'])
-                    else:
-                        save_files(sub, folder, file, type='default', centres=True, desc=temp.centres['multi-unique'])
+                accepted = subjects.get_name(sub['name'], True)
+
+                if app.SESSIONS:
+                    save_files(sub, folder, file, type='default', desc=temp.file_desc[accepted])
+                # elif IGNORE_CENTRE and 'ses' not in folder and app.SESSIONS is None:
+                elif IGNORE_CENTRE and not app.SESSIONS:
+                    save_files(sub, folder, file, type='other', desc=temp.file_desc[accepted])
                 else:
-                    accepted = subjects.get_name(sub['name'], True)
-                    if IGNORE_CENTRE and 'ses' in folder:
-                        save_files(sub, folder, file, type='default', desc=temp.file_desc[accepted])
-                    elif IGNORE_CENTRE and 'ses' not in folder and app.SESSIONS:
-                        save_files(sub, folder, file, type='other', desc=temp.file_desc[accepted])
+                    accepted = subjects.get_name(sub['name'])
+
+                    if IGNORE_CENTRE and 'sub' in folder:
+                        type_ = 'default'
                     else:
-                        accepted = subjects.get_name(sub['name'])
+                        type_ = 'coord'
 
-                        if IGNORE_CENTRE and 'sub' in folder:
-                            type_ = 'default'
-                        else:
-                            type_ = 'coord'
+                    save_files(sub, folder, file, type=type_, desc=temp.file_desc[accepted])
 
-                        save_files(sub, folder, file, type=type_, desc=temp.file_desc[accepted])
+
+            #
+            # if 'content' in sub.keys():
+            #     save_files(sub, folder, file, type='default', centres=True)
+            # else:
+            #     if sub['name'] in ['nodes', 'labels']:
+            #         save_centres(sub, file, ses, folders)
+            #
+            #     # save conversion results
+            #     if 'centres' in sub['fname']:
+            #         if IGNORE_CENTRE or not app.MULTI_INPUT:
+            #             save_files(sub, folder, file, type='other', centres=True, desc=temp.centres['single'])
+            #         else:
+            #             save_files(sub, folder, file, type='default', centres=True, desc=temp.centres['multi-unique'])
+            #     else:
+            #         accepted = subjects.get_name(sub['name'], True)
+            #
+            #         if app.SESSIONS:
+            #             save_files(sub, folder, file, type='default', desc=temp.file_desc[accepted])
+            #         # elif IGNORE_CENTRE and 'ses' not in folder and app.SESSIONS is None:
+            #         elif IGNORE_CENTRE and not app.SESSIONS:
+            #             save_files(sub, folder, file, type='other', desc=temp.file_desc[accepted])
+            #         else:
+            #             accepted = subjects.get_name(sub['name'])
+            #
+            #             if IGNORE_CENTRE and 'sub' in folder:
+            #                 type_ = 'default'
+            #             else:
+            #                 type_ = 'coord'
+            #
+            #             save_files(sub, folder, file, type=type_, desc=temp.file_desc[accepted])
+
+
+def check_file(name, sub, folder, file):
+    if check_coords(name):
+        save_files(sub, os.path.join(app.OUTPUT, 'coord'), file, type='other', desc=temp.file_desc[name])
+        return True
+
+    save_files(sub, folder, file, type='default', desc=temp.file_desc[name])
+    return False
 
 
 def save_centres(sub, file, ses, folders, centre_name='centres'):
     global IGNORE_CENTRE
 
-    if sub['name'] != 'centres':
-        save(sub, folders, ses, 'coord')
-
     # check if all centres are of the same content
-    if check_centres(name=centre_name):
+    if check_coords(name=centre_name):
         # ignore preceding centres files
         IGNORE_CENTRE = True
 
@@ -340,7 +401,7 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
             to_tsv(tsv_file, content)
 
 
-def check_centres(name='centres'):
+def check_coords(name='centres'):
     """
     This function checks all centres files in the input folder and
     decides whether they have the same content or not. The logic of
@@ -354,34 +415,21 @@ def check_centres(name='centres'):
     """
 
     # get all centres files
-    centres = get_specific(name)
+    files = get_specific(name)
 
-    if len(centres) == 1:
+    if len(files) == 1:
         return True
 
-    if centres:
+    if files:
         # get the first element
-        file = open_file(centres[0], subjects.find_separator(centres[0]))
+        f1 = open_file(files[0], subjects.find_separator(files[0]))
+        f2 = open_file(files[1], subjects.find_separator(files[1]))
 
-        # define set literal
-        same = {}
-
-        # iterate over centres
-        for centre in centres[1:]:
-            # append to the set literal whether the contents of the first element
-            # are the same with the rest
-            same.update(file == open_file(centre, subjects.find_separator(centre)))
-
-        # check if set literal contains only one element
-        if len(same) == 1:
-            if bool(same):
-                # if files are the same, return True
-                return True
-            # False otherwise
-            return False
+        if f1.equals(f2):
+            return True
         return False
 
-    return None
+    return False
 
 
 def get_specific(filetype: str, constraint: str = None) -> list:

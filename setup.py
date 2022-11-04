@@ -10,7 +10,7 @@ test_requirements = ['pytest>=3']
 
 setup(
     name='sim2bids',
-    version='2.0.0',
+    version='0.0.50',
     description="App to preprocess and convert simulation data",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -18,7 +18,7 @@ setup(
     author_email='dinarissaa@gmail.com',
     python_requires='>=3.6',
     classifiers=[
-        'Development Status :: 6 - Mature',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
         'Operating System :: Microsoft :: Windows :: Windows 11',
         'License :: OSI Approved :: MIT License',

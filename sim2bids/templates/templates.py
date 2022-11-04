@@ -68,10 +68,10 @@ file_desc = {
     'code': 'The source code to reproduce results.'
 }
 
-centres = {'multi-unique': ['These are the region labels which are the same for all individuals',
-                            'These are the 3d coordinate centres which are unique for each individual.'],
+centres = {'multi-unique': ['These are the region labels which is the same for all individuals',
+                            'These are the 3d coordinate centres which is unique for each individual.'],
            'multi-same': ['These are the region labels which are the same for all individuals',
-                          'These are the 3d coordinate centres which are the same for all individuals.'],
+                          'These are the 3d coordinate centres which is the same for all individuals.'],
            'single': ['These are the region labels for a single subject.',
                       'These are the 3d coordinate centres for a single subject.']
            }

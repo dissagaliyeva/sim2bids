@@ -113,9 +113,9 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         # if no subjects are passed, define them
         if subs is None:
             subs = subjects.Files(path, files).subs
-            results = convert.check_centres()
-            if results:
-                convert.IGNORE_CENTRE = results
+            # results = convert.check_centres()
+            # if results:
+            #     convert.IGNORE_CENTRE = results
 
     # only save conversions if 'save' is True
     if save and subs:
@@ -129,7 +129,8 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 
         # save code
         if CODE:
-            utils.infer_model()
+            if isinstance(CODE, str) and MODEL_NAME is None:
+                utils.infer_model()
             save_code()
 
         global_files.add_global_files()
@@ -274,6 +275,8 @@ def save_output(subs):
     # verify folders exist
     structure.check_folders(OUTPUT)
 
+    print(subs)
+
     def save(sub, ses=None):
         """
 
@@ -396,13 +399,11 @@ def save_code():
 
     """
 
-    utils.infer_model()
-
     path = 'https://github.com/the-virtual-brain/tvb-root/archive/refs/tags/{}.zip'
 
     if SoftwareName == 'TVB':
         if SoftwareVersion == 1.5:
-            path = path.replace(SoftwareVersion, '1.5.10')
+            path = path.replace(str(SoftwareVersion), '1.5.10')
         elif SoftwareVersion:
             path = path.format(str(SoftwareVersion))
 
@@ -545,6 +546,6 @@ def check_output():
         if os.path.exists(path) and len(os.listdir(path)) > 0:
             for file in os.listdir(path):
                 if file.startswith('sub-'):
-                    match = re.match('sub-[0-9]+', file)[0]
+                    match = re.match('sub-[0-9a-zA-Z\_]+', file)[0]
                     os.replace(os.path.join(path, file), os.path.join(path, file.replace(match, '').strip('_')))
 

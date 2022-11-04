@@ -15,9 +15,12 @@ from sim2bids.generate import subjects
 def get_all_files(new_files, old_files, path):
     all_files = new_files
 
-    for file in old_files:
-        if subjects.accepted(file):
-            all_files.append(os.path.join(path, file))
+    # for file in old_files:
+    #
+    #
+    #
+    #     if subjects.accepted(file):
+    #         all_files.append(os.path.join(path, file))
 
     return all_files
 

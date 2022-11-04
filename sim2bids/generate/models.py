@@ -22,7 +22,7 @@ RHYTHMS = ['alpha', 'beta', 'delta', 'gamma', 'theta', None]
 
 def set_params(conversion_name='default', rhythm=None, **kwargs):
     # set the default name for the conversion
-    app.DESC = conversion_name
+    app.DESC, model_name = conversion_name, None
 
     join = lambda x: ', '.join(x)
 
@@ -180,12 +180,12 @@ class NoCodeModel:
         for value in v:
             if self.rhythm:
                 path = os.path.join(app.OUTPUT, 'param',
-                                    f'{self.rhythm}-{k}{str(format(value, ".3f"))}.xml')
+                                    f'{self.rhythm}-{k}{str(format(value, ".3f"))}_param.xml')
             else:
                 if isinstance(value, np.float) or isinstance(value, float):
-                    path = os.path.join(app.OUTPUT, 'param', f'{k}{format(value, ".3f")}.xml')
+                    path = os.path.join(app.OUTPUT, 'param', f'{k}{format(value, ".3f")}_param.xml')
                 else:
-                    path = os.path.join(app.OUTPUT, 'param', f'{k}{format(value, ".3f")}.xml')
+                    path = os.path.join(app.OUTPUT, 'param', f'{k}{format(value, ".3f")}_param.xml')
 
             save_json(path, self.get_model(k, v), use_json=False)
             convert.to_json(path.replace('xml', 'json'), shape=None, desc=self.param_desc, key='param')
