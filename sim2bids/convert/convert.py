@@ -300,9 +300,9 @@ def save_centres(sub, file, ses, folders, centre_name='centres'):
 
         # save conversion results
         if IGNORE_CENTRE:
-            save_files(sub, folder, file, type='default', centres=True, desc=desc)
-        else:
             save_files(sub, folder, file, type='other', centres=True, desc=desc)
+        else:
+            save_files(sub, folder, file, type='default', centres=True, desc=desc)
 
 
 def save_h5(sub, folders, ses=None):

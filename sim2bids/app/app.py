@@ -9,7 +9,6 @@ from zipfile import ZipFile
 import numpy as np
 import pandas as pd
 import panel as pn
-import pylems_py2xml
 import lems.api as lems
 
 # import local packages
@@ -17,6 +16,7 @@ import requests
 
 import sim2bids.utils
 from sim2bids.generate import structure, subjects
+# from sim2bids.generate import subjects
 from sim2bids.preprocess import preprocess as prep
 from sim2bids.convert import convert, mat
 from sim2bids.templates import templates as temp
@@ -137,18 +137,18 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         check_output()
         pn.state.notifications.success(f'{OUTPUT} folder is ready!')
 
-    if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
-        pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=os.path.join(OUTPUT, 'param'),
-                               uid=H5_CONTENT['model'], app=True, suffix=DESC)
-        MODEL_NAME = utils.get_model()
-        transfer_xml()
+    # if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
+    #     pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=os.path.join(OUTPUT, 'param'),
+    #                            uid=H5_CONTENT['model'], app=True, suffix=DESC)
+    #     MODEL_NAME = utils.get_model()
+    #     transfer_xml()
 
     # finally, remove all empty folders
     remove_empty()
 
     # return subjects and possible layouts only if it's enabled
-    if layout:
-        return subs, structure.create_layout(subs)
+    # if layout:
+    #     return subs, structure.create_layout(subs)
 
     # otherwise, return None
     return None
@@ -251,6 +251,19 @@ def save_missing(path, files):
             if not os.path.exists(os.path.join(OUTPUT, os.path.basename(file).replace('.txt', '') + '.txt')):
                 shutil.copy(file, OUTPUT)
 
+                if 'dataset_description.json' in file:
+                    json_file = json.load(open(file))
+                    json_file['ReferencesAndLinks'] = []
+
+                    if SoftwareCode:
+                        json_file['ReferencesAndLinks'].append(SoftwareCode)
+                    if SoftwareName == 'TVB':
+                        json_file['ReferencesAndLinks'].append(f'tvb-framework-{SoftwareVersion}')
+
+                    if json_file['ReferencesAndLinks']:
+                        with open(os.path.join(OUTPUT, 'dataset_description.json'), 'w') as f:
+                            json.dump(json_file, f)
+
 
 def save_output(subs):
     """
@@ -274,8 +287,6 @@ def save_output(subs):
 
     # verify folders exist
     structure.check_folders(OUTPUT)
-
-    print(subs)
 
     def save(sub, ses=None):
         """

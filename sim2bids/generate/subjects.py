@@ -303,6 +303,10 @@ def check_name(path):
     new_path = path
 
     if 'tract_lengths' in basename:
+        dist = os.path.join(path.replace(basename, ''), 'distances.txt')
+        if os.path.exists(dist):
+            os.remove(dist)
+
         new_path = path.replace(basename, 'distances.txt')
     elif 'orientation' in basename:
         new_path = path.replace(basename, 'normals.txt')
@@ -357,6 +361,8 @@ def get_name(path, return_rhythm=False):
         if name[-1].endswith('s'):
             return name[-1]
         return name[-1] + 's'
+    elif name[-1] == 'fc':
+        return 'sim_fc'
 
     return name[-1]
 

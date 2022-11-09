@@ -31,7 +31,7 @@ def set_params(conversion_name='default', rhythm=None, **kwargs):
         model_name = MODELS[0]
     elif app.MODEL_NAME == 'HindmarshRose':
         model_name = MODELS[1]
-    elif app.MODEL_NAME == 'Generic2dOscillator':
+    elif app.MODEL_NAME in ['Generic2dOscillator', 'G2DOS']:
         model_name = MODELS[2]
 
     assert model_name in MODELS, f'{model_name} doesn\'t match existing models. Please select one of the accepted models: {join(MODELS)}'
@@ -48,7 +48,7 @@ def set_params(conversion_name='default', rhythm=None, **kwargs):
         model.set_params()
 
     else:
-        CreateModel(app.CODE, os.path.join(app.OUTPUT, 'param'), **kwargs)
+        CreateModel(app.CODE, os.path.join(app.OUTPUT, 'param'), params=kwargs)
 
 
 class NoCodeModel:
