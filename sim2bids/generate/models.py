@@ -22,7 +22,7 @@ RHYTHMS = ['alpha', 'beta', 'delta', 'gamma', 'theta', None]
 
 def set_params(conversion_name='default', rhythm=None, **kwargs):
     # set the default name for the conversion
-    app.DESC = conversion_name
+    app.DESC, model_name = conversion_name, None
 
     join = lambda x: ', '.join(x)
 
@@ -31,7 +31,7 @@ def set_params(conversion_name='default', rhythm=None, **kwargs):
         model_name = MODELS[0]
     elif app.MODEL_NAME == 'HindmarshRose':
         model_name = MODELS[1]
-    elif app.MODEL_NAME == 'Generic2dOscillator':
+    elif app.MODEL_NAME in ['Generic2dOscillator', 'G2DOS']:
         model_name = MODELS[2]
 
     assert model_name in MODELS, f'{model_name} doesn\'t match existing models. Please select one of the accepted models: {join(MODELS)}'
@@ -48,7 +48,7 @@ def set_params(conversion_name='default', rhythm=None, **kwargs):
         model.set_params()
 
     else:
-        CreateModel(app.CODE, os.path.join(app.OUTPUT, 'param'), **kwargs)
+        CreateModel(app.CODE, os.path.join(app.OUTPUT, 'param'), params=kwargs)
 
 
 class NoCodeModel:
@@ -180,12 +180,12 @@ class NoCodeModel:
         for value in v:
             if self.rhythm:
                 path = os.path.join(app.OUTPUT, 'param',
-                                    f'{self.rhythm}-{k}{str(format(value, ".3f"))}.xml')
+                                    f'{self.rhythm}-{k}{str(format(value, ".3f"))}_param.xml')
             else:
                 if isinstance(value, np.float) or isinstance(value, float):
-                    path = os.path.join(app.OUTPUT, 'param', f'{k}{format(value, ".3f")}.xml')
+                    path = os.path.join(app.OUTPUT, 'param', f'{k}{format(value, ".3f")}_param.xml')
                 else:
-                    path = os.path.join(app.OUTPUT, 'param', f'{k}{format(value, ".3f")}.xml')
+                    path = os.path.join(app.OUTPUT, 'param', f'{k}{format(value, ".3f")}_param.xml')
 
             save_json(path, self.get_model(k, v), use_json=False)
             convert.to_json(path.replace('xml', 'json'), shape=None, desc=self.param_desc, key='param')

@@ -9,7 +9,20 @@ import sim2bids.preprocess.preprocess as prep
 import sim2bids.templates.templates as temp
 from sim2bids import sim2bids
 from sim2bids.convert import convert
+from sim2bids.generate import subjects
 
+
+def get_all_files(new_files, old_files, path):
+    all_files = new_files
+
+    # for file in old_files:
+    #
+    #
+    #
+    #     if subjects.accepted(file):
+    #         all_files.append(os.path.join(path, file))
+
+    return all_files
 
 def reset_values():
     prep.reset_index()
@@ -59,6 +72,8 @@ def append_widgets(files):
 
 def get_settings(json_editor, selected):
     sim2bids.REQUIRED = []
+    to_ignore = ['NumberOfRows', 'NumberOfColumns', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam',
+                 'SourceCode', 'SoftwareName', 'SoftwareRepository', 'Network']
 
     widget = pn.WidgetBox()
 
@@ -67,24 +82,26 @@ def get_settings(json_editor, selected):
     if root == '.ipynb_checkpoints':
         return
 
-    reqs, recommend = temp.struct[root]['required'], temp.struct[root]['recommend']
+    if 'tvb_framework' not in selected and 'tvb-framework':
+        reqs, recommend = temp.struct[root]['required'], temp.struct[root]['recommend']
 
-    # iterate over required fields
-    for k in reqs:
-        if k in json_editor and json_editor[k] == '':
-            if k == 'Units':
-                widget.append(pn.widgets.Select(name=f'Specify {k} (REQUIRED):', options=sim2bids.UNITS, value=''))
-        else:
-            if k not in ['NumberOfRows', 'NumberOfColumns', 'CoordsRows', 'CoordsColumns']:
-                widget.append(pn.widgets.TextInput(name=f'Specify {k} (REQUIRED):'))
-                # sim2bids.REQUIRED.append(k)
+        # iterate over required fields
+        for k in reqs:
+            if k in json_editor and json_editor[k] == '':
+                if k == 'Units':
+                    widget.append(pn.widgets.Select(name=f'Specify {k} (REQUIRED):', options=sim2bids.UNITS, value=''))
+            else:
+                if k not in to_ignore:
+                    widget.append(pn.widgets.TextInput(name=f'Specify {k} (REQUIRED):'))
+                    # sim2bids.REQUIRED.append(k)
 
-    # iterate over recommended fields
-    for k in recommend:
-        widget.append(pn.widgets.TextInput(name=f'Specify {k} (RECOMMENDED):'))
+        # iterate over recommended fields
+        for k in recommend:
+            if k not in to_ignore:
+                widget.append(pn.widgets.TextInput(name=f'Specify {k} (RECOMMENDED):'))
 
-    # append button
-    return widget
+        # append button
+        return widget
 
 
 def verify_complete(widgets):

@@ -4,13 +4,13 @@
 from setuptools import setup
 
 requirements = ['numpy', 'pandas', 'h5py', 'panel~=0.13.1', 'holoviews', 'param~=1.12.0',
-                'graphviz', 'mat73', 'pylems_py2xml', 'sphinx-tabs', 'sphinx-rtd-theme']
+                'graphviz', 'mat73', 'pylems', 'scipy']
 
 test_requirements = ['pytest>=3']
 
 setup(
     name='sim2bids',
-    version='0.0.40',
+    version='2.0.1',
     description="App to preprocess and convert simulation data",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -18,7 +18,7 @@ setup(
     author_email='dinarissaa@gmail.com',
     python_requires='>=3.6',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
         'Operating System :: Microsoft :: Windows :: Windows 11',
         'License :: OSI Approved :: MIT License',
@@ -33,6 +33,6 @@ setup(
               'sim2bids.templates', 'sim2bids.validate'],
     package_data={'sim2bids': ['generate/models/*.xml']},
     # package_dir={'sim2bids': 'src/sim2bids'},
-    url='https://github.com/dissagaliyeva/incf',
+    url='https://github.com/dissagaliyeva/sim2bids',
     zip_safe=False,
 )

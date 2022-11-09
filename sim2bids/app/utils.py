@@ -9,7 +9,7 @@ import shutil
 import h5py
 import numpy as np
 import pandas as pd
-import pylems_py2xml
+# import pylems_py2xml
 
 from sim2bids.app import app
 from sim2bids.generate import subjects as subj, zip_traversal as z
@@ -72,12 +72,12 @@ def recursive_walk(path: str, basename: bool = False) -> list:
             # if code is found, save its location
             if file.endswith('.py'):
                 app.CODE = os.path.join(root, file)
-                temp = pylems_py2xml.main.XML(app.CODE, save=False)
+                # temp = pylems_py2xml.main.XML(app.CODE, save=False)
 
-                if temp.model_name == 'hindmarshrose':
-                    app.MODEL_NAME = 'SJHM3D'
-                elif temp.model_name == 'oscillator':
-                    app.MODEL_NAME = 'G2DOS'
+                # if temp.model_name == 'hindmarshrose':
+                #     app.MODEL_NAME = 'SJHM3D'
+                # elif temp.model_name == 'oscillator':
+                #     app.MODEL_NAME = 'G2DOS'
 
             # rename tract_lengths to distances
 
@@ -262,14 +262,15 @@ def get_model():
 
 
 def infer_model():
-    content = gen_utils.open_file(app.CODE)
-    model = re.findall(r'(?:hindmarsh|wongwang|oscillator)', ''.join(content), flags=re.IGNORECASE)
+    if isinstance(app.CODE, str):
+        content = gen_utils.open_file(app.CODE)
+        model = re.findall(r'(?:hindmarsh|wongwang|oscillator)', ''.join(content), flags=re.IGNORECASE)
 
-    if model:
-        model = model[0].lower()
-        if 'hindmarsh' in model:
-            app.MODEL_NAME = 'HindmarshRose'
-        elif 'wongwang' in model:
-            app.MODEL_NAME = 'ReducedWongWang'
-        elif 'oscillator' in model:
-            app.MODEL_NAME = 'Generic2dOscillator'
+        if model:
+            model = model[0].lower()
+            if 'hindmarsh' in model:
+                app.MODEL_NAME = 'HindmarshRose'
+            elif 'wongwang' in model:
+                app.MODEL_NAME = 'ReducedWongWang'
+            elif 'oscillator' in model:
+                app.MODEL_NAME = 'Generic2dOscillator'

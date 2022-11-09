@@ -97,6 +97,8 @@ class MainArea(param.Parameterized):
             self.to_rename_path = []
             self.structure.value = []
             self.rename_files = pn.WidgetBox()
+            self.to_rename = None
+            self.to_rename_path = None
 
         if len(selected) > 0:
             # check files for preprocessing step
@@ -116,8 +118,14 @@ class MainArea(param.Parameterized):
             self.length = len(selected)
 
     def _generate_files(self, event=None):
-        _ = app.main(path=self.text_input.value, files=self.cross_select.value,
-                          subs=self.subjects, save=True, layout=True)
+        if validate.IS_RENAMED:
+            _ = app.main(path=self.text_input.value,
+                         files=validate.RENAMED,
+                         # files=utils.get_all_files(validate.RENAMED, self.cross_select.value, self.text_input.value),
+                         subs=self.subjects, save=True, layout=True)
+        else:
+            _ = app.main(path=self.text_input.value, files=self.cross_select.value,
+                              subs=self.subjects, save=True, layout=True)
         app.ALL_FILES = None
         utils.reset_values()
 
@@ -167,8 +175,10 @@ class MainArea(param.Parameterized):
             app.OUTPUT = output
 
     def _rename(self, event=None):
-
         validate.validate(self.rename_files, self.to_rename_path, self.text_input.value, self.cross_select.value)
+        self.rename_files = pn.WidgetBox()
+        self.to_rename = None
+        self.to_rename_path = None
 
     @pn.depends('desc.value', watch=True)
     def _change_desc(self):
@@ -190,8 +200,8 @@ class MainArea(param.Parameterized):
                                        #              show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}),
                                        #     sizing_mode='stretch_width', margin=(50, 0, 0, 0)
                                        # ),
-                                       self.structure)),
-            ('Preprocess Data', self.rename_files),
+                                       )),
+            ('Preprocess Data', pn.Column(PREPROCESS, self.rename_files)),
             ('View Results', ViewResults().view()),
             ('User Guide', UserGuide().view()),
             dynamic=True, active=0
@@ -320,7 +330,8 @@ class UserGuide(param.Parameterized):
 
 
 def update_files(content):
-    to_ignore = [*templates.required, 'Units', 'ModelEq', 'ModelParam']
+    to_ignore = [*templates.required, 'Units', 'ModelEq', 'ModelParam',
+                 'ModelParam', 'SourceCode', 'SoftwareName', 'SoftwareRepository', 'Network']
 
     for file in get_files():
         # get keys for the existing json file in the output folder
@@ -335,7 +346,8 @@ def update_files(content):
             for k, v in content.items():
                 if (k in keys['required'] or k in keys['recommend']) and content[k] and \
                         (file_json[k] is None or file_json[k] != content[k]) and k not in to_ignore:
-                    file_json[k] = content[k]
+                    if v is not None:
+                        file_json[k] = content[k]
 
         # save new fields
         with open(file, 'w') as f:
@@ -347,7 +359,7 @@ def get_files(path=app.OUTPUT, ftype='.json'):
 
     for root, dirs, files in os.walk(path, topdown=False):
         for file in files:
-            if ftype in file and '.ipynb_checkpoints' not in file:
+            if ftype in file and '.ipynb_checkpoints' not in file and 'tvb-framework' not in root and 'tvb_framework' not in root:
                 f.append(os.path.join(root, file))
     return f
 
@@ -362,4 +374,9 @@ Click on **Generate Files** button to physically save the results. After that, p
 **make sure to give user-specific input** by clicking on **View Results** tab and selecting JSON files. You'll see a lot
 of required and recommended fields that can be updated. By default, all required fields are already provided. However,
 you have all the rights to change them. See further details in **User Guide**. 
+"""
+
+PREPROCESS = """
+### Preprocessing pipeline
+You will see the file names only if there are files that don't match the existing ones. 
 """

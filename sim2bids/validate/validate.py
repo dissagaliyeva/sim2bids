@@ -12,6 +12,7 @@ from sim2bids.convert import convert
 from sim2bids.app import app, utils
 
 RENAMED = []
+IS_RENAMED = False
 
 
 def filter(contents, files=None):
@@ -70,7 +71,7 @@ def rename_weights(name, ext, paths, input_path, input_files):
     open_file = lambda x: pd.read_csv(x, header=None, sep=subj.find_separator(x)).values
 
     # read the new file
-    if ext in ['txt', 'dat', 'csv', 'tsv']:
+    if ext in ['txt', 'dat', 'csv', 'tsv', 'npy']:
         if len(files) > 1:
             f1, f2 = open_file(files[0]), open_file(files[1])
 
@@ -163,23 +164,43 @@ def rename_files(name, new_ext, paths):
     for file in paths:
         if file.endswith(name):
             if file.endswith('txt') or file.endswith('csv') or file.endswith('dat'):
-                p = os.path.dirname(file)
-                if new_ext == 'weights' and 'weights.txt' in os.listdir(p):
-                    os.rename(file, os.path.join(p, f'weights_{name}'))
-                    os.rename(os.path.join(p, 'weights.txt'), os.path.join(p, 'weights_SCnotthrAn.txt'))
-                else:
-                    if name.lower() == new_ext.lower():
-                        return
-
-                    try:
-                        # os.rename(file, file.replace(name, f'{name.replace("." + ext, "")}_{new_ext}' + '.txt'))
-                        os.rename(file, file.replace(name, f'{new_ext}' + '.txt'))
-                    except FileExistsError:
-                        pn.state.notifications.error(f'File {new_ext} already exists!')
-                    else:
-                        RENAMED.append(file)
+                rename(file, new_ext, name)
             elif file.endswith('mat'):
                 pass
+            elif file.endswith('.npy'):
+                # first convert it to txt file
+                new_path = file.replace('.npy', '.txt')
+                f = np.load(file)
+                np.savetxt(new_path, f)
+                os.remove(file)
+                file = subj.check_name(new_path)
+                rename(file, new_ext, name.replace('.npy', '.txt'))
+
+
+def rename(file, new_ext, name):
+    global IS_RENAMED
+
+    p = os.path.dirname(file)
+    new_file_name = None
+
+    if new_ext == 'weights' and 'weights.txt' in os.listdir(p):
+        os.rename(file, os.path.join(p, f'weights_{name}'))
+        new_file_name = os.path.join(p, 'weights_SCnotthrAn.txt')
+        os.rename(os.path.join(p, 'weights.txt'), new_file_name)
+        RENAMED.append(new_file_name)
+        IS_RENAMED = True
+    else:
+        if name.lower() == new_ext.lower():
+            return
+        try:
+            # os.rename(file, file.replace(name, f'{name.replace("." + ext, "")}_{new_ext}' + '.txt'))
+            new_file_name = file.replace(name, f'{new_ext}' + '.txt')
+            os.rename(file, new_file_name)
+        except FileExistsError:
+            pn.state.notifications.error(f'File {new_ext} already exists!')
+        else:
+            RENAMED.append(new_file_name)
+            IS_RENAMED = True
 
 
 def get_file(files, end):

@@ -9,7 +9,6 @@ from zipfile import ZipFile
 import numpy as np
 import pandas as pd
 import panel as pn
-import pylems_py2xml
 import lems.api as lems
 
 # import local packages
@@ -17,6 +16,7 @@ import requests
 
 import sim2bids.utils
 from sim2bids.generate import structure, subjects
+# from sim2bids.generate import subjects
 from sim2bids.preprocess import preprocess as prep
 from sim2bids.convert import convert, mat
 from sim2bids.templates import templates as temp
@@ -113,9 +113,9 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         # if no subjects are passed, define them
         if subs is None:
             subs = subjects.Files(path, files).subs
-            results = convert.check_centres()
-            if results:
-                convert.IGNORE_CENTRE = results
+            # results = convert.check_centres()
+            # if results:
+            #     convert.IGNORE_CENTRE = results
 
     # only save conversions if 'save' is True
     if save and subs:
@@ -129,25 +129,26 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 
         # save code
         if CODE:
-            utils.infer_model()
+            if isinstance(CODE, str) and MODEL_NAME is None:
+                utils.infer_model()
             save_code()
 
         global_files.add_global_files()
         check_output()
         pn.state.notifications.success(f'{OUTPUT} folder is ready!')
 
-    if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
-        pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=os.path.join(OUTPUT, 'param'),
-                               uid=H5_CONTENT['model'], app=True, suffix=DESC)
-        MODEL_NAME = utils.get_model()
-        transfer_xml()
+    # if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
+    #     pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=os.path.join(OUTPUT, 'param'),
+    #                            uid=H5_CONTENT['model'], app=True, suffix=DESC)
+    #     MODEL_NAME = utils.get_model()
+    #     transfer_xml()
 
     # finally, remove all empty folders
     remove_empty()
 
     # return subjects and possible layouts only if it's enabled
-    if layout:
-        return subs, structure.create_layout(subs)
+    # if layout:
+    #     return subs, structure.create_layout(subs)
 
     # otherwise, return None
     return None
@@ -249,6 +250,19 @@ def save_missing(path, files):
         elif 'participants' in file or 'CHANGES' in file or 'description' in file or 'README' in file:
             if not os.path.exists(os.path.join(OUTPUT, os.path.basename(file).replace('.txt', '') + '.txt')):
                 shutil.copy(file, OUTPUT)
+
+                if 'dataset_description.json' in file:
+                    json_file = json.load(open(file))
+                    json_file['ReferencesAndLinks'] = []
+
+                    if SoftwareCode:
+                        json_file['ReferencesAndLinks'].append(SoftwareCode)
+                    if SoftwareName == 'TVB':
+                        json_file['ReferencesAndLinks'].append(f'tvb-framework-{SoftwareVersion}')
+
+                    if json_file['ReferencesAndLinks']:
+                        with open(os.path.join(OUTPUT, 'dataset_description.json'), 'w') as f:
+                            json.dump(json_file, f)
 
 
 def save_output(subs):
@@ -396,13 +410,11 @@ def save_code():
 
     """
 
-    utils.infer_model()
-
     path = 'https://github.com/the-virtual-brain/tvb-root/archive/refs/tags/{}.zip'
 
     if SoftwareName == 'TVB':
         if SoftwareVersion == 1.5:
-            path = path.replace(SoftwareVersion, '1.5.10')
+            path = path.replace(str(SoftwareVersion), '1.5.10')
         elif SoftwareVersion:
             path = path.format(str(SoftwareVersion))
 
@@ -545,6 +557,6 @@ def check_output():
         if os.path.exists(path) and len(os.listdir(path)) > 0:
             for file in os.listdir(path):
                 if file.startswith('sub-'):
-                    match = re.match('sub-[0-9]+', file)[0]
+                    match = re.match('sub-[0-9a-zA-Z\_]+', file)[0]
                     os.replace(os.path.join(path, file), os.path.join(path, file.replace(match, '').strip('_')))
 
