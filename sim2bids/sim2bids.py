@@ -11,6 +11,8 @@ from sim2bids.app import app, utils as app_utils
 from sim2bids.templates import user_guide as ug, templates
 from sim2bids.validate import validate
 
+import comp_validator.comp_validator as val
+
 
 JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
              'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName', 'SoftwareRepository', 'Network']
@@ -33,6 +35,9 @@ global_coupling = pn.Column('#### Specify `global coupling scaling factor` folde
 class MainArea(param.Parameterized):
     # generate files button
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
+
+    # validate files
+    val_btn = param.Action(lambda self: self._show_bids(), labels='Validate Conversions')
 
     # generate structure button
     gen_struct = param.Action(lambda self: self._generate_struct(), label='Show Structure')
@@ -128,6 +133,12 @@ class MainArea(param.Parameterized):
                               subs=self.subjects, save=True, layout=True)
         app.ALL_FILES = None
         utils.reset_values()
+
+    def _show_bids(self, event=None):
+        if not os.path.exists(app.OUTPUT):
+            pn.state.notifications.error('Please convert files first.')
+        else:
+
 
     def _generate_struct(self, event=None):
         self.subjects, self.struct = app.main(path=self.text_input.value,

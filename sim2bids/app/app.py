@@ -247,23 +247,49 @@ def save_missing(path, files):
             convert.save_files(dict(desc=DESC, name=name), f'{OUTPUT}/coord', f,
                                type='coord', centres=True, desc=temp.centres['single'])
 
-        elif 'participants' in file or 'CHANGES' in file or 'description' in file or 'README' in file:
+
+        elif 'README' in file or 'CHANGES' in file:
+            ext = file.split('.')[-1]
+
+            if ext in ['md', 'txt', 'rst']:
+
+                shutil.copy(file, OUTPUT)
+
+            else:
+                shutil.copy(file, OUTPUT)
+
+                f = os.path.basename(file)
+
+                f = Path(os.path.join(OUTPUT, f.split('.')[0]))
+
+                f.rename(f.with_suffix('.txt'))
+
+
+        elif 'participants' in file:
+            if file.endswith('tsv') or file.endswith('json'):
+                shutil.copy(file, OUTPUT)
+
+
+        elif 'description' in file:
             if not os.path.exists(os.path.join(OUTPUT, os.path.basename(file).replace('.txt', '') + '.txt')):
+
                 shutil.copy(file, OUTPUT)
 
                 if 'dataset_description.json' in file:
+
                     json_file = json.load(open(file))
+
                     json_file['ReferencesAndLinks'] = []
 
                     if SoftwareCode:
                         json_file['ReferencesAndLinks'].append(SoftwareCode)
+
                     if SoftwareName == 'TVB':
                         json_file['ReferencesAndLinks'].append(f'tvb-framework-{SoftwareVersion}')
 
                     if json_file['ReferencesAndLinks']:
                         with open(os.path.join(OUTPUT, 'dataset_description.json'), 'w') as f:
                             json.dump(json_file, f)
-
 
 def save_output(subs):
     """

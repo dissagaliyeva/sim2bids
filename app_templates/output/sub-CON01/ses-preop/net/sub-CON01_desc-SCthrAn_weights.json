@@ -1,0 +1,1 @@
+{"NumberOfRows": 68, "NumberOfColumns": 68, "Description": "This is the thresholded SC representing the strength of connection between regions. Zeros represent unconnected areas (nxn matrix).", "CoordsRows": ["../../../coord/nodes.json", "../../../coord/labels.json"], "CoordsColumns": ["../../../coord/nodes.json", "../../../coord/labels.json"]}
