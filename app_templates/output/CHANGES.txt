@@ -1,5 +1,0 @@
-Please add additional changes with dates and version numbers of dataset here.
-
-1.0.0 2019-10-06
-
-  - initial release

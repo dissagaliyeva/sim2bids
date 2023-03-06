@@ -11,7 +11,7 @@ from sim2bids.app import app, utils as app_utils
 from sim2bids.templates import user_guide as ug, templates
 from sim2bids.validate import validate
 
-import comp_validator.comp_validator as val
+# import comp_validator.comp_validator as val
 
 
 JE_FIELDS = ['Units', 'Description', 'CoordsRows', 'CoordsColumns', 'ModelEq', 'ModelParam', 'SourceCode',
@@ -37,7 +37,7 @@ class MainArea(param.Parameterized):
     gen_btn = param.Action(lambda self: self._generate_files(), label='Generate Files')
 
     # validate files
-    val_btn = param.Action(lambda self: self._show_bids(), labels='Validate Conversions')
+    val_btn = param.Action(lambda self: self._show_bids(), label='Validate Conversions')
 
     # generate structure button
     gen_struct = param.Action(lambda self: self._generate_struct(), label='Show Structure')
@@ -138,6 +138,15 @@ class MainArea(param.Parameterized):
         if not os.path.exists(app.OUTPUT):
             pn.state.notifications.error('Please convert files first.')
         else:
+            pass
+            # val.validate(app.OUTPUT)
+
+    def view_ew(self):
+        files = os.listdir()
+        if 'errors.md' in files and 'warnings.md' in files:
+            return pn.Tabs(('See errors', pn.pane.Markdown('\n'.join(open('errors.md').readlines()))),
+                           ('See warnings', pn.pane.Markdown('\n'.join(open('warnings.md').readlines()))))
+        return 'Please click on `Validate Conversions` button to see errors/warnings.'
 
 
     def _generate_struct(self, event=None):
@@ -203,6 +212,8 @@ class MainArea(param.Parameterized):
                                        self.cross_select,
                                        pn.Param(self, parameters=['gen_btn'],
                                                 show_name=False, widgets={'gen_btn': {'button_type': 'primary'}}),
+                                       pn.Param(self, parameters=['val_btn'],
+                                                show_name=False, widgets={'val_btn': {'button_type': 'primary'}}),
                                        # pn.Row(
                                        #     pn.Param(self, parameters=['gen_struct'],
                                        #              show_name=False,
@@ -215,6 +226,7 @@ class MainArea(param.Parameterized):
             ('Preprocess Data', pn.Column(PREPROCESS, self.rename_files)),
             ('View Results', ViewResults().view()),
             ('User Guide', UserGuide().view()),
+            ('See BIDS errors/warnings', self.view_ew()),
             dynamic=True, active=0
         )
 
