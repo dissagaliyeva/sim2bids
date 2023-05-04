@@ -21,6 +21,9 @@ def filter(contents, files=None):
 
         for content in contents:
             if not subj.accepted(content):
+                if content in ['README.txt', 'CHANGES.txt']: continue
+                if content.endswith('.mat'): continue
+
                 match = subj.find_matches([content])
                 if len(match) > 0:
                     files.append(content.replace(match[0], '').replace('_', ''))

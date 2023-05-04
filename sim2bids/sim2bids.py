@@ -110,6 +110,7 @@ class MainArea(param.Parameterized):
             utils.reset_values()
             path = self.text_input.value
             app.preprocess_input(path, selected)
+
             self.to_rename = validate.filter(app_utils.get_content(path, selected, basename=True))
             self.to_rename_path = validate.filter(app_utils.get_content(path, selected), self.to_rename)
 
@@ -138,8 +139,7 @@ class MainArea(param.Parameterized):
         if not os.path.exists(app.OUTPUT):
             pn.state.notifications.error('Please convert files first.')
         else:
-            pass
-            # val.validate(app.OUTPUT)
+            validate.validate(app.OUTPUT)
 
     def view_ew(self):
         files = os.listdir()
@@ -225,8 +225,9 @@ class MainArea(param.Parameterized):
                                        )),
             ('Preprocess Data', pn.Column(PREPROCESS, self.rename_files)),
             ('View Results', ViewResults().view()),
+            ('Validate Conversions', self.view_ew()),
+            ('Advanced Settings', ViewResults().view()),
             ('User Guide', UserGuide().view()),
-            ('See BIDS errors/warnings', self.view_ew()),
             dynamic=True, active=0
         )
 

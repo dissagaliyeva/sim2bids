@@ -59,11 +59,11 @@ def recursive_walk(path: str, basename: bool = False) -> list:
                 os.remove(os.path.join(root, file))
                 continue
 
-            if file.endswith('.h5'):
-                content += extract_h5(os.path.join(root, file))
+            # if file.endswith('.h5'):
+            #     content += extract_h5(os.path.join(root, file))
 
-            if file.endswith('.mat'):
-                content += extract_mat(os.path.join(root, file), path)
+            # if file.endswith('.mat'):
+            #     content += extract_mat(os.path.join(root, file), path)
 
             if 'times' in file:
                 app.TIMES.append(subj.accepted(file)[-1])
@@ -135,7 +135,7 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
 
     # traverse files
     for file in files:
-        if '.ipynb_checkpoints' in file:
+        if '.ipynb_checkpoints' in file or file.endswith('.mat'):
             continue
 
         # combine path
@@ -161,13 +161,13 @@ def get_content(path: str, files: [str, list], basename: bool = False) -> list:
         # get the file's extension
         ext = os.path.basename(file).split('.')[-1]
 
-        if ext == 'h5':
-            extract_h5(file_path)
-            continue
-
-        if file.endswith('.mat'):
-            contents += extract_mat(os.path.join(path, file), path)
-            continue
+        # if ext == 'h5':
+        #     extract_h5(file_path)
+        #     continue
+        #
+        # if file.endswith('.mat'):
+        #     contents += extract_mat(os.path.join(path, file), path)
+        #     continue
 
         # check if it's among the accepted extensions
         if ext in app.ACCEPTED_EXT:

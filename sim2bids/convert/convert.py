@@ -354,7 +354,7 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
     """
     global COORDS
 
-    name = sub['name'].replace('.txt', '')
+    name = f'desc-{app.DESC}_' + sub['name'].replace('.txt', '')
 
     if type == 'default':
         json_file = os.path.join(folder, DEFAULT_TEMPLATE.format(sub['sid'], name, 'json'))
@@ -378,7 +378,7 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         nodes = json_file.replace(sub['name'], 'nodes')
 
         if COORDS is None:
-            if IGNORE_CENTRE or not app.MULTI_INPUT:
+            if IGNORE_CENTRE or not app.MULTI_INPUT and not app.SESSIONS:
                 COORDS = [f'../coord/desc-{app.DESC}_labels.json', f'../coord/desc-{app.DESC}_nodes.json']
             else:
                 COORDS = [labels.replace(app.OUTPUT, '../..').replace('\\', '/'),
@@ -644,46 +644,63 @@ def to_json(path, shape, desc, key, **kwargs):
     # ===========================================================
     coord = None
 
+    def one_centre():
+        for k, v in app.SUBJECTS.items():
+            for k2, v2 in v.items():
+                if 'centre' in v2 or 'center' in v2 or 'centres' in v2:
+                    print('Center file is in subject-level instance')
+                    return False
+                return True
+
+    # check IGNORE_CENTRE again
+    nodes, labels = f'desc-{app.DESC}_nodes.json', f'desc-{app.DESC}_labels.json'
+
     if 'CoordsRows' in out.keys() or key in ['wd', 'ts', 'spatial']:
         if app.SESSIONS and IGNORE_CENTRE:
-            coord = ['../../../coord/nodes.json', '../../../coord/labels.json']
+            coord = [f'../../../coord/{nodes}', f'../../../coord/{labels}']
         elif app.SESSIONS and not IGNORE_CENTRE:
-            coord = ['../coord/nodes.json', '../coord/labels.json']
+            coord = [f'../coord/{nodes}', f'../coord/{labels}']
         elif not app.SESSIONS and IGNORE_CENTRE:
-            coord = ['../../coord/nodes.json', '../../coord/labels.json']
+            coord = [f'../../coord/{nodes}', f'../../coord/{labels}']
+        elif app.MULTI_INPUT:
+            # check if centres exist on subject-level
+            if one_centre():
+                coord = [f'../../coord/{nodes}', f'../../coord/{labels}']
         else:
-            coord = ['../coord/nodes.json', '../coord/labels.json']
+            coord = [f'../coord/{nodes}', f'../coord/{labels}']
 
     if key != 'wd':
 
         # ===========================================================
         #                     TAKE CARE OF EQUATIONS
         # ===========================================================
+        eq_name = f'desc-{app.DESC}_eq.xml'
 
         if 'ModelEq' in out.keys() or 'ModelEq' in temp.struct[key]['recommend']:
             if 'param' in path or 'code' in path:
-                out['ModelEq'] = '../eq/eq.xml'
+                out['ModelEq'] = f'../eq/{eq_name}'
             else:
                 if app.SESSIONS:
-                    out['ModelEq'] = '../../../eq/eq.xml'
+                    out['ModelEq'] = f'../../../eq/{eq_name}'
                 else:
-                    out['ModelEq'] = '../../eq/eq.xml'
+                    out['ModelEq'] = f'../../eq/{eq_name}'
 
         # ===========================================================
         #                     TAKE CARE OF PARAMETERS
         # ===========================================================
+        param_name = f'desc-{app.DESC}_param.xml'
 
         if 'ModelParam' in out.keys() or 'ModelParam' in temp.struct[key]['recommend']:
             if 'eq' in path or 'code' in path:
-                out['ModelParam'] = '../param/param.xml'
+                out['ModelParam'] = f'../param/{param_name}'
             else:
                 if app.SESSIONS:
-                    out['ModelParam'] = '../../../param/param.xml'
+                    out['ModelParam'] = f'../../../param/{param_name}'
                 else:
-                    out['ModelParam'] = '../../param/param.xml'
+                    out['ModelParam'] = f'../../param/{param_name}'
 
         params = {
-            'SourceCode': f'/tvb-framework-{app.SoftwareVersion}' if app.SoftwareCode == 'MISSING' else app.SoftwareCode,
+            'SourceCode': f'../code/tvb-framework-{app.SoftwareVersion}' if app.SoftwareCode == 'MISSING' else app.SoftwareCode,
             'SoftwareVersion': app.SoftwareVersion if app.SoftwareVersion else None,
             'SoftwareRepository': app.SoftwareRepository if app.SoftwareRepository else None,
             'SourceCodeVersion': app.SoftwareVersion if app.SoftwareVersion else None,

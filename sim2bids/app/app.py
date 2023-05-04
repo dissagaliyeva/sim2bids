@@ -10,6 +10,9 @@ import numpy as np
 import pandas as pd
 import panel as pn
 import lems.api as lems
+from scipy.io import loadmat
+import mat73
+import scipy.io as sio
 
 # import local packages
 import requests
@@ -56,19 +59,21 @@ CODE = None  # path to python code if exists
 SESSIONS = False
 H5_CONTENT = dict()
 MISSING = []
+SUBJECTS = None
+ADDED_FILES = []
 
 # store different time series accounting for 'times'
 TIMES = []
 
 # define all accepted files
-ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speeds',                     # Network (net)
-            'nodes', 'labels', 'centre', 'area', 'hemisphere', 'cortical',               # Coordinates (coord)
-            'orientation', 'average_orientation', 'normals', 'times', 'bold_ts', 'vertices',        # Coordinates (coord)
-            'faces', 'vnormal', 'fnormal', 'sensor', 'volume', 'map',                   # Coordinates (coord)
-            'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',                         # Coordinates (coord)
-            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event',               # Timeseries (ts)
-            'emp', 'bold_times', 'hrf'                                             # Timeseries (ts)
-            'emp_fc', 'fc']                                                                       # Spatial (spatial)
+ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speeds',  # Network (net)
+            'nodes', 'labels', 'centre', 'area', 'hemisphere', 'cortical',  # Coordinates (coord)
+            'orientation', 'average_orientation', 'normals', 'times', 'bold_ts', 'vertices',  # Coordinates (coord)
+            'faces', 'vnormal', 'fnormal', 'sensor', 'volume', 'map',  # Coordinates (coord)
+            'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',  # Coordinates (coord)
+            'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event',  # Timeseries (ts)
+            'emp', 'bold_times', 'hrf'  # Timeseries (ts)
+                                 'emp_fc', 'fc']  # Spatial (spatial)
 
 TO_EXTRACT = ['weights.txt', 'centres.txt', 'distances.txt',  # folder "net"
               'areas.txt', 'average_orientations.txt', 'cortical.txt',  # folder "coord"
@@ -106,13 +111,14 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     :param input_path:
 
     """
-    global MODEL_NAME, INPUT, INPUT_TRANSFERRED
+    global MODEL_NAME, INPUT, INPUT_TRANSFERRED, SUBJECTS
 
     # whether to generate layout
     if layout:
         # if no subjects are passed, define them
         if subs is None:
             subs = subjects.Files(path, files).subs
+            SUBJECTS = subs
             # results = convert.check_centres()
             # if results:
             #     convert.IGNORE_CENTRE = results
@@ -154,37 +160,71 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
     return None
 
 
+def get_mat_files(input_path):
+    matches = []
+    for root, dirnames, filenames in os.walk(input_path):
+        for filename in filenames:
+            if filename.endswith('.mat'):
+                matches.append(os.path.join(root, filename))
+    return matches
+
+
+def open_mat(file):
+    try:
+        matfile = loadmat(file, squeeze_me=True)
+    except NotImplementedError:
+        return mat73.loadmat(file)
+    except sio.matlab._miobase.MatReadError:
+        pn.state.notifications.error(f'File `{file}` is empty! Aborting...')
+        return None
+    except FileNotFoundError:
+        return None
+    else:
+        return matfile
+
+
 def preprocess_input(path, input_files):
-    to_preprocess = {}
+    mat_files = []
 
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            if file in input_files:
+    # check if a folder is passed
+    if len(input_files) > 0:
+        #  and os.path.isdir(os.path.join(path, input_files[0]))
+        # iterate over input files
+        for file in input_files:
+            fpath = os.path.join(path, file)
+
+            # check if it's a directory, if yes get all matlab contents
+            if os.path.isdir(fpath):
+                mat_files += get_mat_files(fpath)
+            elif fpath.endswith('.mat'):
+                mat_files.append(fpath)
+
+    if len(mat_files) > 0:
+        # iterate over matlab files and get the content
+        for file in mat_files:
+            mat = open_mat(file)
+
+            if not isinstance(mat, dict):
                 continue
+            else:
+                # iterate over keys and save content
+                path, fname = os.path.dirname(file), os.path.basename(file).replace('.mat', '')
 
-            if file.endswith('mat') and 'csf' not in root and 'cspeed' not in root and root != path:
-                if root not in to_preprocess:
-                    to_preprocess[root] = []
-                to_preprocess[root].append(file)
+                for array in mat.keys():
+                    if array.startswith('__') or array.endswith('__'): continue
 
-    for root, content in to_preprocess.items():
-        for c in content:
-            cspeed = re.findall(r'speed_[0-9]+', c)
+                    # get new path
+                    new_path = os.path.join(path, f'{fname}_{array}.txt')
 
-            if cspeed:
-                cspeed = cspeed[0].replace('speed_', '')
-                csf = re.findall(r'csf_[0-9\.]+', c)[0].replace('csf_', '')
-
-                path = os.path.join(root, f'{COND_SPEED}{cspeed}')
-                if not os.path.exists(path):
-                    os.mkdir(path)
-
-                path = os.path.join(path, f'csf {csf}')
-                if not os.path.exists(path):
-                    os.mkdir(path)
-
-                # copy file
-                shutil.move(os.path.join(root, c), path)
+                    # save array in the same directory as the original matlab file
+                    with open(new_path, 'w') as fout:
+                        try:
+                            fout.write(mat[array])
+                        except TypeError:
+                            try:
+                                np.savetxt(new_path, mat[array])
+                            except ValueError:
+                                np.savetxt(new_path, mat[array][:, 0, :])
 
 
 def save_params():
@@ -192,6 +232,7 @@ def save_params():
 
     # verify path exists
     path = os.path.join(OUTPUT, 'param')
+
     if not os.path.exists(path):
         os.mkdir(path)
 
@@ -290,6 +331,7 @@ def save_missing(path, files):
                     if json_file['ReferencesAndLinks']:
                         with open(os.path.join(OUTPUT, 'dataset_description.json'), 'w') as f:
                             json.dump(json_file, f)
+
 
 def save_output(subs):
     """
@@ -435,12 +477,14 @@ def save_code():
     -------
 
     """
+    global SoftwareVersion
 
     path = 'https://github.com/the-virtual-brain/tvb-root/archive/refs/tags/{}.zip'
 
     if SoftwareName == 'TVB':
         if SoftwareVersion == 1.5:
-            path = path.replace(str(SoftwareVersion), '1.5.10')
+            SoftwareVersion = '1.5.10'
+            path = 'https://github.com/the-virtual-brain/tvb-root/archive/refs/tags/1.5.10.zip'
         elif SoftwareVersion:
             path = path.format(str(SoftwareVersion))
 
@@ -461,7 +505,7 @@ def save_code():
             pn.state.notifications.error('Please check the TVB version!', duration=5000)
 
     if isinstance(CODE, str) and CODE.endswith('.py'):
-        template = f'code.py'
+        template = f'desc-{DESC}_code.py'
         path = os.path.join(OUTPUT, 'code', template)
 
         shutil.copy(CODE, path)
@@ -489,6 +533,7 @@ def save_code():
 def transfer_xml():
     # transfer results to appropriate folders
     path = os.path.join(OUTPUT, 'param', '_eq.xml')
+
     if os.path.exists(path):
         shutil.move(path, os.path.join(OUTPUT, 'eq'))
 
@@ -516,8 +561,18 @@ def supply_dict(ftype, path):
     if len(temp.struct[ftype]['required']) > 0:
         file.update(get_dict('required'))
 
-    eq = '../eq/eq.xml'
-    file['SourceCode'] = f'../code/code.py'
+    print(f'Ftype: {ftype}')
+    eq = None
+
+    if SESSIONS:
+        if ftype.lower() not in ['code', 'param']:
+            if ftype.lower() != 'eq':
+                eq = f'../../eq/desc-{DESC}_eq.xml'
+    else:
+        eq = f'../eq/desc-{DESC}_eq.xml'
+
+    if ftype.lower() != 'code':
+        file['SourceCode'] = f'../code/desc-{DESC}_code.py'
 
     for key, val in zip(['SoftwareVersion', 'SoftwareRepository', 'SoftwareName'],
                         [SoftwareVersion, SoftwareRepository, SoftwareName]):
@@ -528,10 +583,12 @@ def supply_dict(ftype, path):
             file[key] = val
 
     if ftype == 'code':
-        file['ModelEq'] = eq
+        if eq:
+            file['ModelEq'] = eq
         file['Description'] = 'The source code to reproduce results.'
     elif ftype == 'param':
-        file['ModelEq'] = eq
+        if eq:
+            file['ModelEq'] = eq
         file['Description'] = f'These are the parameters for the {MODEL_NAME} model.'
     elif ftype == 'eq':
         file['Description'] = f'These are the equations to simulate the time series with the {MODEL_NAME} model.'
@@ -582,7 +639,13 @@ def check_output():
 
         if os.path.exists(path) and len(os.listdir(path)) > 0:
             for file in os.listdir(path):
+                fpath = os.path.join(path, file)
+
+                if file.startswith('tvb'): continue
+
+                if f'desc-{DESC}_' not in fpath:
+                    os.rename(fpath, os.path.join(path, f'desc-{DESC}_{file}'))
+
                 if file.startswith('sub-'):
                     match = re.match('sub-[0-9a-zA-Z\_]+', file)[0]
                     os.replace(os.path.join(path, file), os.path.join(path, file.replace(match, '').strip('_')))
-

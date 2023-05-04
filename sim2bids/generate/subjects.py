@@ -91,8 +91,14 @@ class Files:
                     # Step 5: get all content
                     if os.path.isdir(os.path.join(path, file)):
                         all_files = os.listdir(os.path.join(path, file))
+
+                        # disregard MATLAB files
+                        all_files = [x for x in all_files if not x.endswith('.mat')]
                     else:
                         all_files = os.listdir(path)
+
+                        # disregard MATLAB files
+                        all_files = [x for x in all_files if not x.endswith('.mat')]
 
                     # Step 6: traverse ses-preop if present
                     if 'ses-preop' in all_files:
