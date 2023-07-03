@@ -24,6 +24,7 @@ def get_all_files(new_files, old_files, path):
 
     return all_files
 
+
 def reset_values():
     prep.reset_index()
     subj.TO_RENAME = None

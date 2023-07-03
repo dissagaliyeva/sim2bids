@@ -5,7 +5,7 @@ file_desc = {
     #             NETWORK FOLDER
     # ====================================
 
-    'weights': 'This is the {}SC representing the strength of connection between regions. Zeros represent unconnected '
+    'weights': 'This is the {} SC representing the strength of connection between regions. Zeros represent unconnected '
                'areas (nxn matrix).',
     'distances': 'These are the length of myelinated fibre tracts between regions (nxn matrix).',
     'delays': 'This is the matrix of time delays between regions in physical units, calculated by the following '
@@ -17,6 +17,8 @@ file_desc = {
     #             COORD FOLDER
     # ====================================
     # MORE COMMON
+    'centres': ['These are the region labels for a single subject.',
+                'These are the 3d coordinate centres for a single subject.'],
     'times': 'These are the time steps of the simulated time series (nx1 vector).',
     'bold_times': 'These are the time steps of the simulated BOLD time series (nx1 vector).',
     'areas': 'This is the estimated vector each region\'s area in mm^2 (nx1 vector).',
@@ -68,13 +70,13 @@ file_desc = {
     'code': 'The source code to reproduce results.'
 }
 
-centres = {'multi-unique': ['These are the region labels which is the same for all individuals',
-                            'These are the 3d coordinate centres which is unique for each individual.'],
-           'multi-same': ['These are the region labels which are the same for all individuals',
-                          'These are the 3d coordinate centres which is the same for all individuals.'],
-           'single': ['These are the region labels for a single subject.',
-                      'These are the 3d coordinate centres for a single subject.']
-           }
+# centres = {'single': ['These are the region labels for a single subject.',
+#                       'These are the 3d coordinate centres for a single subject.'],
+#            'multi-same': ['These are the region labels which are the same for all individuals',
+#                           'These are the 3d coordinate centres which is the same for all individuals.'],
+#            # 'single': ['These are the region labels for a single subject.',
+#            #            'These are the 3d coordinate centres for a single subject.']
+#            }
 
 struct = {
     'net': {'required': required, 'recommend': []},

@@ -97,6 +97,8 @@ class MainArea(param.Parameterized):
 
         if len(selected) == 0:
             utils.reset_values()
+            app.ALL_FILES = None
+            app.ADDED_FILES = []
             app.CODE = None
             self.to_rename = []
             self.to_rename_path = []
@@ -108,6 +110,8 @@ class MainArea(param.Parameterized):
         if len(selected) > 0:
             # check files for preprocessing step
             utils.reset_values()
+            app.ALL_FILES = None
+            app.ADDED_FILES = []
             path = self.text_input.value
             app.preprocess_input(path, selected)
 
@@ -124,16 +128,21 @@ class MainArea(param.Parameterized):
             self.length = len(selected)
 
     def _generate_files(self, event=None):
-        if validate.IS_RENAMED:
+        if app.ALL_FILES and app.ADDED_FILES and len(app.ALL_FILES) != len(app.ADDED_FILES):
+            # continue converting the files
             _ = app.main(path=self.text_input.value,
-                         files=validate.RENAMED,
-                         # files=utils.get_all_files(validate.RENAMED, self.cross_select.value, self.text_input.value),
+                         files=list(set(app.ALL_FILES).difference(set(app.ADDED_FILES))),
                          subs=self.subjects, save=True, layout=True)
+
         else:
-            _ = app.main(path=self.text_input.value, files=self.cross_select.value,
-                              subs=self.subjects, save=True, layout=True)
-        app.ALL_FILES = None
-        utils.reset_values()
+            if validate.IS_RENAMED:
+                _ = app.main(path=self.text_input.value,
+                             files=validate.RENAMED,
+                             # files=utils.get_all_files(validate.RENAMED, self.cross_select.value, self.text_input.value),
+                             subs=self.subjects, save=True, layout=True)
+            else:
+                _ = app.main(path=self.text_input.value, files=self.cross_select.value,
+                             subs=self.subjects, save=True, layout=True)
 
     def _show_bids(self, event=None):
         if not os.path.exists(app.OUTPUT):

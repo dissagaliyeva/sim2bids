@@ -13,6 +13,7 @@ from collections import OrderedDict
 import sim2bids.preprocess.preprocess as prep
 from sim2bids.convert import convert
 from sim2bids.app import utils
+from sim2bids.validate import validate as val
 
 GLOBAL_FILES = []
 
@@ -86,6 +87,9 @@ class Files:
                     self.subs[sid].update(prepare_subs([os.path.join(path, x) for x in v], sid))
             else:
                 for file in files:
+                    if file in val.TO_IGNORE:
+                        print('File to ignore:', file)
+                        continue
                     sid = self.get_sid(path, file)
 
                     # Step 5: get all content
@@ -216,6 +220,10 @@ def prepare_subs(file_paths, sid):
     subs = {}
 
     for file_path in file_paths:
+        if file_path in val.TO_IGNORE:
+            print('File to ignore:', file_path)
+            continue
+
         if 'CHANGES' in file_path or 'participants' in file_path or 'README' in file_path:
             app.MISSING.append(file_path)
             continue
@@ -374,6 +382,11 @@ def get_name(path, return_rhythm=False):
 
 
 def accepted(name, return_accepted=False):
+    if 'subsample_ts' in name or 'subsample_times':
+        if return_accepted:
+            return True
+        return True, name
+
     for accept in app.ACCEPTED:
         if accept in name:
             if accept == 'ts' or accept == 'times':
@@ -394,6 +407,8 @@ def accepted(name, return_accepted=False):
                     return accept
 
                 return True, accept
+
+            if 'bold' in name and (name != 'bold_ts' or name != 'bold_times'): return False
 
             if accept == 'emp' and 'emp_fc' in name:
                 if return_accepted:
@@ -427,37 +442,49 @@ def find_separator(path):
     :param path:
     :return:
     """
-    if path.split('.')[-1] not in ['txt', 'csv']:
-        return
 
-    try:
-        file = pd.read_csv(path, index_col=None, header=None, sep=' ')
-    except pd.errors.EmptyDataError:
-        return 'remove'
-    except pd.errors.ParserError:
-        file = pd.DataFrame(np.loadtxt(path).tolist())
-        os.remove(path)
-        file.to_csv(path, header=None, index=None, sep='\t')
-    else:
-        # if cortical.txt, hemisphere.txt, or areas.txt are present, return '\n' delimiter
-        if path.endswith('hemisphere.txt') or path.endswith('cortical.txt') or path.endswith('areas.txt') \
-                or path.endswith('times.txt'):
-            file.to_csv(path, sep='\n', header=None, index=None)
-            return '\n'
+    if 'time' in path:
+        return '\t'
+    return '\s'
 
-        # try with '\t'
-        trial = pd.read_csv(path, header=None, sep='\t')
-        if trial.shape[0] > 1 and trial.shape[1] > 1:
-            return '\t'
 
-        sniffer = csv.Sniffer()
-
-        with open(path) as fp:
-            try:
-                delimiter = sniffer.sniff(fp.read(5000)).delimiter
-            except Exception:
-                delimiter = sniffer.sniff(fp.read(50)).delimiter
-
-        delimiter = '\s' if delimiter == ' ' else delimiter
-        return delimiter
-
+    # if path.endswith('.mat'): return
+    #
+    # if path.split('.')[-1] not in ['txt', 'csv']:
+    #     return
+    #
+    # try:
+    #     file = pd.read_csv(path, index_col=None, header=None, sep='\s')
+    # except pd.errors.EmptyDataError:
+    #     return 'remove'
+    # except pd.errors.ParserError:
+    #     file = pd.DataFrame(np.loadtxt(path).tolist())
+    #     os.remove(path)
+    #     file.to_csv(path, header=None, index=None, sep='\t')
+    # else:
+    #     # if cortical.txt, hemisphere.txt, or areas.txt are present, return '\n' delimiter
+    #     if path.endswith('hemisphere.txt') or path.endswith('cortical.txt') or path.endswith('areas.txt') \
+    #             or path.endswith('times.txt'):
+    #         file.to_csv(path, sep='\n', header=None, index=None)
+    #         return '\n'
+    #
+    #     # try with '\t'
+    #     trial = pd.read_csv(path, header=None, sep='\t')
+    #
+    #     if trial.shape[0] > 1 and trial.shape[1] > 1:
+    #         return '\t'
+    #
+    #     sniffer = csv.Sniffer()
+    #
+    #     with open(path) as fp:
+    #         pass
+    #     try:
+    #         delimiter = sniffer.sniff(fp.read(5000)).delimiter
+    #     except ValueError:
+    #         try:
+    #             delimiter = sniffer.sniff(fp.read(50)).delimiter
+    #         except csv.Error:
+    #             return ' '
+    #
+    #     delimiter = '\s' if delimiter == ' ' else delimiter
+    #     return delimiter

@@ -54,12 +54,13 @@ SID = None
 INPUT_TRANSFERRED = False
 CENTRES = False  # whether centres.txt|nodes.txt|labels.txt were found
 MULTI_INPUT = False  # whether input files include single- or multi-subjects
-ALL_FILES = None  # list of all file paths (gets supplemented in subjects.py)
+ALL_FILES = []  # list of all file paths (gets supplemented in subjects.py)
 CODE = None  # path to python code if exists
 SESSIONS = False
 H5_CONTENT = dict()
 MISSING = []
 SUBJECTS = None
+CONVERTED_FILES = []
 ADDED_FILES = []
 
 # store different time series accounting for 'times'
@@ -68,7 +69,7 @@ TIMES = []
 # define all accepted files
 ACCEPTED = ['weight', 'distance', 'tract_length', 'delay', 'speeds',  # Network (net)
             'nodes', 'labels', 'centre', 'area', 'hemisphere', 'cortical',  # Coordinates (coord)
-            'orientation', 'average_orientation', 'normals', 'times', 'bold_ts', 'vertices',  # Coordinates (coord)
+            'orientation', 'average_orientation', 'normals', 'times', 'bold_ts', 'vertices',   # Coordinates (coord)
             'faces', 'vnormal', 'fnormal', 'sensor', 'volume', 'map',  # Coordinates (coord)
             'cartesian2d', 'cartesian3d', 'polar2d', 'polar3d',  # Coordinates (coord)
             'vars', 'stimuli', 'noise', 'spike', 'raster', 'ts', 'event',  # Timeseries (ts)
@@ -119,9 +120,6 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         if subs is None:
             subs = subjects.Files(path, files).subs
             SUBJECTS = subs
-            # results = convert.check_centres()
-            # if results:
-            #     convert.IGNORE_CENTRE = results
 
     # only save conversions if 'save' is True
     if save and subs:
@@ -143,6 +141,9 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
         check_output()
         pn.state.notifications.success(f'{OUTPUT} folder is ready!')
 
+    # check global files that are missing
+    check_global(path, files)
+
     # if H5_CONTENT is not None and 'model' in H5_CONTENT.keys():
     #     pylems_py2xml.main.XML(inp=H5_CONTENT, output_path=os.path.join(OUTPUT, 'param'),
     #                            uid=H5_CONTENT['model'], app=True, suffix=DESC)
@@ -154,10 +155,19 @@ def main(path: str, files: list, subs: dict = None, save: bool = False, layout: 
 
     # return subjects and possible layouts only if it's enabled
     # if layout:
+
     #     return subs, structure.create_layout(subs)
 
     # otherwise, return None
     return None
+
+
+def check_global(path, files):
+    for file in files:
+        print(file)
+        if ('alpha' in file or 'delta' in file) and 'times' in file:
+            temp = pd.read_csv(os.path.join(path, file), header=None)
+            temp.to_csv(os.path.join(OUTPUT, 'coord', f'desc-{DESC}_{file.replace(".txt", ".tsv")}'), index=False)
 
 
 def get_mat_files(input_path):
@@ -170,6 +180,7 @@ def get_mat_files(input_path):
 
 
 def open_mat(file):
+    print('MATLAB:', file)
     try:
         matfile = loadmat(file, squeeze_me=True)
     except NotImplementedError:
@@ -179,6 +190,8 @@ def open_mat(file):
         return None
     except FileNotFoundError:
         return None
+    except OSError:
+        return None 
     else:
         return matfile
 
@@ -208,23 +221,65 @@ def preprocess_input(path, input_files):
                 continue
             else:
                 # iterate over keys and save content
-                path, fname = os.path.dirname(file), os.path.basename(file).replace('.mat', '')
+                path, name = os.path.dirname(file), os.path.basename(file).replace('.mat', '')
 
                 for array in mat.keys():
                     if array.startswith('__') or array.endswith('__'): continue
 
-                    # get new path
-                    new_path = os.path.join(path, f'{fname}_{array}.txt')
+                    # reinstantiate fname
+                    fname = None
 
-                    # save array in the same directory as the original matlab file
-                    with open(new_path, 'w') as fout:
-                        try:
-                            fout.write(mat[array])
-                        except TypeError:
-                            try:
-                                np.savetxt(new_path, mat[array])
-                            except ValueError:
-                                np.savetxt(new_path, mat[array][:, 0, :])
+                    # get the shape of the array
+                    shape = len(mat[array].shape)
+
+                    temp_name = array.lower()
+                    accepted, accepted_name = subjects.accepted(temp_name)
+
+                    if accepted and accepted_name in ACCEPTED:
+                        fname = os.path.join(path, accepted_name + '.txt')
+                    elif accepted and accepted_name not in ACCEPTED:
+                        if 'data' in accepted_name:
+                            if 'subs' in accepted_name:
+                                fname = os.path.join(path, 'subsample_ts.txt')
+                            else:
+                                fname = os.path.join(path, accepted_name.split('_')[0] + '_ts.txt')
+                        elif 'time' in accepted_name:
+                            if 'subs' in accepted_name:
+                                fname = os.path.join(path, 'subsample_times.txt')
+                            else:
+                                fname = os.path.join(path, accepted_name.split('_')[0] + '_times.txt')
+                        else:
+                            # check dimensions
+                            if shape == 1:
+                                if 'subs' in temp_name:
+                                    fname = os.path.join(path, 'subsample_times.txt')
+                                else:
+                                    fname = os.path.join(path, name + '_times.txt')
+                            elif shape > 1:
+                                if 'subs' in temp_name:
+                                    fname = os.path.join(path, 'subsample_ts.txt')
+                                else:
+                                    fname = os.path.join(path, name + '_ts.txt')
+                    else: continue
+
+                    if fname:
+                        min = re.findall(r'[0-9]+min', path)
+
+                        if len(min) > 0:
+                            fname = fname.replace('.txt', f'{min[0]}.txt')
+
+                        # check if array already has been extracted
+                        if os.path.exists(fname):
+                            break
+
+                        # save array in the same directory as the original matlab file
+                        if shape < 3:
+                            # save array
+                            np.savetxt(fname, mat[array])
+                        elif shape == 3:
+                            np.savetxt(fname, mat[array][:, 1, :])
+                        elif shape == 4:
+                            np.savetxt(fname, mat[array][:, 1, :, 1])
 
 
 def save_params():
@@ -286,8 +341,7 @@ def save_missing(path, files):
 
             f = convert.open_file(os.path.join(path, file), subjects.find_separator(os.path.join(path, file)))
             convert.save_files(dict(desc=DESC, name=name), f'{OUTPUT}/coord', f,
-                               type='coord', centres=True, desc=temp.centres['single'])
-
+                               type='coord', centres=True, desc=temp.file_desc['centres'])
 
         elif 'README' in file or 'CHANGES' in file:
             ext = file.split('.')[-1]
@@ -416,10 +470,14 @@ def check_output_folder():
     # if true, notify about removal and remove folder with its contents
     conflict = len(os.listdir(OUTPUT)) > 0
 
-    if conflict:
-        pn.state.notifications.info('Output folder contains files. Removing them...')
-        sim2bids.utils.rm_tree(OUTPUT)
-        prep.reset_index()
+    if ADDED_FILES and ALL_FILES and len(ADDED_FILES) < len(ALL_FILES):
+        print('Continuing conversion from last checkpoint...')
+        return
+    else:
+        if conflict:
+            pn.state.notifications.info('Output folder contains files. Removing them...')
+            sim2bids.utils.rm_tree(OUTPUT)
+            prep.reset_index()
 
 
 def create_sub_struct(path, subs=None, ses_name=None):
@@ -561,7 +619,6 @@ def supply_dict(ftype, path):
     if len(temp.struct[ftype]['required']) > 0:
         file.update(get_dict('required'))
 
-    print(f'Ftype: {ftype}')
     eq = None
 
     if SESSIONS:

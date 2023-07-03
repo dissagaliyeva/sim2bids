@@ -13,6 +13,7 @@ from sim2bids.app import app, utils
 
 RENAMED = []
 IS_RENAMED = False
+TO_IGNORE = []
 
 
 def filter(contents, files=None):
@@ -44,6 +45,8 @@ def filter(contents, files=None):
 
 
 def validate(unique_files, paths, input_path, input_files):
+    global TO_IGNORE
+
     for idx, file in enumerate(unique_files):
         if type(file) == pn.widgets.select.Select:
             name, value = file.name.replace('Specify ', ''), file.value
@@ -52,11 +55,22 @@ def validate(unique_files, paths, input_path, input_files):
             if value == 'weights':
                 rename_weights(name, ext, paths, input_path, input_files)
             elif value == 'skip':
-                remove_files(name, paths)
+                TO_IGNORE.append(ignore_files(name, paths))
+                # remove_files(name, paths)
             else:
                 rename_files(name, value, paths)
 
     pn.state.notifications.success('Preprocessing finished!')
+
+
+def ignore_files(name, paths):
+    files = []
+
+    for file in paths:
+        if file.endswith(name):
+            files.append(file)
+
+    return files
 
 
 def rename_weights(name, ext, paths, input_path, input_files):

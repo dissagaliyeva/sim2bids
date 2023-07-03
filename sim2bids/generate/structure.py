@@ -306,7 +306,10 @@ def check_folders(path):
 
     for p in [path, eq, code, coord, param]:
         if not os.path.exists(p):
-            os.mkdir(p)
+            try:
+                os.mkdir(p)
+            except FileExistsError:
+                pass
 
     # read = os.path.join(path, 'README.txt')
     # part = os.path.join(path, 'participants.tsv')

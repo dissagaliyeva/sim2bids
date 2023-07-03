@@ -34,6 +34,7 @@ IGNORE_TIMES = False
 
 NETWORK = []
 TIMES_TO_SKIP = []
+SIMILAR = False
 
 
 def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
@@ -129,6 +130,8 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
             desc = temp.file_desc['weights'].format('thresholded ')
         elif 'scnot' in sub['name'].lower():
             desc = temp.file_desc['weights'].format('')
+        elif sub['name'] == 'weights':
+            desc = temp.file_desc['weights'].format('')
         else:
             desc = temp.file_desc['distances']
 
@@ -144,9 +147,12 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
 
     # get folder location for spatial
     elif name in ['spatial', 'fc', 'map']:
-        fname = subjects.accepted(sub['name'], True)
-        desc = temp.file_desc['spatial_map'] if 'map' in fname \
-               else temp.file_desc[subjects.accepted(fname, return_accepted=True)].format(sub['sid'])
+        _, fname = subjects.accepted(sub['name'])
+
+        if name == 'map' or name == 'spatial':
+            desc = temp.file_desc['spatial_map']
+        else:
+            desc = temp.file_desc[name].format(sub['sid'])
 
         if ses is None:
             folder = folders[2]
@@ -229,38 +235,6 @@ def save(sub: dict, folders: list, ses: str = None, name: str = None) -> None:
                     save_files(sub, folder, file, type=type_, desc=temp.file_desc[accepted])
 
 
-            #
-            # if 'content' in sub.keys():
-            #     save_files(sub, folder, file, type='default', centres=True)
-            # else:
-            #     if sub['name'] in ['nodes', 'labels']:
-            #         save_centres(sub, file, ses, folders)
-            #
-            #     # save conversion results
-            #     if 'centres' in sub['fname']:
-            #         if IGNORE_CENTRE or not app.MULTI_INPUT:
-            #             save_files(sub, folder, file, type='other', centres=True, desc=temp.centres['single'])
-            #         else:
-            #             save_files(sub, folder, file, type='default', centres=True, desc=temp.centres['multi-unique'])
-            #     else:
-            #         accepted = subjects.get_name(sub['name'], True)
-            #
-            #         if app.SESSIONS:
-            #             save_files(sub, folder, file, type='default', desc=temp.file_desc[accepted])
-            #         # elif IGNORE_CENTRE and 'ses' not in folder and app.SESSIONS is None:
-            #         elif IGNORE_CENTRE and not app.SESSIONS:
-            #             save_files(sub, folder, file, type='other', desc=temp.file_desc[accepted])
-            #         else:
-            #             accepted = subjects.get_name(sub['name'])
-            #
-            #             if IGNORE_CENTRE and 'sub' in folder:
-            #                 type_ = 'default'
-            #             else:
-            #                 type_ = 'coord'
-            #
-            #             save_files(sub, folder, file, type=type_, desc=temp.file_desc[accepted])
-
-
 def check_file(name, sub, folder, file):
     if check_coords(name):
         save_files(sub, os.path.join(app.OUTPUT, 'coord'), file, type='other', desc=temp.file_desc[name])
@@ -282,10 +256,10 @@ def save_centres(sub, file, ses, folders, centre_name='centres'):
         folder = os.path.join(app.OUTPUT, 'coord')
 
         # save conversion results
-        save_files(sub, folder, file, type='other', centres=True, desc=temp.centres['multi-same'])
+        save_files(sub, folder, file, type='other', centres=True, desc=temp.file_desc['centres'])
     else:
         # get description for centres depending on input files
-        desc = temp.centres['multi-unique'] if app.MULTI_INPUT else temp.centres['single']
+        desc = temp.file_desc['centres']
 
         # set appropriate output path depending on session and subject types
         if len(folders) > 1:
@@ -364,41 +338,67 @@ def save_files(sub: dict, folder: str, content, type: str = 'default', centres: 
         json_file = os.path.join(folder, COORD_TEMPLATE.format(name, 'json'))
         tsv_file = json_file.replace('json', 'tsv')
 
-    # Save 'centres.txt' as 'nodes.txt' and 'labels.txt'. This will require breaking the
-    # 'centres.txt' file, the first column HAS TO BE labels, and the rest N dimensions
-    # are nodes.
-    if centres:
-        # create names for nodes and labels
-        # Since the usual structure leaves the name of the files as is,
-        # we need to make sure we save 'nodes' and 'labels' appropriately.
-        # If we didn't create these two values below, both labels and nodes
-        # would be stored as 'sub-<ID>_desc-<label>_centres.txt', and the
-        # content would only have nodes.
-        labels = json_file.replace(sub['name'], 'labels')
-        nodes = json_file.replace(sub['name'], 'nodes')
+    # check if json file exists
+    if not os.path.exists(json_file) or not os.path.join(tsv_file):
+        # Save 'centres.txt' as 'nodes.txt' and 'labels.txt'. This will require breaking the
+        # 'centres.txt' file, the first column HAS TO BE labels, and the rest N dimensions
+        # are nodes.
+        if centres:
+            # create names for nodes and labels
+            # Since the usual structure leaves the name of the files as is,
+            # we need to make sure we save 'nodes' and 'labels' appropriately.
+            # If we didn't create these two values below, both labels and nodes
+            # would be stored as 'sub-<ID>_desc-<label>_centres.txt', and the
+            # content would only have nodes.
+            labels = json_file.replace(sub['name'], 'labels')
+            nodes = json_file.replace(sub['name'], 'nodes')
 
-        if COORDS is None:
-            if IGNORE_CENTRE or not app.MULTI_INPUT and not app.SESSIONS:
-                COORDS = [f'../coord/desc-{app.DESC}_labels.json', f'../coord/desc-{app.DESC}_nodes.json']
-            else:
-                COORDS = [labels.replace(app.OUTPUT, '../..').replace('\\', '/'),
-                          nodes.replace(app.OUTPUT, '../..').replace('\\', '/')]
+            if COORDS is None:
+                if IGNORE_CENTRE or not app.MULTI_INPUT and not app.SESSIONS:
+                    COORDS = [f'../coord/desc-{app.DESC}_labels.json', f'../coord/desc-{app.DESC}_nodes.json']
+                else:
+                    COORDS = [labels.replace(app.OUTPUT, '../..').replace('\\', '/'),
+                              nodes.replace(app.OUTPUT, '../..').replace('\\', '/')]
 
-        # save labels to json and tsv
-        to_json(labels, shape=[content.shape[0], 1], key='coord', desc=desc[0])
-        to_tsv(labels.replace('json', 'tsv'), content.iloc[:, 0])
+            # save labels to json and tsv
+            to_json(labels, shape=[content.shape[0], 1], key='coord', desc=desc[0])
+            to_tsv(labels.replace('json', 'tsv'), content.iloc[:, 0])
 
-        # save nodes to json and tsv
-        to_json(nodes, shape=[content.shape[0], content.shape[1] - 1], key='coord', desc=desc[1])
-        to_tsv(nodes.replace('json', 'tsv'), content.iloc[:, 1:])
-    else:
-        if ftype == 'coord':
-            to_json(json_file, shape=content.shape, key='coord', desc=desc)
-            to_tsv(tsv_file, content)
+            # save nodes to json and tsv
+            to_json(nodes, shape=[content.shape[0], content.shape[1] - 1], key='coord', desc=desc[1])
+            to_tsv(nodes.replace('json', 'tsv'), content.iloc[:, 1:])
         else:
-            # otherwise, save files as usual
-            to_json(json_file, shape=content.shape, key=ftype, desc=desc)
-            to_tsv(tsv_file, content)
+            if ftype == 'coord':
+                to_json(json_file, shape=content.shape, key='coord', desc=desc)
+                to_tsv(tsv_file, content)
+            else:
+                # otherwise, save files as usual
+                try:
+                    to_json(json_file, shape=content.shape, key=ftype, desc=desc)
+                except AttributeError:
+                    content = pd.read_csv(sub['path'], sep='\t', header=None)
+
+                    if content.shape[0] == 1 and content.shape[1] == 1:
+                        content = pd.read_csv(sub['path'], sep='\s', header=None)
+
+                        if content.shape[0] > 1 or content.shape[1] >= 1:
+                            to_json(json_file, shape=content.shape, desc=desc, key=ftype)
+                            to_tsv(tsv_file, content)
+
+                    else:
+                        to_json(json_file, shape=content.shape, key=ftype, desc=desc)
+                        to_tsv(tsv_file, content)
+                else:
+                    to_tsv(tsv_file, content)
+    else:
+        print('Skipping file since it exists:', json_file, end='\n===\n')
+
+    # save added file
+    if getattr(sub, 'path', 'None'):
+        try:
+            app.ADDED_FILES.append(sub['path'])
+        except KeyError:
+            pass
 
 
 def check_coords(name='centres'):
@@ -503,10 +503,13 @@ def open_file(path: str, sep: str):
 
 
 def traverse_times(sub, folders, ses):
-    global TIMES_TO_SKIP
+    global TIMES_TO_SKIP, SIMILAR
 
     # get description
     desc = temp.file_desc['times'] if 'bold' not in sub['name'] else temp.file_desc['bold_times']
+
+    if SIMILAR:
+        return
 
     # check if times are similar
     for times in app.TIMES:
@@ -524,11 +527,18 @@ def traverse_times(sub, folders, ses):
                 if len(results) > 1:
                     for result in results[1:]:
                         if first.equals(open_df(result)):
-                            similar = True
+                            SIMILAR = True
                             TIMES_TO_SKIP.append(f'{rhythm}_{times}')
 
-                            # save in global folder
-                            sub['name'] = f'{rhythm}-{times}'
+                            match = re.findall(r'[0-9]+min', sub['name'])
+
+                            if match:
+                                print('MATCHED CONVERTED @536:', sub['name'])
+                                sub['name'] = f'{rhythm}-{match[0]}-{times.replace(match[0], "")}'
+                            else:
+                                # save in global folder
+                                sub['name'] = f'{rhythm}-{times}'
+
                             save_files(sub, os.path.join(app.OUTPUT, 'coord'), first, 'coord', desc=desc)
                         else:
                             # set appropriate output path depending on session and subject types
@@ -542,8 +552,9 @@ def traverse_times(sub, folders, ses):
                             save_files(sub, folder, first, 'default', desc=desc)
                             save_files(sub, folder, open_df(result), 'default', desc=desc)
                 else:
-                    similar = True
+                    SIMILAR = True
                     TIMES_TO_SKIP.append(f'{rhythm}_{times}')
+
                     # save in global folder
                     sub['name'] = f'{rhythm}-{times.replace(".txt", "")}'
                     save_files(sub, os.path.join(app.OUTPUT, 'coord'), first, 'coord', desc=desc)
@@ -592,6 +603,29 @@ def to_tsv(path, file, sep=None):
     -------
 
     """
+    # remove minutes if present
+    match = re.findall(r'_ts[0-9]+min.tsv$', os.path.basename(path))
+
+    if match:
+        path = os.path.join(os.path.dirname(path), os.path.basename(path).replace(match[0], '.tsv'))
+
+    match = re.findall(r'[0-9]+min.tsv$', os.path.basename(path))
+
+    if match and 'coord' in path:
+        path = os.path.join(os.path.dirname(path), os.path.basename(path).replace(match[0], '.tsv').replace('alpha', 'alpha-22min'))
+
+    if isinstance(file, pd.DataFrame) or isinstance(file, pd.Series):
+        # check the size of the file
+        try:
+            memory = file.memory_usage().sum()
+        except AttributeError:
+            pass
+        else:
+            if memory > 100_000:
+                print('Memory:', memory, 'Path', path, end='\n\n')
+                path = path.replace('.tsv', '.tsv.gz')
+
+
     params = {'sep': '\t', 'header': None, 'index': None}
     sep = sep if sep != '\n' else '\0'
 
@@ -628,6 +662,7 @@ def to_json(path, shape, desc, key, **kwargs):
     -------
 
     """
+
     global NETWORK
 
     if key not in ['param', 'eq', 'code']:
@@ -648,7 +683,6 @@ def to_json(path, shape, desc, key, **kwargs):
         for k, v in app.SUBJECTS.items():
             for k2, v2 in v.items():
                 if 'centre' in v2 or 'center' in v2 or 'centres' in v2:
-                    print('Center file is in subject-level instance')
                     return False
                 return True
 
@@ -699,11 +733,13 @@ def to_json(path, shape, desc, key, **kwargs):
                 else:
                     out['ModelParam'] = f'../../param/{param_name}'
 
+        sv = '1.5.10' if app.SoftwareVersion == 1.5 else app.SoftwareVersion
+
         params = {
-            'SourceCode': f'../code/tvb-framework-{app.SoftwareVersion}' if app.SoftwareCode == 'MISSING' else app.SoftwareCode,
-            'SoftwareVersion': app.SoftwareVersion if app.SoftwareVersion else None,
+            'SourceCode': f'../code/tvb-framework-{sv}' if sv == 'MISSING' else sv,
+            'SoftwareVersion': sv if sv else None,
             'SoftwareRepository': app.SoftwareRepository if app.SoftwareRepository else None,
-            'SourceCodeVersion': app.SoftwareVersion if app.SoftwareVersion else None,
+            'SourceCodeVersion': sv if sv else None,
             'SoftwareName': app.SoftwareName if app.SoftwareName else None,
             'Network': NETWORK if NETWORK else None
         }
@@ -713,7 +749,7 @@ def to_json(path, shape, desc, key, **kwargs):
             network = None
 
             if sub:
-                network = [f'../net/{sub[0]}_{app.DESC}_weights.json', f'../net/{sub[0]}_{app.DESC}_distances.json']
+                network = [f'../net/{sub[0]}_desc-{app.DESC}_weights.json', f'../net/{sub[0]}_desc-{app.DESC}_distances.json']
 
             if network:
                 params['Network'] = network
@@ -730,6 +766,17 @@ def to_json(path, shape, desc, key, **kwargs):
             out['Units'] = ''
         else:
             out['Units'] = 'ms'
+
+    # check if path contains minutes
+    match = re.findall(r'_ts[0-9]+min.json$', os.path.basename(path))
+
+    if match:
+        path = os.path.join(os.path.dirname(path), os.path.basename(path).replace(match[0], '.json').replace('alpha', f'alpha-22min'))
+
+    match = re.findall(r'[0-9]+min.tsv$', os.path.basename(path))
+
+    if match and 'coord' in path:
+        path = os.path.join(os.path.dirname(path), os.path.basename(path).replace(match[0], '.json'))
 
     with open(path, 'w') as file:
         json.dump(temp.populate_dict(out, shape=shape, desc=desc, coords=coord), file)

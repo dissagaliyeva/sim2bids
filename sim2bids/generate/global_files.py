@@ -54,7 +54,8 @@ def add_global_files():
 
         for file in files:
             if file.startswith('sub-'):
-                df = df.append({'participant_id': file}, ignore_index=True)
+                # df = df.append({'participant_id': file}, ignore_index=True)
+                df = pd.concat([df, pd.DataFrame([{'participant_id': file}])], ignore_index=True)
                 df.replace(np.NaN, 'n/a', inplace=True)
 
         df.to_csv(os.path.join(app.OUTPUT, 'participants.tsv'), index=None, sep='\t')
